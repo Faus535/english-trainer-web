@@ -1,5 +1,10 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, isDevMode } from '@angular/core';
-import { provideRouter, withComponentInputBinding } from '@angular/router';
+import {
+  provideRouter,
+  withComponentInputBinding,
+  withPreloading,
+  PreloadAllModules,
+} from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app.routes';
@@ -10,7 +15,7 @@ import { provideServiceWorker } from '@angular/service-worker';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes, withComponentInputBinding()),
+    provideRouter(routes, withComponentInputBinding(), withPreloading(PreloadAllModules)),
     provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),

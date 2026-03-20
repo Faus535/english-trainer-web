@@ -1,21 +1,29 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { catchError, throwError } from 'rxjs';
+import { catchError, EMPTY, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { NotificationService } from '../../shared/services/notification.service';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
-  const router = inject(Router);
   const auth = inject(AuthService);
+  const notification = inject(NotificationService);
 
   return next(req).pipe(
-    catchError(error => {
+    catchError((error: HttpErrorResponse) => {
       if (error.status === 401 && !req.url.includes('/auth/')) {
         auth.logout();
+        return EMPTY;
       }
 
       if (error.status === 0) {
-        console.error('No se pudo conectar con el servidor');
+        notification.warning(
+          'Sin conexion. Los cambios se guardaran cuando vuelvas a estar online.',
+        );
+        return EMPTY;
+      }
+
+      if (error.status >= 500) {
+        notification.error('Error del servidor. Intenta de nuevo mas tarde.');
       }
 
       return throwError(() => error);

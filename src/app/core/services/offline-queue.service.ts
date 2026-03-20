@@ -1,5 +1,6 @@
 import { Injectable, inject, signal, computed, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { NotificationService } from '../../shared/services/notification.service';
 
 interface QueuedRequest {
   id: string;
@@ -7,13 +8,17 @@ interface QueuedRequest {
   url: string;
   body: unknown;
   timestamp: number;
+  retryCount?: number;
 }
 
 const QUEUE_KEY = 'et_offline_queue';
 
 @Injectable({ providedIn: 'root' })
 export class OfflineQueueService implements OnDestroy {
+  private static readonly MAX_RETRIES = 5;
+
   private readonly http = inject(HttpClient);
+  private readonly notification = inject(NotificationService);
   private readonly _online = signal(navigator.onLine);
   private readonly _queue = signal<QueuedRequest[]>(this.loadQueue());
   private readonly onlineHandler = () => this.handleOnline();
@@ -41,7 +46,7 @@ export class OfflineQueueService implements OnDestroy {
       timestamp: Date.now(),
     };
 
-    this._queue.update(q => [...q, request]);
+    this._queue.update((q) => [...q, request]);
     this.persistQueue();
 
     if (this._online()) {
@@ -54,13 +59,38 @@ export class OfflineQueueService implements OnDestroy {
     if (queue.length === 0) return;
 
     for (const req of queue) {
-      this.executeRequest(req).subscribe({
-        next: () => this.removeFromQueue(req.id),
-        error: () => {
-          // Keep in queue for retry
-        },
-      });
+      this.executeWithRetry(req);
     }
+  }
+
+  private executeWithRetry(req: QueuedRequest): void {
+    const attempt = req.retryCount ?? 0;
+
+    if (attempt >= OfflineQueueService.MAX_RETRIES) {
+      this.notification.error(
+        `No se pudo enviar una solicitud despues de ${OfflineQueueService.MAX_RETRIES} intentos.`,
+      );
+      this.removeFromQueue(req.id);
+      return;
+    }
+
+    this.executeRequest(req).subscribe({
+      next: () => this.removeFromQueue(req.id),
+      error: () => {
+        this._queue.update((q) =>
+          q.map((r) => (r.id === req.id ? { ...r, retryCount: attempt + 1 } : r)),
+        );
+        this.persistQueue();
+
+        const delay = Math.min(1000 * Math.pow(2, attempt), 30000);
+        setTimeout(() => {
+          if (this._online()) {
+            const current = this._queue().find((r) => r.id === req.id);
+            if (current) this.executeWithRetry(current);
+          }
+        }, delay);
+      },
+    });
   }
 
   private handleOnline(): void {
@@ -80,7 +110,7 @@ export class OfflineQueueService implements OnDestroy {
   }
 
   private removeFromQueue(id: string): void {
-    this._queue.update(q => q.filter(r => r.id !== id));
+    this._queue.update((q) => q.filter((r) => r.id !== id));
     this.persistQueue();
   }
 
@@ -91,7 +121,7 @@ export class OfflineQueueService implements OnDestroy {
   private loadQueue(): QueuedRequest[] {
     try {
       const val = localStorage.getItem(QUEUE_KEY);
-      return val ? JSON.parse(val) as QueuedRequest[] : [];
+      return val ? (JSON.parse(val) as QueuedRequest[]) : [];
     } catch {
       return [];
     }

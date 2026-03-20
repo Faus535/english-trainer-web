@@ -15,18 +15,21 @@ Angular 21 frontend application. Stack: Angular 21, TypeScript 5.9, SCSS, Vitest
 
 Before creating or modifying any Angular code, you MUST load and follow the relevant skills:
 
-| Skill | Path | When to load |
-|-------|------|--------------|
-| Components | `.claude/skills/angular/components.md` | Creating/editing components |
-| Services | `.claude/skills/angular/services.md` | Creating/editing services, DI |
-| Routing | `.claude/skills/angular/routing.md` | Adding routes, guards, resolvers |
-| Forms | `.claude/skills/angular/forms.md` | Creating/editing forms |
-| Testing | `.claude/skills/angular/testing.md` | Writing tests |
-| Styling | `.claude/skills/angular/styling.md` | Writing SCSS styles |
-| Architecture | `.claude/skills/angular/architecture.md` | Creating features, project structure |
-| Performance | `.claude/skills/angular/performance.md` | Performance-sensitive code |
-| RxJS | `.claude/skills/angular/rxjs.md` | Using observables, HTTP |
-| Templates | `.claude/skills/angular/templates.md` | Writing HTML templates |
+| Skill          | Path                                       | When to load                                 |
+| -------------- | ------------------------------------------ | -------------------------------------------- |
+| Components     | `.claude/skills/angular/components.md`     | Creating/editing components                  |
+| Services       | `.claude/skills/angular/services.md`       | Creating/editing services, DI                |
+| Routing        | `.claude/skills/angular/routing.md`        | Adding routes, guards, resolvers             |
+| Forms          | `.claude/skills/angular/forms.md`          | Creating/editing forms                       |
+| Testing        | `.claude/skills/angular/testing.md`        | Writing tests                                |
+| Styling        | `.claude/skills/angular/styling.md`        | Writing SCSS styles                          |
+| Architecture   | `.claude/skills/angular/architecture.md`   | Creating features, project structure         |
+| Performance    | `.claude/skills/angular/performance.md`    | Performance-sensitive code                   |
+| RxJS           | `.claude/skills/angular/rxjs.md`           | Using observables, HTTP                      |
+| Templates      | `.claude/skills/angular/templates.md`      | Writing HTML templates                       |
+| Error Handling | `.claude/skills/angular/error-handling.md` | Handling errors, notifications, interceptors |
+| Security       | `.claude/skills/angular/security.md`       | Auth tokens, sanitization, environments      |
+| Accessibility  | `.claude/skills/angular/accessibility.md`  | ARIA, focus, contrast, keyboard navigation   |
 
 **Workflow**: When asked to create a feature, read ALL relevant skills first, then generate code that complies with every rule.
 
@@ -45,8 +48,8 @@ Before creating or modifying any Angular code, you MUST load and follow the rele
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `npm start` | Start dev server |
-| `npm run build` | Production build |
-| `npm test` | Run tests with Vitest |
+| Command         | Description           |
+| --------------- | --------------------- |
+| `npm start`     | Start dev server      |
+| `npm run build` | Production build      |
+| `npm test`      | Run tests with Vitest |

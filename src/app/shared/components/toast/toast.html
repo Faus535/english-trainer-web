@@ -1,0 +1,16 @@
+@if (notifications().length > 0) {
+  <div class="toast-container" aria-live="polite">
+    @for (notification of notifications(); track notification.id) {
+      <div class="toast" [class]="'toast--' + notification.type" role="alert">
+        <span class="toast-message">{{ notification.message }}</span>
+        <button
+          class="toast-close"
+          (click)="dismiss(notification.id)"
+          aria-label="Cerrar notificacion"
+        >
+          &times;
+        </button>
+      </div>
+    }
+  </div>
+}

@@ -1,8 +1,11 @@
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, ChangeDetectionStrategy, inject, DestroyRef } from '@angular/core';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter } from 'rxjs';
 import { TtsService } from '../../features/speak/services/tts.service';
 import { Icon } from '../../shared/components/icon/icon';
 import { ConnectionStatus } from '../../shared/components/connection-status/connection-status';
+import { Toast } from '../../shared/components/toast/toast';
 import { LucideIconData, LayoutDashboard, Mic, Trophy, Settings, Square } from 'lucide-angular';
 
 interface NavTab {
@@ -13,19 +16,37 @@ interface NavTab {
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Icon, ConnectionStatus],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Icon, ConnectionStatus, Toast],
   templateUrl: './shell.html',
   styleUrl: './shell.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Shell {
   private readonly tts = inject(TtsService);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly speaking = this.tts.speaking;
   protected readonly stopIcon = Square;
 
+  constructor() {
+    this.router.events
+      .pipe(
+        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(() => {
+        const main = document.querySelector<HTMLElement>('main');
+        main?.focus();
+      });
+  }
+
   protected stopAudio(): void {
     this.tts.stop();
+  }
+
+  protected isActive(path: string): boolean {
+    return this.router.url.startsWith(path);
   }
 
   protected readonly tabs: NavTab[] = [

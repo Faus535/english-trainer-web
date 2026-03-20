@@ -1,3 +1,4 @@
 export const environment = {
-  apiUrl: 'https://english-trainer-api.up.railway.app/api',
+  apiUrl: '/api',
+  production: true,
 } as const;
