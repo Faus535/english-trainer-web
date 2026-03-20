@@ -1,0 +1,73 @@
+<div class="speak-page">
+  @if (!supported()) {
+    <div class="unsupported">
+      <h3>Navegador no soportado</h3>
+      <p>Tu navegador no soporta reconocimiento de voz. Usa Chrome, Edge o Safari para esta funcion.</p>
+    </div>
+  } @else if (currentPhrase(); as phrase) {
+    <!-- Level selector -->
+    <app-level-selector [level]="currentLevel()" (levelChange)="onLevelChange($event)" />
+
+    <!-- Stats -->
+    <div class="stats">
+      <span>Nivel {{ currentLevel().toUpperCase() }}</span>
+      <span>Frase #{{ phraseNumber() }}</span>
+    </div>
+
+    <!-- Card -->
+    <div class="card">
+      <!-- Step 1: Listen -->
+      <section class="section">
+        <div class="step-label">1. Escucha</div>
+        <button class="play-btn" (click)="listenPhrase()">
+          &#9654; Escuchar frase
+        </button>
+      </section>
+
+      <!-- Step 2: Speak -->
+      <section class="section">
+        <div class="step-label">2. Repite la frase</div>
+        <app-pronunciation-check [phrase]="phrase.en" />
+      </section>
+
+      <!-- Step 3: Check words -->
+      <section class="section">
+        <div class="step-label">3. Comprueba</div>
+        <div class="phrase-text">
+          @for (word of phraseWords(); track $index) {
+            <span
+              class="word"
+              role="button"
+              tabindex="0"
+              (click)="speakWord(word)"
+            >
+              {{ word }}
+            </span>
+          }
+        </div>
+        <div class="phrase-hint">Pulsa una palabra para escucharla</div>
+      </section>
+
+      <!-- Translation -->
+      <section class="section">
+        @if (translationRevealed()) {
+          <div class="translation">{{ phrase.es }}</div>
+        } @else {
+          <button class="reveal-btn" (click)="revealTranslation()">
+            Ver traduccion
+          </button>
+        }
+      </section>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+      <button class="nav-btn" [disabled]="!canGoPrev()" (click)="prevPhrase()">
+        &larr; Anterior
+      </button>
+      <button class="nav-btn nav-next" (click)="nextPhrase()">
+        Siguiente &rarr;
+      </button>
+    </div>
+  }
+</div>

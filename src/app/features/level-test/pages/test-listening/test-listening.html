@@ -1,0 +1,30 @@
+@if (testService.progress(); as p) {
+  <app-test-shell [label]="p.label" [current]="p.current" [total]="p.total">
+    @if (testService.currentListeningQuestion()) {
+      <p class="instruction">Escucha y escribe lo que oyes:</p>
+      <div class="play-row">
+        <button class="play-btn" (click)="playAudio()">
+          <app-icon [name]="playIcon" [size]="16" /> Reproducir audio
+        </button>
+        <button class="play-btn" (click)="playAudio()">
+          <app-icon [name]="repeatIcon" [size]="16" /> Repetir
+        </button>
+      </div>
+      <input
+        class="input"
+        type="text"
+        [value]="inputValue()"
+        (input)="onInput($event)"
+        (keydown)="onKeydown($event)"
+        placeholder="Escribe lo que has oido..."
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+      />
+      <div class="actions">
+        <button class="btn-next" (click)="submit()" [disabled]="!inputValue().trim()">Siguiente</button>
+        <button class="btn-skip" (click)="skip()">No lo entiendo</button>
+      </div>
+    }
+  </app-test-shell>
+}

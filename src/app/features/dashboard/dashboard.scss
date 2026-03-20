@@ -1,0 +1,37 @@
+:host {
+  display: block;
+}
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+.zone {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.zone-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-3);
+}
+
+.zone-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--sp-3);
+}
+
+@media (max-width: 480px) {
+  .zone-grid-3 {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .zone-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}

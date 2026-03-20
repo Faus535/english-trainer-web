@@ -1,0 +1,13 @@
+@if (testService.progress(); as p) {
+  <app-test-shell [label]="p.label" [current]="p.current" [total]="p.total">
+    @if (testService.currentGrammarQuestion(); as q) {
+      <p class="instruction">Elige la opcion correcta:</p>
+      <p class="sentence">{{ q.sentence }}</p>
+      <div class="options">
+        @for (opt of q.options; track $index) {
+          <button class="option-btn" (click)="selectOption($index)">{{ opt }}</button>
+        }
+      </div>
+    }
+  </app-test-shell>
+}

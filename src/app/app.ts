@@ -1,12 +1,11 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Shell } from './layout/shell/shell';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [Shell],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class App {
-  protected readonly title = signal('english-trainer-web');
-}
+export class App {}

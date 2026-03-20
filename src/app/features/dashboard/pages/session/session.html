@@ -1,0 +1,104 @@
+@if (session(); as s) {
+  <div class="session-page">
+    <div class="session-header">
+      <button class="back-btn" (click)="exitSession()">&larr; Salir</button>
+      <span class="session-title">Sesion {{ s.number }} &mdash; {{ s.mode }}</span>
+      <span class="session-time">{{ s.duration }} min</span>
+    </div>
+
+    <div class="session-progress-bar">
+      <div class="session-progress-fill" [style.width.%]="progress()"></div>
+    </div>
+
+    <div class="block-tabs">
+      @for (block of blocks(); track $index) {
+        <button
+          class="block-tab"
+          [class.active]="$index === blockIndex()"
+          [class.completed]="isCompleted($index)"
+          [disabled]="$index > blockIndex() && !isCompleted($index)"
+          (click)="goToBlock($index)"
+        >
+          <span class="block-tab-icon">{{ blockIcon(block.type) }}</span>
+          <span class="block-tab-label">{{ block.label }}</span>
+        </button>
+      }
+    </div>
+
+    @if (currentBlock(); as block) {
+      <div class="block-content">
+        <div class="block-header">
+          <span class="block-icon-large">{{ blockIcon(block.type) }}</span>
+          <div class="block-info">
+            <h2 class="block-title">{{ block.label }}</h2>
+            <span class="block-duration">{{ block.duration }} minutos</span>
+          </div>
+        </div>
+
+        @if (block.unit; as unit) {
+          <div class="block-unit">
+            <h3 class="unit-title">{{ unit.unit.title }}</h3>
+            <p class="unit-desc">{{ unit.unit.desc }}</p>
+            <div class="unit-meta">
+              <span class="unit-level">{{ unit.level.toUpperCase() }}</span>
+              <span class="unit-module">{{ unit.module }}</span>
+            </div>
+          </div>
+        }
+
+        @switch (block.type) {
+          @case ('warmup') {
+            <div class="block-instructions">
+              <p>Toma unos minutos para calentar. Repasa contenido anterior y prepara tu mente para la sesion.</p>
+              @for (item of s.warmup; track item.desc) {
+                <div class="warmup-item">
+                  <span class="warmup-icon">{{ item.icon }}</span>
+                  <span class="warmup-desc">{{ item.desc }}</span>
+                </div>
+              }
+            </div>
+          }
+          @case ('practice') {
+            <div class="block-instructions">
+              <p>Practica activa: intenta usar lo aprendido.</p>
+              <ul class="practice-tasks">
+                <li>Escribe 3 frases usando el vocabulario de hoy</li>
+                <li>Repite en voz alta las palabras nuevas</li>
+                <li>Intenta explicar el tema en ingles</li>
+              </ul>
+            </div>
+          }
+          @case ('bonus') {
+            <div class="block-instructions">
+              <p>Bonus: Busca contenido real en ingles para practicar.</p>
+              <ul class="practice-tasks">
+                <li>Ve un video de YouTube en ingles (5 min)</li>
+                <li>Lee un articulo corto</li>
+                <li>Escucha un fragmento de podcast</li>
+              </ul>
+            </div>
+          }
+          @default {
+            <div class="block-instructions">
+              <p>Sigue las instrucciones de esta unidad. Cuando termines, avanza al siguiente bloque.</p>
+            </div>
+          }
+        }
+
+        <div class="block-actions">
+          @if (blockIndex() > 0) {
+            <button class="nav-btn" (click)="goBack()">&larr; Anterior</button>
+          }
+          <button class="nav-btn primary" (click)="advanceBlock()">
+            {{ advanceLabel() }}
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+} @else {
+  <div class="no-session">
+    <p>No hay sesion activa.</p>
+    <button class="nav-btn primary" (click)="exitSession()">Ir al dashboard</button>
+  </div>
+}

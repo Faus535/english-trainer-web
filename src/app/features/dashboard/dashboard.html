@@ -1,0 +1,32 @@
+<div class="dashboard">
+  <!-- Hero: Quick Start + Gamification -->
+  <app-quick-start (sessionStarted)="onSessionStarted()" />
+
+  <!-- Primary Modules -->
+  <section class="zone">
+    <app-module-card moduleName="listening" variant="primary" />
+    <app-module-card moduleName="pronunciation" variant="primary" />
+  </section>
+
+  <!-- Secondary Modules -->
+  <section class="zone-grid-3">
+    <app-module-card moduleName="vocabulary" variant="compact" />
+    <app-module-card moduleName="grammar" variant="compact" />
+    <app-module-card moduleName="phrases" variant="compact" />
+  </section>
+
+  <!-- Niveles actuales -->
+  <app-current-levels />
+
+  <!-- Stats -->
+  <app-stats-summary />
+
+  <!-- Widgets -->
+  <section class="zone-grid-2">
+    <app-sound-of-day />
+    <app-phrase-roulette />
+  </section>
+
+  <!-- Motivation -->
+  <app-motivation />
+</div>

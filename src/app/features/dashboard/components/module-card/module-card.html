@@ -1,0 +1,41 @@
+@if (variant() === 'primary') {
+  <div class="card-primary">
+    <div class="card-accent" [style.background]="color()"></div>
+    <div class="card-body">
+      <div class="card-top">
+        <div class="card-icon-wrap" [style.background]="softColor()" [style.color]="color()">
+          <app-icon [name]="icon()" [size]="20" />
+        </div>
+        <div class="card-info">
+          <span class="card-name">{{ config().name }}</span>
+          <span class="card-level">{{ level() }}</span>
+        </div>
+        <div class="card-percent">{{ percent() }}%</div>
+      </div>
+
+      @if (nextUnit(); as next) {
+        <p class="card-next">{{ next.unit.title }}</p>
+      } @else {
+        <p class="card-next done">Completado</p>
+      }
+
+      <div class="card-dots">
+        @for (filled of dots(); track $index) {
+          <span class="dot" [class.filled]="filled" [style.background]="filled ? color() : ''"></span>
+        }
+        <span class="dot-label">{{ completedCount() }}/{{ totalUnits() }}</span>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="card-compact">
+    <div class="compact-icon" [style.background]="softColor()" [style.color]="color()">
+      <app-icon [name]="icon()" [size]="16" />
+    </div>
+    <span class="compact-name">{{ config().name }}</span>
+    <span class="compact-level">{{ level() }}</span>
+    <div class="compact-bar">
+      <div class="compact-fill" [style.width.%]="percent()" [style.background]="color()"></div>
+    </div>
+  </div>
+}

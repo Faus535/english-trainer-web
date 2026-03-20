@@ -1,0 +1,67 @@
+<div class="settings-page">
+  <h2 class="page-title">Ajustes</h2>
+
+  <section class="setting-group">
+    <h3 class="group-title">Apariencia</h3>
+
+    <div class="setting-row-inline">
+      <span class="setting-label">Tema oscuro</span>
+      <button class="toggle" [class.active]="isDark()" (click)="toggleTheme()">
+        <span class="toggle-knob" [class.on]="isDark()"></span>
+      </button>
+    </div>
+  </section>
+
+  <section class="setting-group">
+    <h3 class="group-title">Audio</h3>
+
+    <div class="setting-row">
+      <label class="setting-label" for="rateSlider">Velocidad TTS</label>
+      <div class="setting-control">
+        <input
+          id="rateSlider"
+          type="range"
+          min="0.3"
+          max="1.5"
+          step="0.1"
+          [value]="rate()"
+          (input)="onRateChange($event)"
+          class="slider"
+        />
+        <span class="setting-value">{{ rate() }}x</span>
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <label class="setting-label" for="voiceSelect">Voz</label>
+      <select id="voiceSelect" class="select" (change)="onVoiceChange($event)">
+        @for (voice of voices(); track $index) {
+          <option [value]="$index">{{ voice.name }} ({{ voice.lang }})</option>
+        }
+      </select>
+    </div>
+  </section>
+
+  <section class="setting-group">
+    <h3 class="group-title">Datos</h3>
+
+    <button class="btn-action" (click)="exportProgress()">
+      Exportar progreso (JSON)
+      @if (exportReady()) {
+        <span class="badge-done">Descargado</span>
+      }
+    </button>
+  </section>
+
+  <section class="setting-group danger">
+    <h3 class="group-title">Zona peligrosa</h3>
+
+    <button class="btn-action warning" (click)="retakeTest()">
+      Repetir test de nivel
+    </button>
+
+    <button class="btn-action danger" (click)="resetAll()">
+      Resetear todo el progreso
+    </button>
+  </section>
+</div>

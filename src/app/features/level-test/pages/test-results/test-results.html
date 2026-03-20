@@ -1,0 +1,25 @@
+@if (testService.results(); as r) {
+  <div class="results">
+    <h2 class="results-title">Tu perfil</h2>
+    <div class="profile-type">{{ r.profileType.label }}</div>
+    <p class="profile-msg" [innerHTML]="r.message"></p>
+
+    <div class="levels-grid">
+      @for (mod of modules; track mod) {
+        <div class="level-card">
+          <span class="level-module">{{ label(mod) }}</span>
+          <span class="level-value">{{ (r.levels[mod] || 'a1').toUpperCase() }}</span>
+        </div>
+      }
+    </div>
+
+    <div class="plan-preview">
+      <h3 class="plan-title">Tu plan personalizado</h3>
+      <p>Listening sera el <strong>40%</strong> de cada sesion (tu mayor area de mejora).</p>
+      <p><strong>{{ r.sessions }}</strong> sesiones estimadas hasta C1.</p>
+      <p>3-4 sesiones por semana, 15-20 minutos cada una.</p>
+    </div>
+
+    <button class="btn-finish" (click)="finish.emit()">Empezar a aprender</button>
+  </div>
+}

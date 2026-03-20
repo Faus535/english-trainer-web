@@ -1,0 +1,20 @@
+@switch (phase()) {
+  @case ('intro') {
+    <app-test-intro (start)="onStart()" (skip)="onSkip($event)" />
+  }
+  @case ('vocabulary') {
+    <app-test-vocab />
+  }
+  @case ('grammar') {
+    <app-test-grammar />
+  }
+  @case ('listening') {
+    <app-test-listening />
+  }
+  @case ('pronunciation') {
+    <app-test-pronunciation />
+  }
+  @case ('results') {
+    <app-test-results (finish)="onFinish()" />
+  }
+}

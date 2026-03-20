@@ -1,0 +1,129 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+// ---- Header ----
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-3) var(--sp-5);
+  background: var(--surface-0);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+}
+
+.logo {
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  text-decoration: none;
+  color: var(--primary);
+  width: 2.25rem;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-md);
+  background: var(--primary-soft);
+}
+
+.header-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-3);
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 200ms var(--ease);
+
+  &:hover {
+    color: var(--text);
+    border-color: var(--border-active);
+    background: var(--surface-1);
+  }
+}
+
+// ---- Main ----
+.main {
+  flex: 1;
+  padding: var(--sp-5) var(--sp-4);
+  padding-bottom: 6rem;
+  max-width: 30rem;
+  width: 100%;
+  margin: 0 auto;
+}
+
+// ---- Bottom Nav ----
+.nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  background: var(--surface-0);
+  border-top: 1px solid var(--border);
+  padding: var(--sp-2) var(--sp-4);
+  padding-bottom: calc(var(--sp-2) + env(safe-area-inset-bottom, 0px));
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  gap: var(--sp-1);
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-3) 0 var(--sp-2);
+  text-decoration: none;
+  color: var(--text-3);
+  border-radius: var(--r-md);
+  transition: color 200ms var(--ease);
+  position: relative;
+
+  app-icon {
+    transition: transform 200ms var(--ease);
+  }
+
+  .nav-dot {
+    width: 0;
+    height: 3px;
+    border-radius: var(--r-full);
+    background: var(--primary);
+    transition: width 250ms var(--ease);
+  }
+
+  &:hover {
+    color: var(--text-2);
+  }
+
+  &.active {
+    color: var(--primary);
+
+    app-icon {
+      transform: translateY(-2px);
+    }
+
+    .nav-dot {
+      width: 1rem;
+    }
+  }
+}
+
+.nav-label {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}

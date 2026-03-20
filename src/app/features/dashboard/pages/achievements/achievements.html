@@ -1,0 +1,56 @@
+<div class="achievements-page">
+  <div class="ach-stats">
+    <div class="ach-stat-card">
+      <div class="ach-stat-value">{{ level().xp }}</div>
+      <div class="ach-stat-label">XP Total</div>
+    </div>
+    <div class="ach-stat-card">
+      <div class="ach-stat-value">{{ level().name }}</div>
+      <div class="ach-stat-label">Level</div>
+    </div>
+    <div class="ach-stat-card">
+      <div class="ach-stat-value">{{ streak() }}</div>
+      <div class="ach-stat-label">Racha</div>
+    </div>
+    <div class="ach-stat-card">
+      <div class="ach-stat-value">{{ bestStreak() }}</div>
+      <div class="ach-stat-label">Mejor racha</div>
+    </div>
+    <div class="ach-stat-card">
+      <div class="ach-stat-value">{{ totalSessions() }}</div>
+      <div class="ach-stat-label">Sesiones</div>
+    </div>
+    <div class="ach-stat-card">
+      <div class="ach-stat-value">{{ flashcards() }}</div>
+      <div class="ach-stat-label">Flashcards</div>
+    </div>
+  </div>
+
+  <div class="ach-level-section">
+    <div class="ach-level-title">{{ level().name }}</div>
+    <div class="ach-level-bar">
+      <div class="ach-level-fill" [style.width.%]="progressPercent()"></div>
+    </div>
+    @if (level().nextLevel; as next) {
+      <div class="ach-level-next">
+        {{ level().xp }} / {{ next.minXP }} XP &mdash; {{ next.minXP - level().xp }} XP to {{ next.name }}
+      </div>
+    } @else {
+      <div class="ach-level-next">MAX LEVEL</div>
+    }
+  </div>
+
+  <h3 class="ach-page-title">
+    {{ unlockedIds().size }} / {{ allAchievements.length }} Achievements
+  </h3>
+
+  <div class="achievements-grid">
+    @for (a of allAchievements; track a.id) {
+      <div class="achievement-card" [class.unlocked]="isUnlocked(a.id)" [class.locked]="!isUnlocked(a.id)">
+        <div class="ach-icon">{{ a.icon }}</div>
+        <div class="ach-name">{{ a.name }}</div>
+        <div class="ach-desc">{{ a.desc }}</div>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,26 @@
+import { Achievement } from '../models/gamification.model';
+
+export const ACHIEVEMENTS: Achievement[] = [
+  { id: 'first_session', icon: '1', name: 'Primer Paso', desc: 'Completa tu primera sesion' },
+  { id: 'week_complete', icon: '3', name: 'Semana Activa', desc: 'Completa 3 sesiones en una semana' },
+  { id: 'sessions_10', icon: '!', name: '10 Sesiones', desc: 'Completa 10 sesiones' },
+  { id: 'sessions_25', icon: '~', name: '25 Sesiones', desc: 'Completa 25 sesiones' },
+  { id: 'sessions_50', icon: 'H', name: 'Mitad del Camino', desc: 'Completa 50 sesiones' },
+  { id: 'sessions_100', icon: 'C', name: 'Centenario', desc: 'Completa 100 sesiones' },
+  { id: 'streak_3', icon: '3', name: 'Racha de 3', desc: 'Consigue una racha de 3 dias' },
+  { id: 'streak_7', icon: '7', name: 'Semana Perfecta', desc: 'Racha de 7 dias seguidos' },
+  { id: 'streak_14', icon: '*', name: 'Imparable', desc: 'Racha de 14 dias seguidos' },
+  { id: 'flash_50', icon: 'F', name: 'Coleccionista', desc: 'Revisa 50 flashcards' },
+  { id: 'flash_200', icon: 'V', name: 'Vocabulario Solido', desc: 'Revisa 200 flashcards' },
+  { id: 'listening_a2', icon: 'A', name: 'Listening A2', desc: 'Alcanza nivel A2 en Listening' },
+  { id: 'listening_b1', icon: 'B', name: 'Listening B1', desc: 'Alcanza nivel B1 en Listening' },
+  { id: 'listening_b2', icon: 'C', name: 'Listening B2', desc: 'Alcanza nivel B2 en Listening' },
+  { id: 'listening_c1', icon: 'G', name: 'Listening C1', desc: 'Alcanza nivel C1 en Listening' },
+  { id: 'pron_a2', icon: 'P', name: 'Pronunciacion A2', desc: 'Alcanza A2 en Pronunciacion' },
+  { id: 'pron_b1', icon: 'P', name: 'Pronunciacion B1', desc: 'Alcanza B1 en Pronunciacion' },
+  { id: 'pron_b2', icon: 'P', name: 'Pronunciacion B2', desc: 'Alcanza B2 en Pronunciacion' },
+  { id: 'all_b1', icon: 'M', name: 'B1 Global', desc: 'Todos los modulos en B1+' },
+  { id: 'all_b2', icon: 'M', name: 'B2 Global', desc: 'Todos los modulos en B2+' },
+  { id: 'graduate', icon: 'G', name: 'Graduado C1', desc: 'Todos los modulos en C1' },
+  { id: 'review_7', icon: 'R', name: 'Repaso constante', desc: '7 sesiones con repaso espaciado' },
+];

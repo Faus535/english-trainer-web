@@ -1,0 +1,20 @@
+@if (testService.progress(); as p) {
+  <app-test-shell [label]="p.label" [current]="p.current" [total]="p.total">
+    @if (testService.currentPronunciationQuestion(); as q) {
+      <p class="instruction">{{ instruction() }}</p>
+      <div class="play-row">
+        <button class="play-btn" (click)="playAudio()">
+          <app-icon [name]="playIcon" [size]="16" /> Reproducir
+        </button>
+        <button class="play-btn" (click)="playAudio()">
+          <app-icon [name]="repeatIcon" [size]="16" /> Repetir
+        </button>
+      </div>
+      <div class="options">
+        @for (opt of q.options; track $index) {
+          <button class="option-btn" (click)="selectOption($index)">{{ opt }}</button>
+        }
+      </div>
+    }
+  </app-test-shell>
+}

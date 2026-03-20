@@ -1,0 +1,22 @@
+<header class="header">
+  <a class="logo" routerLink="/dashboard">ET</a>
+  @if (speaking()) {
+    <button class="header-btn" (click)="stopAudio()" aria-label="Detener audio">
+      <app-icon [name]="stopIcon" [size]="16" />
+    </button>
+  }
+</header>
+
+<main class="main">
+  <router-outlet />
+</main>
+
+<nav class="nav" aria-label="Navegacion principal">
+  @for (tab of tabs; track tab.path) {
+    <a class="nav-item" [routerLink]="tab.path" routerLinkActive="active">
+      <app-icon [name]="tab.icon" [size]="20" [strokeWidth]="1.5" />
+      <span class="nav-label">{{ tab.label }}</span>
+      <span class="nav-dot"></span>
+    </a>
+  }
+</nav>

@@ -1,0 +1,23 @@
+<div class="gamification-bar">
+  <div class="gam-streak">
+    <span class="gam-streak-fire">{{ streak() > 0 ? streakFireIcon : streakEmptyIcon }}</span>
+    <span class="gam-streak-num">{{ streak() }}</span>
+    <span class="gam-streak-label">racha</span>
+  </div>
+
+  <div class="gam-level">
+    <span class="gam-level-name">{{ level().name }}</span>
+    <span class="gam-xp">{{ level().xp }} XP</span>
+    <div class="gam-level-bar">
+      <div class="gam-level-fill" [style.width.%]="progressPercent"></div>
+    </div>
+    @if (level().nextLevel; as next) {
+      <span class="gam-next-level">{{ next.minXP - level().xp }} XP para {{ next.name }}</span>
+    }
+  </div>
+
+  <div class="gam-achievements-count" routerLink="/achievements">
+    <span class="gam-badge-icon">{{ badgeIcon }}</span>
+    <span>{{ unlockedCount().length }}/{{ totalAchievements }}</span>
+  </div>
+</div>

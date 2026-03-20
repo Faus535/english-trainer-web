@@ -1,0 +1,36 @@
+<div class="intro">
+  <h2 class="intro-title">Bienvenido a English Trainer</h2>
+  <p class="intro-sub">Necesitamos saber tu nivel para crear un plan personalizado.</p>
+  <p class="intro-sub">Son 4 mini-tests rapidos (~13 minutos en total):</p>
+
+  <div class="steps">
+    @for (step of steps; track step.num) {
+      <div class="step">
+        <span class="step-num">{{ step.num }}</span>
+        <div class="step-info">
+          <strong>{{ step.title }}</strong>
+          <span class="step-desc">{{ step.desc }}</span>
+        </div>
+      </div>
+    }
+  </div>
+
+  <p class="intro-note">No te preocupes si no sabes algo — el test sirve para NO hacerte repetir lo que ya sabes.</p>
+
+  <button class="btn-start" (click)="start.emit()">Empezar Test</button>
+
+  <div class="divider"><span>o</span></div>
+
+  <div class="skip-section">
+    <p class="skip-title">Ya se mi nivel</p>
+    <p class="skip-desc">Si ya conoces tu nivel de ingles, puedes saltarte el test.</p>
+    <div class="level-grid">
+      @for (l of levels; track l.level) {
+        <button class="level-btn" (click)="skip.emit(l.level)">
+          <span class="level-name">{{ l.level.toUpperCase() }}</span>
+          <span class="level-label">{{ l.label }}</span>
+        </button>
+      }
+    </div>
+  </div>
+</div>
