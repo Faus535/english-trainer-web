@@ -2,6 +2,8 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { ModuleName, MODULE_NAMES } from '../../../shared/models/learning.model';
 import { StateService } from '../../../shared/services/state.service';
 import { GamificationService } from './gamification.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { SessionApiService } from '../../../core/services/session-api.service';
 import { SessionMode, StudySession, SessionBlock, WarmupItem } from '../models/session.model';
 import { MODULES, getModuleLabel } from '../data/modules.data';
 
@@ -12,6 +14,8 @@ const STORAGE_KEY = 'english_modular_currentSession';
 export class SessionService {
   private readonly state = inject(StateService);
   private readonly gamification = inject(GamificationService);
+  private readonly auth = inject(AuthService);
+  private readonly sessionApi = inject(SessionApiService);
 
   private readonly _currentSession = signal<StudySession | null>(this.loadSession());
   private readonly _currentBlockIndex = signal(0);
@@ -120,6 +124,13 @@ export class SessionService {
     if (session.secondary) {
       this.state.completeUnit(session.secondary.module, session.secondary.unitIndex, 100);
     }
+
+    const profileId = this.auth.profileId();
+    if (profileId) {
+      this.sessionApi.completeSession(profileId, session.id).subscribe();
+    }
+
+    this.gamification.syncToBackend();
 
     this._currentSession.set(null);
     this._currentBlockIndex.set(0);

@@ -1,0 +1,58 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h1 class="auth-title">English Trainer</h1>
+    <p class="auth-subtitle">Inicia sesion para continuar</p>
+
+    @if (error()) {
+      <div class="auth-error">{{ error() }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
+      <div class="field">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          placeholder="tu@email.com"
+        />
+        @if (form.controls.email.hasError('required') && form.controls.email.touched) {
+          <span class="field-error">El email es obligatorio</span>
+        }
+        @if (form.controls.email.hasError('email') && form.controls.email.touched) {
+          <span class="field-error">Email no valido</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="password">Contrasena</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          autocomplete="current-password"
+          placeholder="••••••"
+        />
+        @if (form.controls.password.hasError('required') && form.controls.password.touched) {
+          <span class="field-error">La contrasena es obligatoria</span>
+        }
+        @if (form.controls.password.hasError('minlength') && form.controls.password.touched) {
+          <span class="field-error">Minimo 6 caracteres</span>
+        }
+      </div>
+
+      <button type="submit" class="auth-button" [disabled]="loading()">
+        @if (loading()) {
+          Iniciando sesion...
+        } @else {
+          Iniciar sesion
+        }
+      </button>
+    </form>
+
+    <p class="auth-link">
+      No tienes cuenta? <a routerLink="/auth/register">Registrate</a>
+    </p>
+  </div>
+</div>

@@ -1,6 +1,8 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
-import { Level, CEFR_LEVELS, MODULE_NAMES } from '../../../shared/models/learning.model';
+import { Level, CEFR_LEVELS, MODULE_NAMES, ModuleName } from '../../../shared/models/learning.model';
 import { StateService } from '../../../shared/services/state.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { AssessmentApiService } from '../../../core/services/assessment-api.service';
 import { TestPhase, TestAnswer, ProfileType } from '../models/level-test.model';
 import { TEST_VOCABULARY, TEST_GRAMMAR, TEST_LISTENING, TEST_PRONUNCIATION } from '../data/test-questions.data';
 import { getProfileType, estimateSessions, PROFILE_MESSAGES } from '../data/profile-types.data';
@@ -8,6 +10,8 @@ import { getProfileType, estimateSessions, PROFILE_MESSAGES } from '../data/prof
 @Injectable({ providedIn: 'root' })
 export class LevelTestService {
   private readonly state = inject(StateService);
+  private readonly auth = inject(AuthService);
+  private readonly assessmentApi = inject(AssessmentApiService);
 
   private readonly _phase = signal<TestPhase>('intro');
   private readonly _currentQuestion = signal(0);
@@ -154,13 +158,43 @@ export class LevelTestService {
     const vocIdx = CEFR_LEVELS.indexOf(vocabLevel);
     const gramIdx = CEFR_LEVELS.indexOf(grammarLevel);
     const phraseIdx = Math.min(vocIdx, gramIdx);
+    const phrasesLevel = CEFR_LEVELS[phraseIdx];
 
     this.state.setModuleLevel('vocabulary', vocabLevel);
     this.state.setModuleLevel('grammar', grammarLevel);
     this.state.setModuleLevel('listening', listeningLevel);
     this.state.setModuleLevel('pronunciation', pronunciationLevel);
-    this.state.setModuleLevel('phrases', CEFR_LEVELS[phraseIdx]);
+    this.state.setModuleLevel('phrases', phrasesLevel);
     this.state.markTestCompleted();
+
+    this.submitToBackend({
+      vocabulary: vocabLevel,
+      grammar: grammarLevel,
+      listening: listeningLevel,
+      pronunciation: pronunciationLevel,
+      phrases: phrasesLevel,
+    });
+  }
+
+  private submitToBackend(levels: Record<ModuleName, Level>): void {
+    const profileId = this.auth.profileId();
+    if (!profileId) return;
+
+    const scores: Record<ModuleName, number> = {
+      vocabulary: this.calculateScore(this._vocabAnswers()),
+      grammar: this.calculateScore(this._grammarAnswers()),
+      listening: this.calculateScore(this._listeningAnswers()),
+      pronunciation: this.calculateScore(this._pronunciationAnswers()),
+      phrases: 0,
+    };
+
+    this.assessmentApi.submitLevelTest(profileId, { answers: {}, scores }).subscribe();
+  }
+
+  private calculateScore(answers: TestAnswer[]): number {
+    if (answers.length === 0) return 0;
+    const correct = answers.filter(a => a.correct).length;
+    return Math.round((correct / answers.length) * 100);
   }
 
   private calculateLevel(answers: TestAnswer[]): Level {

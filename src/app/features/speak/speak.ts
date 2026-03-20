@@ -6,6 +6,7 @@ import { PHRASE_BANK } from './data/phrase-bank.data';
 import { Level, Phrase } from './models/speak.model';
 import { SpeechRecognitionService } from './services/speech-recognition.service';
 import { TtsService } from './services/tts.service';
+import { VocabApiService } from '../../core/services/vocab-api.service';
 
 @Component({
   selector: 'app-speak',
@@ -17,11 +18,14 @@ import { TtsService } from './services/tts.service';
 export class Speak {
   private readonly tts = inject(TtsService);
   private readonly recognition = inject(SpeechRecognitionService);
+  private readonly vocabApi = inject(VocabApiService);
 
   protected readonly currentLevel = signal<Level>('a1');
   protected readonly history = signal<Phrase[]>([]);
   protected readonly historyIndex = signal(-1);
   protected readonly translationRevealed = signal(false);
+
+  private readonly _apiPhrases = signal<Record<Level, Phrase[]>>({} as Record<Level, Phrase[]>);
 
   protected readonly supported = this.recognition.supported;
 
@@ -48,6 +52,7 @@ export class Speak {
     this.currentLevel.set(level);
     this.history.set([]);
     this.historyIndex.set(-1);
+    this.loadPhrasesForLevel(level);
     this.nextPhrase();
   }
 
@@ -55,10 +60,11 @@ export class Speak {
     const idx = this.historyIndex();
     const h = this.history();
 
-    // Trim forward history if navigated back
     const trimmed = idx < h.length - 1 ? h.slice(0, idx + 1) : [...h];
 
-    const phrases = PHRASE_BANK[this.currentLevel()];
+    const level = this.currentLevel();
+    const apiPhrases = this._apiPhrases()[level];
+    const phrases = apiPhrases?.length ? apiPhrases : PHRASE_BANK[level];
     const phrase = phrases[Math.floor(Math.random() * phrases.length)];
 
     trimmed.push(phrase);
@@ -66,6 +72,21 @@ export class Speak {
     this.historyIndex.set(trimmed.length - 1);
     this.translationRevealed.set(false);
     this.recognition.reset();
+  }
+
+  private loadPhrasesForLevel(level: Level): void {
+    if (this._apiPhrases()[level]?.length) return;
+
+    this.vocabApi.getPhrasesByLevel(level).subscribe({
+      next: (phrases) => {
+        if (phrases.length > 0) {
+          this._apiPhrases.update(p => ({
+            ...p,
+            [level]: phrases.map(ph => ({ en: ph.en, es: ph.es })),
+          }));
+        }
+      },
+    });
   }
 
   protected prevPhrase(): void {

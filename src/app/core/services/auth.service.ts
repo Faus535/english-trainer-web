@@ -1,0 +1,69 @@
+import { Injectable, inject, signal, computed } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { Observable, tap } from 'rxjs';
+import { environment } from './environment';
+import {
+  AuthResponse,
+  LoginRequest,
+  RefreshRequest,
+  RegisterRequest,
+} from '../../shared/models/api.model';
+
+const TOKEN_KEY = 'et_token';
+const REFRESH_KEY = 'et_refresh_token';
+const PROFILE_ID_KEY = 'et_profile_id';
+const EMAIL_KEY = 'et_email';
+
+@Injectable({ providedIn: 'root' })
+export class AuthService {
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
+  private readonly baseUrl = `${environment.apiUrl}/auth`;
+
+  private readonly _token = signal<string | null>(localStorage.getItem(TOKEN_KEY));
+  private readonly _profileId = signal<string | null>(localStorage.getItem(PROFILE_ID_KEY));
+
+  readonly isAuthenticated = computed(() => !!this._token());
+  readonly profileId = this._profileId.asReadonly();
+  readonly token = this._token.asReadonly();
+
+  login(request: LoginRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.baseUrl}/login`, request).pipe(
+      tap(res => this.storeAuth(res)),
+    );
+  }
+
+  register(request: RegisterRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.baseUrl}/register`, request).pipe(
+      tap(res => this.storeAuth(res)),
+    );
+  }
+
+  refresh(): Observable<AuthResponse> {
+    const refreshToken = localStorage.getItem(REFRESH_KEY);
+    const request: RefreshRequest = { refreshToken: refreshToken ?? '' };
+    return this.http.post<AuthResponse>(`${this.baseUrl}/refresh`, request).pipe(
+      tap(res => this.storeAuth(res)),
+    );
+  }
+
+  logout(): void {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_KEY);
+    localStorage.removeItem(PROFILE_ID_KEY);
+    localStorage.removeItem(EMAIL_KEY);
+    this._token.set(null);
+    this._profileId.set(null);
+    this.router.navigate(['/auth/login']);
+  }
+
+  private storeAuth(res: AuthResponse): void {
+    localStorage.setItem(TOKEN_KEY, res.token);
+    localStorage.setItem(REFRESH_KEY, res.refreshToken);
+    localStorage.setItem(PROFILE_ID_KEY, res.profileId);
+    localStorage.setItem(EMAIL_KEY, res.email);
+    this._token.set(res.token);
+    this._profileId.set(res.profileId);
+  }
+}

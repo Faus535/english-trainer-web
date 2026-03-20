@@ -1,6 +1,8 @@
-import { Injectable, inject, computed, signal } from '@angular/core';
+import { Injectable, inject, computed, signal, effect } from '@angular/core';
 import { CEFR_LEVELS, MODULE_NAMES } from '../../../shared/models/learning.model';
 import { StateService } from '../../../shared/services/state.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { GamificationApiService } from '../../../core/services/gamification-api.service';
 import { GamificationStatus, PhraseRoulette, SoundOfTheDay } from '../models/gamification.model';
 import { Achievement } from '../models/gamification.model';
 import { ACHIEVEMENTS } from '../data/achievements.data';
@@ -17,8 +19,11 @@ import {
 @Injectable({ providedIn: 'root' })
 export class GamificationService {
   private readonly state = inject(StateService);
+  private readonly auth = inject(AuthService);
+  private readonly gamificationApi = inject(GamificationApiService);
   private readonly _rouletteIndex = signal(-1);
   private readonly _rouletteRevealed = signal(false);
+  private _lastXp = 0;
 
   readonly xp = computed(() => {
     const sessions = this.state.totalSessions();
@@ -85,6 +90,24 @@ export class GamificationService {
   });
 
   readonly allAchievements = ACHIEVEMENTS;
+
+  /**
+   * Syncs XP and checks achievements on the backend.
+   * Call after actions that change XP (session complete, flashcard, level-up).
+   */
+  syncToBackend(): void {
+    const profileId = this.auth.profileId();
+    if (!profileId) return;
+
+    const currentXp = this.xp();
+    const diff = currentXp - this._lastXp;
+    if (diff > 0) {
+      this._lastXp = currentXp;
+      this.gamificationApi.grantXp(profileId, diff).subscribe();
+    }
+
+    this.gamificationApi.checkAchievements(profileId).subscribe();
+  }
 
   getSoundOfTheDay(): SoundOfTheDay {
     const today = new Date().toISOString().slice(0, 10);

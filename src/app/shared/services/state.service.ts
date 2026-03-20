@@ -1,4 +1,4 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import {
   CEFR_LEVELS,
   Level,
@@ -8,17 +8,31 @@ import {
   UnitReference,
   UserProfile,
 } from '../models/learning.model';
+import { UserProfileResponse } from '../models/api.model';
 import { getModuleConfig } from '../../features/dashboard/data/modules.data';
+import { ProfileApiService } from '../../core/services/profile-api.service';
+import { ActivityApiService } from '../../core/services/activity-api.service';
+import { ReviewApiService } from '../../core/services/review-api.service';
+import { ProgressApiService } from '../../core/services/progress-api.service';
+import { AuthService } from '../../core/services/auth.service';
 
 const STORAGE_PREFIX = 'english_modular_';
 
 @Injectable({ providedIn: 'root' })
 export class StateService {
+  private readonly profileApi = inject(ProfileApiService);
+  private readonly activityApi = inject(ActivityApiService);
+  private readonly reviewApi = inject(ReviewApiService);
+  private readonly progressApi = inject(ProgressApiService);
+  private readonly auth = inject(AuthService);
+
   private readonly _profile = signal<UserProfile>(this.loadProfile());
   private readonly _activityDates = signal<Record<string, boolean>>(this.loadState('activityDates', {}));
   private readonly _flashcardCount = signal<number>(this.loadState('flashcardCount', 0));
+  private readonly _syncing = signal(false);
 
   readonly profile = this._profile.asReadonly();
+  readonly syncing = this._syncing.asReadonly();
 
   readonly totalSessions = computed(() => this._profile().sessionCount || 0);
 
@@ -44,6 +58,37 @@ export class StateService {
     return CEFR_LEVELS[minIdx];
   });
 
+  /**
+   * Loads the user profile and activity data from the backend API.
+   * Call this after login/register to sync state.
+   */
+  loadFromBackend(): void {
+    const profileId = this.auth.profileId();
+    if (!profileId) return;
+
+    this._syncing.set(true);
+    this.profileApi.getProfile(profileId).subscribe({
+      next: (res) => {
+        this.applyBackendProfile(res);
+        this._syncing.set(false);
+      },
+      error: () => {
+        this._syncing.set(false);
+      },
+    });
+
+    this.activityApi.getActivityDates(profileId).subscribe({
+      next: (dates) => {
+        const map: Record<string, boolean> = {};
+        for (const d of dates) {
+          map[d] = true;
+        }
+        this._activityDates.set(map);
+        this.saveState('activityDates', map);
+      },
+    });
+  }
+
   getModuleLevel(moduleName: ModuleName): Level {
     return this._profile().levels[moduleName] || 'a1';
   }
@@ -54,6 +99,11 @@ export class StateService {
       levels: { ...p.levels, [moduleName]: level },
     }));
     this.persistProfile();
+
+    const profileId = this.auth.profileId();
+    if (profileId) {
+      this.profileApi.updateModuleLevel(profileId, moduleName, level).subscribe();
+    }
   }
 
   getModuleProgress(moduleName: ModuleName): ModuleProgress {
@@ -91,6 +141,11 @@ export class StateService {
     const config = getModuleConfig(moduleName, level);
     if (config?.units[unitIndex]) {
       this.addToReviewQueue(moduleName, config.units[unitIndex].id);
+    }
+
+    const profileId = this.auth.profileId();
+    if (profileId) {
+      this.progressApi.completeUnit(profileId, moduleName, level, unitIndex).subscribe();
     }
 
     this.checkLevelUp(moduleName);
@@ -169,12 +224,22 @@ export class StateService {
     });
     this.persistProfile();
     this.recordActivity();
+
+    const profileId = this.auth.profileId();
+    if (profileId) {
+      this.profileApi.recordSession(profileId, { duration: sessionData.duration }).subscribe();
+    }
   }
 
   recordActivity(): void {
     const today = this.getToday();
     this._activityDates.update(dates => ({ ...dates, [today]: true }));
     this.saveState('activityDates', this._activityDates());
+
+    const profileId = this.auth.profileId();
+    if (profileId) {
+      this.activityApi.recordActivity(profileId).subscribe();
+    }
   }
 
   trackFlashcard(): void {
@@ -234,6 +299,11 @@ export class StateService {
       return { ...p, moduleProgress: newProgress };
     });
     this.persistProfile();
+
+    const profileId = this.auth.profileId();
+    if (profileId) {
+      this.reviewApi.completeReview(profileId, unitId, 3).subscribe();
+    }
   }
 
   readonly testCompleted = computed(() => this._profile().testCompleted);
@@ -241,6 +311,11 @@ export class StateService {
   markTestCompleted(): void {
     this._profile.update(p => ({ ...p, testCompleted: true }));
     this.persistProfile();
+
+    const profileId = this.auth.profileId();
+    if (profileId) {
+      this.profileApi.markTestCompleted(profileId).subscribe();
+    }
   }
 
   markTestIncomplete(): void {
@@ -274,6 +349,23 @@ export class StateService {
     this._flashcardCount.set(0);
   }
 
+  private applyBackendProfile(res: UserProfileResponse): void {
+    this._profile.update(p => ({
+      ...p,
+      testCompleted: res.testCompleted,
+      levels: {
+        listening: res.levelListening,
+        vocabulary: res.levelVocabulary,
+        grammar: res.levelGrammar,
+        phrases: res.levelPhrases,
+        pronunciation: res.levelPronunciation,
+      },
+      sessionCount: res.sessionCount,
+      sessionsThisWeek: res.sessionsThisWeek,
+    }));
+    this.persistProfile();
+  }
+
   private addToReviewQueue(moduleName: ModuleName, unitId: string): void {
     const level = this.getModuleLevel(moduleName);
     const key = `${moduleName}-${level}`;
@@ -303,6 +395,11 @@ export class StateService {
       };
     });
     this.persistProfile();
+
+    const profileId = this.auth.profileId();
+    if (profileId) {
+      this.reviewApi.addToReviewQueue(profileId, 'unit', unitId).subscribe();
+    }
   }
 
   private calculateStreak(): number {

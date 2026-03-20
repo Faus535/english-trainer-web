@@ -1,39 +1,46 @@
 import { Routes } from '@angular/router';
+import { authGuard, guestGuard } from './core/guards/auth.guard';
 import { testCompletedGuard, testNotCompletedGuard } from './core/guards/test-completed.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   {
+    path: 'auth',
+    canActivate: [guestGuard],
+    loadChildren: () => import('./features/auth/auth.routes'),
+  },
+  {
     path: 'level-test',
-    canActivate: [testNotCompletedGuard],
+    canActivate: [authGuard, testNotCompletedGuard],
     loadComponent: () => import('./features/level-test/level-test').then(m => m.LevelTest),
     title: 'Test de Nivel',
   },
   {
     path: 'dashboard',
-    canActivate: [testCompletedGuard],
+    canActivate: [authGuard, testCompletedGuard],
     loadComponent: () => import('./features/dashboard/dashboard').then(m => m.Dashboard),
     title: 'Dashboard',
   },
   {
     path: 'speak',
-    canActivate: [testCompletedGuard],
+    canActivate: [authGuard, testCompletedGuard],
     loadChildren: () => import('./features/speak/speak.routes'),
   },
   {
     path: 'achievements',
-    canActivate: [testCompletedGuard],
+    canActivate: [authGuard, testCompletedGuard],
     loadComponent: () => import('./features/dashboard/pages/achievements/achievements').then(m => m.Achievements),
     title: 'Logros',
   },
   {
     path: 'session',
-    canActivate: [testCompletedGuard],
+    canActivate: [authGuard, testCompletedGuard],
     loadComponent: () => import('./features/dashboard/pages/session/session').then(m => m.Session),
     title: 'Sesion',
   },
   {
     path: 'settings',
+    canActivate: [authGuard],
     loadComponent: () => import('./features/settings/settings').then(m => m.Settings),
     title: 'Ajustes',
   },

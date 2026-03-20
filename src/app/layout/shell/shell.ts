@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { TtsService } from '../../features/speak/services/tts.service';
 import { Icon } from '../../shared/components/icon/icon';
+import { ConnectionStatus } from '../../shared/components/connection-status/connection-status';
 import { LucideIconData, LayoutDashboard, Mic, Trophy, Settings, Square } from 'lucide-angular';
 
 interface NavTab {
@@ -12,7 +13,7 @@ interface NavTab {
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Icon],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Icon, ConnectionStatus],
   templateUrl: './shell.html',
   styleUrl: './shell.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
