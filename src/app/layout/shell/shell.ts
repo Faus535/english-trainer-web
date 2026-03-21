@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, DestroyRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, DestroyRef, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
@@ -28,6 +28,7 @@ export class Shell {
 
   protected readonly speaking = this.tts.speaking;
   protected readonly stopIcon = Square;
+  protected readonly showChrome = signal(!this.router.url.startsWith('/auth'));
 
   constructor() {
     this.router.events
@@ -35,7 +36,8 @@ export class Shell {
         filter((e): e is NavigationEnd => e instanceof NavigationEnd),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe(() => {
+      .subscribe((event) => {
+        this.showChrome.set(!event.urlAfterRedirects.startsWith('/auth'));
         const main = document.querySelector<HTMLElement>('main');
         main?.focus();
       });

@@ -3,10 +3,11 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { StateService } from '../../../shared/services/state.service';
+import { GoogleSignInButton } from '../../../shared/components/google-sign-in-button/google-sign-in-button';
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, GoogleSignInButton],
   templateUrl: './register.html',
   styleUrl: './register.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,6 +26,29 @@ export class Register {
     password: ['', [Validators.required, Validators.minLength(6)]],
     confirmPassword: ['', [Validators.required]],
   });
+
+  protected onGoogleAuth(idToken: string): void {
+    this.loading.set(true);
+    this.error.set(null);
+
+    this.auth.loginWithGoogle({ idToken }).subscribe({
+      next: () => {
+        this.state.loadFromBackend();
+        this.loading.set(false);
+        this.router.navigate(['/']);
+      },
+      error: () => {
+        this.loading.set(false);
+        this.error.set('Error al registrarse con Google');
+      },
+    });
+  }
+
+  protected onGoogleError(message: string): void {
+    if (message !== 'google_prompt_not_available') {
+      this.error.set('No se pudo conectar con Google');
+    }
+  }
 
   protected onSubmit(): void {
     if (this.form.invalid) {
@@ -51,9 +75,7 @@ export class Register {
       error: (err) => {
         this.loading.set(false);
         this.error.set(
-          err.status === 409
-            ? 'Ya existe una cuenta con ese email'
-            : 'Error al crear la cuenta',
+          err.status === 409 ? 'Ya existe una cuenta con ese email' : 'Error al crear la cuenta',
         );
       },
     });

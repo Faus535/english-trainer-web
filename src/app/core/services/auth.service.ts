@@ -5,6 +5,7 @@ import { Observable, tap } from 'rxjs';
 import { environment } from './environment';
 import {
   AuthResponse,
+  GoogleAuthRequest,
   LoginRequest,
   RefreshRequest,
   RegisterRequest,
@@ -37,6 +38,12 @@ export class AuthService {
   register(request: RegisterRequest): Observable<AuthResponse> {
     return this.http
       .post<AuthResponse>(`${this.baseUrl}/register`, request)
+      .pipe(tap((res) => this.storeAuth(res)));
+  }
+
+  loginWithGoogle(request: GoogleAuthRequest): Observable<AuthResponse> {
+    return this.http
+      .post<AuthResponse>(`${this.baseUrl}/google`, request)
       .pipe(tap((res) => this.storeAuth(res)));
   }
 

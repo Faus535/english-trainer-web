@@ -18,6 +18,10 @@ export interface AuthResponse {
   email: string;
 }
 
+export interface GoogleAuthRequest {
+  idToken: string;
+}
+
 export interface RefreshRequest {
   refreshToken: string;
 }
