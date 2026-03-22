@@ -4,6 +4,7 @@ import { UpperCasePipe } from '@angular/common';
 import { ReadingApiService } from '../../services/reading-api.service';
 import { ReadingTextResponse } from '../../../../shared/models/api.model';
 import { Level, CEFR_LEVELS } from '../../../../shared/models/learning.model';
+import { ProfileStateService } from '../../../../shared/services/profile-state.service';
 import { Icon } from '../../../../shared/components/icon/icon';
 import { LucideIconData, BookOpen, Clock } from 'lucide-angular';
 
@@ -16,6 +17,7 @@ import { LucideIconData, BookOpen, Clock } from 'lucide-angular';
 })
 export class ReadingList implements OnInit {
   private readonly readingApi = inject(ReadingApiService);
+  private readonly profileState = inject(ProfileStateService);
   protected readonly texts = signal<ReadingTextResponse[]>([]);
   protected readonly loading = signal(true);
   protected readonly selectedLevel = signal<Level | null>(null);
@@ -24,6 +26,7 @@ export class ReadingList implements OnInit {
   protected readonly clockIcon: LucideIconData = Clock;
 
   ngOnInit(): void {
+    this.selectedLevel.set(this.profileState.overallLevel());
     this.loadTexts();
   }
 
