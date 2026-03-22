@@ -20,6 +20,11 @@ export class Login {
 
   protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
+  protected readonly showPassword = signal(false);
+
+  protected togglePassword(): void {
+    this.showPassword.update((v) => !v);
+  }
 
   readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],

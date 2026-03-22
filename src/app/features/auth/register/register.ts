@@ -20,6 +20,16 @@ export class Register {
 
   protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
+  protected readonly showPassword = signal(false);
+  protected readonly showConfirmPassword = signal(false);
+
+  protected togglePassword(): void {
+    this.showPassword.update((v) => !v);
+  }
+
+  protected toggleConfirmPassword(): void {
+    this.showConfirmPassword.update((v) => !v);
+  }
 
   readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
