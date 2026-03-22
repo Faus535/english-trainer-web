@@ -1,4 +1,14 @@
 <div class="dashboard">
+  @if (!testCompleted()) {
+    <a class="test-banner" routerLink="/level-test">
+      <span class="test-banner-text">
+        <strong>Completa tu test de nivel</strong>
+        <span>Personalizaremos tu experiencia segun tu nivel de ingles</span>
+      </span>
+      <span class="test-banner-arrow">→</span>
+    </a>
+  }
+
   <!-- Hero: Quick Start + Gamification -->
   <app-quick-start (sessionStarted)="onSessionStarted()" />
 

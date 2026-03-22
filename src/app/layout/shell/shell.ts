@@ -60,7 +60,7 @@ export class Shell {
   }
 
   private shouldShowChrome(url: string): boolean {
-    return !url.startsWith('/auth') && !url.startsWith('/level-test');
+    return !url.startsWith('/auth');
   }
 
   protected readonly tabs: NavTab[] = [

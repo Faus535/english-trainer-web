@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { QuickStart } from './components/quick-start/quick-start';
 import { ModuleCard } from './components/module-card/module-card';
 import { StatsSummary } from './components/stats-summary/stats-summary';
@@ -19,6 +19,7 @@ import { StateService } from '../../shared/services/state.service';
     PhraseRoulette,
     Motivation,
     CurrentLevels,
+    RouterLink,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
@@ -27,6 +28,8 @@ import { StateService } from '../../shared/services/state.service';
 export class Dashboard implements OnInit {
   private readonly router = inject(Router);
   private readonly state = inject(StateService);
+
+  protected readonly testCompleted = this.state.testCompleted;
 
   ngOnInit(): void {
     this.state.loadFromBackend();
