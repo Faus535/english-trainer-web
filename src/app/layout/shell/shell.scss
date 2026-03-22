@@ -1,7 +1,13 @@
+$breakpoint-desktop: 768px;
+
 :host {
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
+
+  @media (min-width: $breakpoint-desktop) {
+    flex-direction: row;
+  }
 }
 
 // ---- Header ----
@@ -15,7 +21,10 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  backdrop-filter: blur(12px);
+
+  @media (min-width: $breakpoint-desktop) {
+    display: none;
+  }
 }
 
 .logo {
@@ -53,17 +62,68 @@
   }
 }
 
+// ---- Sidebar (desktop only) ----
+.sidebar {
+  display: none;
+
+  @media (min-width: $breakpoint-desktop) {
+    display: flex;
+    flex-direction: column;
+    width: 14rem;
+    min-height: 100dvh;
+    padding: var(--sp-6) var(--sp-3);
+    background: var(--surface-0);
+    border-right: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    gap: var(--sp-1);
+    flex-shrink: 0;
+  }
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  text-decoration: none;
+  color: var(--text-3);
+  border-radius: var(--r-md);
+  transition: all 200ms var(--ease);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+
+  &:hover {
+    color: var(--text);
+    background: var(--surface-1);
+  }
+
+  &.active {
+    color: var(--primary);
+    background: var(--primary-soft);
+  }
+}
+
+.sidebar-label {
+  letter-spacing: 0.01em;
+}
+
 // ---- Main ----
 .main {
   flex: 1;
   padding: var(--sp-5) var(--sp-4);
   padding-bottom: 6rem;
-  max-width: 30rem;
+  max-width: 48rem;
   width: 100%;
   margin: 0 auto;
+
+  @media (min-width: $breakpoint-desktop) {
+    padding-bottom: var(--sp-5);
+    max-width: 52rem;
+  }
 }
 
-// ---- Bottom Nav ----
+// ---- Bottom Nav (mobile only) ----
 .nav {
   position: fixed;
   bottom: 0;
@@ -75,8 +135,11 @@
   padding: var(--sp-2) var(--sp-4);
   padding-bottom: calc(var(--sp-2) + env(safe-area-inset-bottom, 0px));
   z-index: 100;
-  backdrop-filter: blur(12px);
   gap: var(--sp-1);
+
+  @media (min-width: $breakpoint-desktop) {
+    display: none;
+  }
 }
 
 .nav-item {
