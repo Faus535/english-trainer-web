@@ -1,0 +1,26 @@
+<div class="practice-page">
+  <h2 class="page-title">Mejorar</h2>
+  <p class="page-desc">Elige una habilidad para practicar</p>
+
+  <div class="hub-grid">
+    <a class="hub-card" routerLink="/reading">
+      <div class="hub-icon reading">
+        <app-icon [name]="bookIcon" [size]="28" aria-hidden="true" />
+      </div>
+      <div class="hub-info">
+        <h3 class="hub-label">Reading</h3>
+        <p class="hub-desc">Lee textos adaptados a tu nivel y responde preguntas de comprension</p>
+      </div>
+    </a>
+
+    <a class="hub-card" routerLink="/writing">
+      <div class="hub-icon writing">
+        <app-icon [name]="penIcon" [size]="28" aria-hidden="true" />
+      </div>
+      <div class="hub-info">
+        <h3 class="hub-label">Writing</h3>
+        <p class="hub-desc">Practica escritura con prompts y recibe feedback de IA</p>
+      </div>
+    </a>
+  </div>
+</div>

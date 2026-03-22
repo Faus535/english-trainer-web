@@ -10,15 +10,10 @@ import {
   LucideIconData,
   LayoutDashboard,
   Mic,
-  Trophy,
-  Settings,
   Square,
   BotMessageSquare,
-  BookOpen,
-  PenLine,
-  BarChart3,
+  GraduationCap,
   UserCircle,
-  Bell,
 } from 'lucide-angular';
 
 interface NavTab {
@@ -60,8 +55,20 @@ export class Shell {
     this.tts.stop();
   }
 
+  private readonly profilePaths = [
+    '/profile',
+    '/achievements',
+    '/analytics',
+    '/notifications',
+    '/settings',
+  ];
+  private readonly practicePaths = ['/practice', '/reading', '/writing'];
+
   protected isActive(path: string): boolean {
-    return this.router.url.startsWith(path);
+    const url = this.router.url;
+    if (path === '/profile') return this.profilePaths.some((p) => url.startsWith(p));
+    if (path === '/practice') return this.practicePaths.some((p) => url.startsWith(p));
+    return url.startsWith(path);
   }
 
   private shouldShowChrome(url: string): boolean {
@@ -72,12 +79,7 @@ export class Shell {
     { path: '/dashboard', label: 'Sesiones', icon: LayoutDashboard },
     { path: '/speak', label: 'Hablar', icon: Mic },
     { path: '/tutor', label: 'Tutor', icon: BotMessageSquare },
-    { path: '/reading', label: 'Leer', icon: BookOpen },
-    { path: '/writing', label: 'Escribir', icon: PenLine },
-    { path: '/analytics', label: 'Progreso', icon: BarChart3 },
-    { path: '/achievements', label: 'Logros', icon: Trophy },
+    { path: '/practice', label: 'Mejorar', icon: GraduationCap },
     { path: '/profile', label: 'Perfil', icon: UserCircle },
-    { path: '/notifications', label: 'Alertas', icon: Bell },
-    { path: '/settings', label: 'Ajustes', icon: Settings },
   ];
 }

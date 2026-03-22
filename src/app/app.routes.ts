@@ -46,6 +46,12 @@ export const routes: Routes = [
     loadChildren: () => import('./features/tutor/tutor.routes'),
   },
   {
+    path: 'practice',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/practice/practice-hub').then((m) => m.PracticeHub),
+    title: 'Mejorar',
+  },
+  {
     path: 'reading',
     canActivate: [authGuard],
     loadChildren: () => import('./features/reading/reading.routes'),

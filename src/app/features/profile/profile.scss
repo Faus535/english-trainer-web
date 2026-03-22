@@ -5,42 +5,26 @@
 .profile-page {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-6);
+  gap: var(--sp-5);
 }
-.page-title {
-  font-size: var(--fs-xl);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-}
+
 .loading {
   text-align: center;
   color: var(--text-3);
   padding: var(--sp-8);
 }
 
-.setting-group {
+// ---- Header ----
+.profile-header {
   display: flex;
-  flex-direction: column;
-  gap: var(--sp-3);
+  align-items: center;
+  gap: var(--sp-4);
   padding: var(--sp-5);
   background: var(--surface-0);
   border-radius: var(--r-xl);
   border: 1px solid var(--border);
 }
 
-.group-title {
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-3);
-}
-
-.account-header {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-4);
-}
 .avatar {
   width: 3.5rem;
   height: 3.5rem;
@@ -54,19 +38,23 @@
   font-size: var(--fs-lg);
   flex-shrink: 0;
 }
-.account-info {
+
+.header-info {
   display: flex;
   flex-direction: column;
   gap: var(--sp-1);
 }
-.account-name {
+
+.header-name {
   font-size: var(--fs-base);
   font-weight: 700;
 }
-.account-email {
+
+.header-email {
   font-size: var(--fs-sm);
   color: var(--text-2);
 }
+
 .account-badge {
   align-self: flex-start;
   padding: var(--sp-1) var(--sp-2);
@@ -75,10 +63,69 @@
   font-size: var(--fs-xs);
   font-weight: 600;
   color: var(--text-3);
+
   &.google {
     background: var(--primary-soft);
     color: var(--primary);
   }
+}
+
+// ---- Menu links ----
+.menu-section {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-0);
+  border-radius: var(--r-xl);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+  text-decoration: none;
+  color: var(--text);
+  transition: background 200ms var(--ease);
+  border-bottom: 1px solid var(--border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: var(--surface-1);
+  }
+}
+
+.menu-label {
+  flex: 1;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+
+.menu-chevron {
+  color: var(--text-3);
+}
+
+// ---- Account section ----
+.account-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: var(--sp-5);
+  background: var(--surface-0);
+  border-radius: var(--r-xl);
+  border: 1px solid var(--border);
+}
+
+.section-title {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
 }
 
 .edit-form {
@@ -86,15 +133,18 @@
   flex-direction: column;
   gap: var(--sp-4);
 }
+
 .field {
   display: flex;
   flex-direction: column;
   gap: var(--sp-1);
+
   label {
     font-size: var(--fs-sm);
     font-weight: 500;
     color: var(--text);
   }
+
   input {
     padding: 0.625rem 0.75rem;
     border: 1px solid var(--border);
@@ -105,14 +155,21 @@
     outline: none;
     font-family: inherit;
     transition: border-color 0.2s var(--ease);
+
     &:focus {
       border-color: var(--primary);
     }
   }
 }
+
 .field-error {
   font-size: var(--fs-xs);
   color: var(--error);
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--sp-3);
 }
 
 .btn-primary {
@@ -126,45 +183,63 @@
   cursor: pointer;
   font-family: inherit;
   transition: background 200ms var(--ease);
+  flex: 1;
+
   &:hover:not(:disabled) {
     background: var(--primary-hover);
   }
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
   }
 }
 
-.btn-secondary {
+.btn-outline {
   padding: var(--sp-3);
-  background: var(--surface-1);
+  background: transparent;
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: var(--r-md);
   font-size: var(--fs-sm);
   font-weight: 600;
   cursor: pointer;
-  font-family: inherit;
-}
-
-.btn-action {
-  width: 100%;
-  padding: var(--sp-3);
-  background: var(--surface-1);
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  color: var(--text);
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  cursor: pointer;
-  text-align: left;
   font-family: inherit;
   transition: all 200ms var(--ease);
-  &.danger {
-    color: var(--error);
-    &:hover {
-      background: var(--error-soft);
-    }
+  flex: 1;
+
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+}
+
+// ---- Danger ----
+.danger-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-5);
+  background: var(--surface-0);
+  border-radius: var(--r-xl);
+  border: 1px solid var(--border);
+}
+
+.btn-danger-outline {
+  width: 100%;
+  padding: var(--sp-3);
+  background: transparent;
+  border: 1px solid var(--error);
+  border-radius: var(--r-md);
+  color: var(--error);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 200ms var(--ease);
+
+  &:hover {
+    background: var(--error-soft);
   }
 }
 
@@ -178,6 +253,8 @@
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
+  flex: 1;
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -189,7 +266,27 @@
   color: var(--error);
   line-height: 1.5;
 }
-.danger-actions {
+
+// ---- Logout ----
+.logout-btn {
   display: flex;
-  gap: var(--sp-3);
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  width: 100%;
+  padding: var(--sp-3);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 200ms var(--ease);
+
+  &:hover {
+    border-color: var(--error);
+    color: var(--error);
+  }
 }
