@@ -1,0 +1,13 @@
+<div class="conv-header">
+  <div class="conv-info">
+    <span class="conv-level" [attr.aria-label]="'Nivel ' + level().toUpperCase()">
+      {{ level().toUpperCase() }}
+    </span>
+    <span class="conv-messages">{{ messageCount() }} mensajes</span>
+  </div>
+
+  <button class="conv-end" (click)="endConversation.emit()" aria-label="Terminar conversacion">
+    <app-icon [name]="closeIcon" [size]="18" aria-hidden="true" />
+    <span>Terminar</span>
+  </button>
+</div>

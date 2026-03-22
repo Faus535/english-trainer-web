@@ -12,13 +12,13 @@ export const routes: Routes = [
   {
     path: 'level-test',
     canActivate: [authGuard, testNotCompletedGuard],
-    loadComponent: () => import('./features/level-test/level-test').then(m => m.LevelTest),
+    loadComponent: () => import('./features/level-test/level-test').then((m) => m.LevelTest),
     title: 'Test de Nivel',
   },
   {
     path: 'dashboard',
     canActivate: [authGuard, testCompletedGuard],
-    loadComponent: () => import('./features/dashboard/dashboard').then(m => m.Dashboard),
+    loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard),
     title: 'Dashboard',
   },
   {
@@ -29,19 +29,26 @@ export const routes: Routes = [
   {
     path: 'achievements',
     canActivate: [authGuard, testCompletedGuard],
-    loadComponent: () => import('./features/dashboard/pages/achievements/achievements').then(m => m.Achievements),
+    loadComponent: () =>
+      import('./features/dashboard/pages/achievements/achievements').then((m) => m.Achievements),
     title: 'Logros',
   },
   {
     path: 'session',
     canActivate: [authGuard, testCompletedGuard],
-    loadComponent: () => import('./features/dashboard/pages/session/session').then(m => m.Session),
+    loadComponent: () =>
+      import('./features/dashboard/pages/session/session').then((m) => m.Session),
     title: 'Sesion',
+  },
+  {
+    path: 'tutor',
+    canActivate: [authGuard, testCompletedGuard],
+    loadChildren: () => import('./features/tutor/tutor.routes'),
   },
   {
     path: 'settings',
     canActivate: [authGuard],
-    loadComponent: () => import('./features/settings/settings').then(m => m.Settings),
+    loadComponent: () => import('./features/settings/settings').then((m) => m.Settings),
     title: 'Ajustes',
   },
 ];

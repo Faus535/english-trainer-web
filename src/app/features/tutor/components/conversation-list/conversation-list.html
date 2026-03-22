@@ -1,0 +1,32 @@
+@let list = conversations();
+
+@if (list.length > 0) {
+  <div class="conv-list">
+    <h3 class="conv-list-title">Conversaciones anteriores</h3>
+    @for (conv of list; track conv.id) {
+      <button
+        class="conv-item"
+        (click)="selectConversation.emit(conv.id)"
+        [attr.aria-label]="
+          'Conversacion del ' +
+          (conv.startedAt | date: 'd MMM') +
+          ', nivel ' +
+          conv.level.toUpperCase()
+        "
+      >
+        <app-icon [name]="chatIcon" [size]="18" aria-hidden="true" />
+        <div class="conv-item-info">
+          <span class="conv-item-date">{{ conv.startedAt | date: 'd MMM yyyy, HH:mm' }}</span>
+          <span class="conv-item-meta">
+            {{ conv.level.toUpperCase() }}
+            @if (conv.topic) {
+              &middot; {{ conv.topic }}
+            }
+            &middot; {{ conv.messageCount }} msgs
+          </span>
+        </div>
+        <app-icon [name]="arrowIcon" [size]="16" aria-hidden="true" />
+      </button>
+    }
+  </div>
+}

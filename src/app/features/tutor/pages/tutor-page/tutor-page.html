@@ -1,0 +1,86 @@
+@if (showSummary()) {
+  @let result = endResult();
+  <div class="summary" role="region" aria-label="Resumen de conversacion" aria-live="polite">
+    <div class="summary-icon">
+      <app-icon [name]="trophyIcon" [size]="48" aria-hidden="true" />
+    </div>
+    <h2 class="summary-title">Conversacion completada</h2>
+
+    @if (result) {
+      <div class="summary-stats">
+        <div class="summary-stat">
+          <span class="summary-stat-value">{{ result.messagesCount }}</span>
+          <span class="summary-stat-label">Mensajes</span>
+        </div>
+        <div class="summary-stat summary-stat--xp">
+          <span class="summary-stat-value">+{{ result.xpEarned }}</span>
+          <span class="summary-stat-label">XP</span>
+        </div>
+      </div>
+      <p class="summary-text">{{ result.summary }}</p>
+    }
+
+    <button class="summary-btn" (click)="startNew()">
+      <app-icon [name]="newChatIcon" [size]="18" aria-hidden="true" />
+      Nueva conversacion
+    </button>
+  </div>
+} @else if (isActive()) {
+  <app-conversation-header
+    [level]="currentLevel()"
+    [messageCount]="messageCount()"
+    (endConversation)="endConversation()"
+  />
+
+  <div class="chat-area" #chatContainer>
+    @if (status() === 'sending' && messages().length === 0) {
+      <div class="skeleton-container" aria-label="Cargando conversacion">
+        <div class="skeleton skeleton--avatar"></div>
+        <div class="skeleton skeleton--line skeleton--long"></div>
+        <div class="skeleton skeleton--line skeleton--short"></div>
+      </div>
+    }
+
+    @for (msg of messages(); track msg.id) {
+      <app-chat-bubble
+        [message]="msg"
+        (speakWord)="speakWord($event)"
+        (addToReview)="addToReview($event)"
+      />
+    } @empty {
+      <p class="chat-empty">Toca el microfono para empezar a hablar</p>
+    }
+
+    @if (status() === 'sending' && messages().length > 0) {
+      <div class="skeleton-container" aria-label="El tutor esta pensando">
+        <div class="skeleton skeleton--avatar"></div>
+        <div class="skeleton skeleton--line skeleton--long"></div>
+        <div class="skeleton skeleton--line skeleton--medium"></div>
+      </div>
+    }
+  </div>
+
+  @if (error(); as err) {
+    <div class="error-bar" role="alert">
+      <span>{{ err }}</span>
+      <button class="error-dismiss" (click)="clearError()" aria-label="Cerrar error">
+        &times;
+      </button>
+    </div>
+  }
+
+  <app-voice-input
+    [status]="status()"
+    [supported]="speechSupported()"
+    (toggleRecord)="toggleRecord()"
+  />
+} @else {
+  <app-start-screen
+    [pastConversations]="pastConversations()"
+    [defaultLevel]="defaultLevel()"
+    [sending]="sending()"
+    [loadingHistory]="loadingHistory()"
+    (startConvo)="onStart($event)"
+    (selectConversation)="onSelectConversation($event)"
+  />
+}

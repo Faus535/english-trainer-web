@@ -6,7 +6,15 @@ import { TtsService } from '../../features/speak/services/tts.service';
 import { Icon } from '../../shared/components/icon/icon';
 import { ConnectionStatus } from '../../shared/components/connection-status/connection-status';
 import { Toast } from '../../shared/components/toast/toast';
-import { LucideIconData, LayoutDashboard, Mic, Trophy, Settings, Square } from 'lucide-angular';
+import {
+  LucideIconData,
+  LayoutDashboard,
+  Mic,
+  Trophy,
+  Settings,
+  Square,
+  BotMessageSquare,
+} from 'lucide-angular';
 
 interface NavTab {
   path: string;
@@ -54,6 +62,7 @@ export class Shell {
   protected readonly tabs: NavTab[] = [
     { path: '/dashboard', label: 'Sesiones', icon: LayoutDashboard },
     { path: '/speak', label: 'Hablar', icon: Mic },
+    { path: '/tutor', label: 'Tutor', icon: BotMessageSquare },
     { path: '/achievements', label: 'Logros', icon: Trophy },
     { path: '/settings', label: 'Ajustes', icon: Settings },
   ];

@@ -1,0 +1,59 @@
+<div class="start-screen">
+  <h1 class="start-title">AI Tutor</h1>
+  <p class="start-subtitle">Practica ingles conversando con tu tutor de IA</p>
+
+  <div class="selector-section">
+    <span class="selector-label" id="level-label">Nivel</span>
+    <div class="selector-options" role="radiogroup" aria-labelledby="level-label">
+      @for (level of levels; track level) {
+        <button
+          class="selector-chip"
+          [class.selector-chip--active]="selectedLevel() === level"
+          (click)="selectLevel(level)"
+          role="radio"
+          [attr.aria-checked]="selectedLevel() === level"
+        >
+          {{ level.toUpperCase() }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="selector-section">
+    <span class="selector-label" id="topic-label">Tema</span>
+    <div
+      class="selector-options selector-options--wrap"
+      role="radiogroup"
+      aria-labelledby="topic-label"
+    >
+      @for (topic of topics; track topic.value) {
+        <button
+          class="selector-chip"
+          [class.selector-chip--active]="selectedTopic() === topic.value"
+          (click)="selectTopic(topic.value)"
+          role="radio"
+          [attr.aria-checked]="selectedTopic() === topic.value"
+        >
+          {{ topic.label }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <button class="start-btn" (click)="startConversation()" [disabled]="sending()">
+    <app-icon [name]="newChatIcon" [size]="20" aria-hidden="true" />
+    Iniciar conversacion
+  </button>
+
+  @if (loadingHistory()) {
+    <div class="history-loading" aria-label="Cargando historial">
+      <div class="skeleton skeleton--line skeleton--long"></div>
+      <div class="skeleton skeleton--line skeleton--long"></div>
+    </div>
+  } @else {
+    <app-conversation-list
+      [conversations]="pastConversations()"
+      (selectConversation)="selectConversation.emit($event)"
+    />
+  }
+</div>

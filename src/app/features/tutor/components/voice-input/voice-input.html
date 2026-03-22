@@ -1,0 +1,21 @@
+<div class="voice-input">
+  <button
+    class="mic-btn"
+    [class.mic-btn--recording]="status() === 'recording'"
+    [class.mic-btn--sending]="status() === 'sending'"
+    [class.mic-btn--speaking]="status() === 'speaking'"
+    [class.mic-btn--error]="status() === 'error'"
+    [disabled]="disabled()"
+    [attr.aria-label]="label()"
+    [attr.aria-pressed]="status() === 'recording'"
+    (click)="onTap()"
+  >
+    <app-icon [name]="icon()" [size]="28" aria-hidden="true" />
+  </button>
+
+  <span class="voice-label" aria-live="polite">{{ label() }}</span>
+
+  @if (!supported()) {
+    <span class="voice-warning" role="alert"> Tu navegador no soporta reconocimiento de voz </span>
+  }
+</div>

@@ -1,0 +1,34 @@
+@let msg = message();
+
+<div
+  class="bubble"
+  [class.bubble--user]="msg.role === 'user'"
+  [class.bubble--assistant]="msg.role === 'assistant'"
+  [attr.aria-label]="msg.role === 'user' ? 'Tu mensaje' : 'Respuesta del tutor'"
+>
+  @if (msg.role === 'assistant') {
+    <span class="bubble-avatar" aria-hidden="true">AI</span>
+  }
+
+  <div class="bubble-content">
+    <p class="bubble-text">{{ msg.content }}</p>
+
+    @if (msg.confidence; as conf) {
+      <span class="bubble-confidence" aria-label="Confianza de reconocimiento">
+        {{ conf * 100 | number: '1.0-0' }}%
+      </span>
+    }
+
+    <time class="bubble-time" [attr.datetime]="msg.timestamp">
+      {{ msg.timestamp | date: 'HH:mm' }}
+    </time>
+  </div>
+</div>
+
+@if (msg.feedback) {
+  <app-feedback-card
+    [feedback]="msg.feedback"
+    (speakWord)="speakWord.emit($event)"
+    (addToReview)="addToReview.emit($event)"
+  />
+}

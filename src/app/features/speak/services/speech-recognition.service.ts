@@ -3,6 +3,12 @@ import { Injectable, NgZone, inject, signal } from '@angular/core';
 import { PronunciationResult, RecognitionState } from '../models/speak.model';
 import { compareTexts } from '../utils/pronunciation-feedback.util';
 
+export interface FreeRecognitionResult {
+  transcript: string;
+  confidence: number;
+  error?: string;
+}
+
 // Web Speech Recognition API types (not in all TS libs)
 interface SpeechRecognitionResult {
   readonly isFinal: boolean;
@@ -20,10 +26,6 @@ interface SpeechRecognitionResultList {
   readonly length: number;
   item(index: number): SpeechRecognitionResult;
   [index: number]: SpeechRecognitionResult;
-}
-
-interface SpeechRecognitionEventInit extends EventInit {
-  results: SpeechRecognitionResultList;
 }
 
 interface WebSpeechRecognitionEvent extends Event {
@@ -67,6 +69,7 @@ export class SpeechRecognitionService {
 
   private recognitionInstance: WebSpeechRecognition | null = null;
   private timeoutId: number | null = null;
+  private freeResolve: ((result: FreeRecognitionResult) => void) | null = null;
 
   readonly supported = this._supported.asReadonly();
   readonly state = this._state.asReadonly();
@@ -95,10 +98,11 @@ export class SpeechRecognitionService {
     this.recognitionInstance.onresult = (event: WebSpeechRecognitionEvent) => {
       let transcript = '';
       let confidence = 0;
-      for (let i = 0; i < event.results.length; i++) {
-        transcript += event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          confidence = Math.max(confidence, event.results[i][0].confidence);
+      const results = Array.from({ length: event.results.length }, (_, i) => event.results[i]);
+      for (const res of results) {
+        transcript += res[0].transcript;
+        if (res.isFinal) {
+          confidence = Math.max(confidence, res[0].confidence);
         }
       }
       lastTranscript = transcript;
@@ -178,6 +182,81 @@ export class SpeechRecognitionService {
     this.stopRecording();
     this._state.set('idle');
     this._result.set(null);
+  }
+
+  startFreeRecording(): Promise<FreeRecognitionResult> {
+    return new Promise<FreeRecognitionResult>((resolve) => {
+      if (!this.SpeechRecognitionAPI) {
+        resolve({ transcript: '', confidence: 0, error: 'not-supported' });
+        return;
+      }
+
+      if (this._state() === 'recording') {
+        this.stopRecording();
+        return;
+      }
+
+      this.freeResolve = resolve;
+      this._result.set(null);
+      this._state.set('recording');
+
+      this.recognitionInstance = new this.SpeechRecognitionAPI();
+      this.recognitionInstance.lang = 'en-US';
+      this.recognitionInstance.interimResults = true;
+      this.recognitionInstance.maxAlternatives = 1;
+      this.recognitionInstance.continuous = true;
+
+      let lastTranscript = '';
+      let lastConfidence = 0;
+
+      this.recognitionInstance.onresult = (event: WebSpeechRecognitionEvent) => {
+        let transcript = '';
+        let confidence = 0;
+        const results = Array.from({ length: event.results.length }, (_, i) => event.results[i]);
+        for (const res of results) {
+          transcript += res[0].transcript;
+          if (res.isFinal) {
+            confidence = Math.max(confidence, res[0].confidence);
+          }
+        }
+        lastTranscript = transcript;
+        lastConfidence = confidence || event.results[0][0].confidence;
+      };
+
+      this.recognitionInstance.onerror = (event: WebSpeechRecognitionErrorEvent) => {
+        this.clearTimeout();
+        this.zone.run(() => {
+          this._state.set('idle');
+          const result: FreeRecognitionResult = {
+            transcript: '',
+            confidence: 0,
+            error: event.error === 'aborted' ? undefined : event.error,
+          };
+          this.freeResolve?.(result);
+          this.freeResolve = null;
+        });
+      };
+
+      this.recognitionInstance.onend = () => {
+        this.clearTimeout();
+        this.zone.run(() => {
+          if (this._state() === 'recording' || this._state() === 'processing') {
+            const result: FreeRecognitionResult = lastTranscript
+              ? { transcript: lastTranscript, confidence: lastConfidence }
+              : { transcript: '', confidence: 0, error: 'no-speech' };
+            this._state.set('idle');
+            this.freeResolve?.(result);
+            this.freeResolve = null;
+          }
+        });
+      };
+
+      this.recognitionInstance.start();
+
+      this.timeoutId = window.setTimeout(() => {
+        this.stopRecording();
+      }, 30000);
+    });
   }
 
   private clearTimeout(): void {
