@@ -36,7 +36,7 @@ export class Shell {
 
   protected readonly speaking = this.tts.speaking;
   protected readonly stopIcon = Square;
-  protected readonly showChrome = signal(!this.router.url.startsWith('/auth'));
+  protected readonly showChrome = signal(this.shouldShowChrome(this.router.url));
 
   constructor() {
     this.router.events
@@ -45,7 +45,7 @@ export class Shell {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((event) => {
-        this.showChrome.set(!event.urlAfterRedirects.startsWith('/auth'));
+        this.showChrome.set(this.shouldShowChrome(event.urlAfterRedirects));
         const main = document.querySelector<HTMLElement>('main');
         main?.focus();
       });
@@ -57,6 +57,10 @@ export class Shell {
 
   protected isActive(path: string): boolean {
     return this.router.url.startsWith(path);
+  }
+
+  private shouldShowChrome(url: string): boolean {
+    return !url.startsWith('/auth') && !url.startsWith('/level-test');
   }
 
   protected readonly tabs: NavTab[] = [
