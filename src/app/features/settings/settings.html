@@ -53,15 +53,34 @@
     </button>
   </section>
 
+  <section class="setting-group">
+    <h3 class="group-title">Idioma</h3>
+
+    <div class="setting-row">
+      <label class="setting-label" for="localeSelect">Idioma de la interfaz</label>
+      <select id="localeSelect" class="select" (change)="onLocaleChange($event)">
+        <option value="es" [selected]="locale() === 'es'">Espanol</option>
+        <option value="en" [selected]="locale() === 'en'">English</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="setting-group">
+    <h3 class="group-title">Modo de estudio</h3>
+
+    <div class="setting-row-inline">
+      <span class="setting-label">Modo focus / zen</span>
+      <button class="toggle" [class.active]="isFocusMode()" (click)="toggleFocusMode()">
+        <span class="toggle-knob" [class.on]="isFocusMode()"></span>
+      </button>
+    </div>
+  </section>
+
   <section class="setting-group danger">
     <h3 class="group-title">Zona peligrosa</h3>
 
-    <button class="btn-action warning" (click)="retakeTest()">
-      Repetir test de nivel
-    </button>
+    <button class="btn-action warning" (click)="retakeTest()">Repetir test de nivel</button>
 
-    <button class="btn-action danger" (click)="resetAll()">
-      Resetear todo el progreso
-    </button>
+    <button class="btn-action danger" (click)="resetAll()">Resetear todo el progreso</button>
   </section>
 </div>

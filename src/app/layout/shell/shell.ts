@@ -14,6 +14,11 @@ import {
   Settings,
   Square,
   BotMessageSquare,
+  BookOpen,
+  PenLine,
+  BarChart3,
+  UserCircle,
+  Bell,
 } from 'lucide-angular';
 
 interface NavTab {
@@ -67,7 +72,12 @@ export class Shell {
     { path: '/dashboard', label: 'Sesiones', icon: LayoutDashboard },
     { path: '/speak', label: 'Hablar', icon: Mic },
     { path: '/tutor', label: 'Tutor', icon: BotMessageSquare },
+    { path: '/reading', label: 'Leer', icon: BookOpen },
+    { path: '/writing', label: 'Escribir', icon: PenLine },
+    { path: '/analytics', label: 'Progreso', icon: BarChart3 },
     { path: '/achievements', label: 'Logros', icon: Trophy },
+    { path: '/profile', label: 'Perfil', icon: UserCircle },
+    { path: '/notifications', label: 'Alertas', icon: Bell },
     { path: '/settings', label: 'Ajustes', icon: Settings },
   ];
 }

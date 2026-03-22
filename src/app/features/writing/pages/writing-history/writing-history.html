@@ -1,0 +1,28 @@
+<div class="history-page">
+  <div class="history-header">
+    <a routerLink="/writing" class="back-link">Volver</a>
+    <h2 class="page-title">Historial de escritura</h2>
+  </div>
+  @if (loading()) {
+    <div class="loading">Cargando historial...</div>
+  } @else if (history().length === 0) {
+    <div class="empty">Aun no has completado ningun ejercicio de escritura.</div>
+  } @else {
+    <div class="history-list">
+      @for (item of history(); track item.id) {
+        <div class="history-card">
+          <div class="history-card-header">
+            <span
+              class="history-score"
+              [class.good]="item.score >= 70"
+              [class.bad]="item.score < 70"
+              >{{ item.score }}%</span
+            ><span class="history-date">{{ formatDate(item.submittedAt) }}</span>
+          </div>
+          <p class="history-prompt">{{ item.prompt }}</p>
+          <span class="history-meta">{{ item.wordCount }} palabras</span>
+        </div>
+      }
+    </div>
+  }
+</div>

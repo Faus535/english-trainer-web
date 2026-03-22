@@ -1,0 +1,20 @@
+<div class="chart-container">
+  <div class="chart-labels">
+    @for (level of levels; track level) {
+      <span class="chart-label">{{ level }}</span>
+    }
+  </div>
+  @for (module of chartData(); track module.name) {
+    <div class="chart-row">
+      <span class="module-name">{{ module.name }}</span>
+      <div class="bar-track">
+        <div
+          class="bar-fill"
+          [style.width.%]="module.progress"
+          [style.background]="module.color"
+        ></div>
+      </div>
+      <span class="level-label">{{ module.currentLevel | uppercase }}</span>
+    </div>
+  }
+</div>

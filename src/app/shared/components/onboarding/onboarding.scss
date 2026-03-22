@@ -1,0 +1,110 @@
+:host {
+  display: block;
+}
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--sp-4);
+  backdrop-filter: blur(0.25rem);
+}
+.onboarding-card {
+  background: var(--surface-0);
+  border-radius: var(--r-xl);
+  padding: var(--sp-8);
+  max-width: 24rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--sp-4);
+  box-shadow: var(--shadow-elevated);
+  animation: slideUp 300ms var(--ease);
+}
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.onboarding-icon {
+  font-size: 3rem;
+}
+.onboarding-title {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+}
+.onboarding-desc {
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  line-height: 1.6;
+}
+.onboarding-dots {
+  display: flex;
+  gap: var(--sp-2);
+}
+.dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--surface-3);
+  transition: all 200ms var(--ease);
+  &.active {
+    background: var(--primary);
+    width: 1.5rem;
+    border-radius: var(--r-full);
+  }
+}
+.onboarding-actions {
+  display: flex;
+  gap: var(--sp-3);
+  width: 100%;
+}
+.btn-primary {
+  flex: 1;
+  padding: var(--sp-3);
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  &:hover {
+    background: var(--primary-hover);
+  }
+}
+.btn-secondary {
+  flex: 1;
+  padding: var(--sp-3);
+  background: var(--surface-1);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+.skip-btn {
+  background: none;
+  border: none;
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  cursor: pointer;
+  font-family: inherit;
+  padding: var(--sp-2);
+  &:hover {
+    color: var(--text);
+  }
+}

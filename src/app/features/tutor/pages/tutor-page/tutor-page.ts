@@ -21,12 +21,13 @@ import { ChatBubble } from '../../components/chat-bubble/chat-bubble';
 import { VoiceInput } from '../../components/voice-input/voice-input';
 import { ConversationHeader } from '../../components/conversation-header/conversation-header';
 import { StartScreen } from '../../components/start-screen/start-screen';
+import { ConversationStats } from '../../components/conversation-stats/conversation-stats';
 import { Icon } from '../../../../shared/components/icon/icon';
-import { LucideIconData, MessageSquarePlus, Trophy } from 'lucide-angular';
+import { LucideIconData, MessageSquarePlus, Trophy, Download } from 'lucide-angular';
 
 @Component({
   selector: 'app-tutor-page',
-  imports: [ChatBubble, VoiceInput, ConversationHeader, StartScreen, Icon],
+  imports: [ChatBubble, VoiceInput, ConversationHeader, StartScreen, ConversationStats, Icon],
   templateUrl: './tutor-page.html',
   styleUrl: './tutor-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -59,6 +60,8 @@ export class TutorPage {
 
   protected readonly newChatIcon: LucideIconData = MessageSquarePlus;
   protected readonly trophyIcon: LucideIconData = Trophy;
+  protected readonly downloadIcon: LucideIconData = Download;
+  protected readonly streaming = this.conversationState.streaming;
 
   constructor() {
     this.loadHistory();
@@ -151,6 +154,20 @@ export class TutorPage {
 
   protected clearError(): void {
     this.conversationState.clearError();
+  }
+
+  protected exportConversation(): void {
+    const msgs = this.messages();
+    const text = msgs
+      .map((m) => `[${m.role === 'user' ? 'Tu' : 'Tutor'}] ${m.content}`)
+      .join('\n\n');
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `conversation-${new Date().toISOString().slice(0, 10)}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   private loadHistory(): void {

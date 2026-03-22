@@ -1,0 +1,23 @@
+@if (visible()) {
+  <div class="onboarding-overlay" role="dialog" aria-modal="true" aria-label="Tour de bienvenida">
+    <div class="onboarding-card">
+      <div class="onboarding-icon">{{ step().icon }}</div>
+      <h2 class="onboarding-title">{{ step().title }}</h2>
+      <p class="onboarding-desc">{{ step().description }}</p>
+      <div class="onboarding-dots">
+        @for (s of steps; track $index) {
+          <span class="dot" [class.active]="$index === currentStep()"></span>
+        }
+      </div>
+      <div class="onboarding-actions">
+        @if (currentStep() > 0) {
+          <button class="btn-secondary" (click)="previous()">Anterior</button>
+        }
+        <button class="btn-primary" (click)="next()">
+          {{ isLast() ? 'Empezar' : 'Siguiente' }}
+        </button>
+      </div>
+      <button class="skip-btn" (click)="skip()">Saltar tour</button>
+    </div>
+  </div>
+}

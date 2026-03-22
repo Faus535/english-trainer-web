@@ -90,3 +90,19 @@ export const TUTOR_TOPICS: { value: TutorTopic; label: string }[] = [
   { value: 'shopping', label: 'De compras' },
   { value: 'daily_life', label: 'Vida diaria' },
 ];
+
+export interface ConversationStats {
+  totalMessages: number;
+  userMessages: number;
+  assistantMessages: number;
+  grammarErrors: number;
+  vocabLearned: string[];
+  averageConfidence: number;
+  duration: number;
+}
+
+export interface TopicSuggestion {
+  topic: TutorTopic;
+  label: string;
+  reason: string;
+}

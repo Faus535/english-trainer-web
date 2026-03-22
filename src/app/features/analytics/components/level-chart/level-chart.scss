@@ -1,0 +1,56 @@
+:host {
+  display: block;
+}
+.chart-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+}
+.chart-labels {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 6rem;
+  padding-right: 2.5rem;
+}
+.chart-label {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  font-weight: 600;
+}
+.chart-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+.module-name {
+  width: 5rem;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-2);
+  text-transform: capitalize;
+  flex-shrink: 0;
+}
+.bar-track {
+  flex: 1;
+  height: 1.25rem;
+  background: var(--surface-1);
+  border-radius: var(--r-full);
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: var(--r-full);
+  transition: width 600ms var(--ease);
+  min-width: 0.5rem;
+}
+.level-label {
+  width: 2rem;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-align: center;
+  flex-shrink: 0;
+}

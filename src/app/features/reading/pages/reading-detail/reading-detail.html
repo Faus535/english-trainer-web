@@ -1,0 +1,18 @@
+@if (loading()) {
+  <div class="loading">Cargando...</div>
+} @else if (text()) {
+  <div class="reading-detail">
+    <div class="detail-header">
+      <a routerLink="/reading" class="back-link">Volver</a>
+      <span class="level-badge">{{ text()!.level | uppercase }}</span>
+    </div>
+    <h2 class="detail-title">{{ text()!.title }}</h2>
+    <p class="detail-meta">
+      {{ text()!.wordCount }} palabras &middot; {{ text()!.estimatedMinutes }} min
+    </p>
+    <div class="reading-content">
+      <p>{{ text()!.content }}</p>
+    </div>
+    <button class="quiz-btn" (click)="startQuiz()">Iniciar preguntas de comprension</button>
+  </div>
+}

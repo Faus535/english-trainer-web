@@ -1,0 +1,99 @@
+<div class="notifications-page">
+  <h2 class="page-title">Notificaciones</h2>
+  @if (!supported()) {
+    <div class="notice warning">Tu navegador no soporta notificaciones push.</div>
+  } @else {
+    @if (permission() === 'denied') {
+      <div class="notice error">
+        Las notificaciones estan bloqueadas. Habilitalas desde la configuracion de tu navegador.
+      </div>
+    } @else if (permission() !== 'granted') {
+      <section class="setting-group">
+        <h3 class="group-title">Activar notificaciones</h3>
+        <p class="setting-desc">
+          Recibe recordatorios para mantener tu racha y seguir practicando.
+        </p>
+        <button class="enable-btn" (click)="enableNotifications()" [disabled]="registering()">
+          {{ registering() ? 'Activando...' : 'Activar notificaciones push' }}
+        </button>
+      </section>
+    }
+    @if (isEnabled()) {
+      <section class="setting-group">
+        <h3 class="group-title">Tipos de notificacion</h3>
+        <div class="setting-row-inline">
+          <div class="setting-info">
+            <span class="setting-label">Recordatorio diario</span
+            ><span class="setting-hint">Te recordamos practicar si no lo has hecho hoy</span>
+          </div>
+          <button
+            class="toggle"
+            [class.active]="preferences().dailyReminder"
+            (click)="toggleDaily()"
+            [attr.aria-pressed]="preferences().dailyReminder"
+          >
+            <span class="toggle-knob" [class.on]="preferences().dailyReminder"></span>
+          </button>
+        </div>
+        <div class="setting-row-inline">
+          <div class="setting-info">
+            <span class="setting-label">Alerta de racha</span
+            ><span class="setting-hint">Aviso cuando tu racha esta en peligro</span>
+          </div>
+          <button
+            class="toggle"
+            [class.active]="preferences().streakAlert"
+            (click)="toggleStreak()"
+            [attr.aria-pressed]="preferences().streakAlert"
+          >
+            <span class="toggle-knob" [class.on]="preferences().streakAlert"></span>
+          </button>
+        </div>
+        <div class="setting-row-inline">
+          <div class="setting-info">
+            <span class="setting-label">Repaso pendiente</span
+            ><span class="setting-hint">Aviso cuando tienes items pendientes de repaso</span>
+          </div>
+          <button
+            class="toggle"
+            [class.active]="preferences().reviewReminder"
+            (click)="toggleReview()"
+            [attr.aria-pressed]="preferences().reviewReminder"
+          >
+            <span class="toggle-knob" [class.on]="preferences().reviewReminder"></span>
+          </button>
+        </div>
+      </section>
+      <section class="setting-group">
+        <h3 class="group-title">Horario de recordatorio</h3>
+        <div class="time-picker">
+          <select
+            class="time-select"
+            [value]="preferences().reminderHour"
+            (change)="onHourChange($event)"
+            aria-label="Hora"
+          >
+            @for (h of hours; track h) {
+              <option [value]="h" [selected]="preferences().reminderHour === h">
+                {{ h.toString().padStart(2, '0') }}
+              </option>
+            }
+          </select>
+          <span class="time-separator">:</span>
+          <select
+            class="time-select"
+            [value]="preferences().reminderMinute"
+            (change)="onMinuteChange($event)"
+            aria-label="Minutos"
+          >
+            @for (m of minutes; track m) {
+              <option [value]="m" [selected]="preferences().reminderMinute === m">
+                {{ m.toString().padStart(2, '0') }}
+              </option>
+            }
+          </select>
+        </div>
+      </section>
+    }
+  }
+</div>

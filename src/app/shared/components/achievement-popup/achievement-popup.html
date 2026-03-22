@@ -1,0 +1,16 @@
+@if (visible()) {
+  <div
+    class="popup-overlay"
+    role="button"
+    tabindex="0"
+    (click)="dismiss()"
+    (keydown.enter)="dismiss()"
+    (keydown.escape)="dismiss()"
+  >
+    <div class="popup-card" [class]="type()" role="alert">
+      <div class="popup-icon">{{ icon() }}</div>
+      <h3 class="popup-title">{{ title() }}</h3>
+      <p class="popup-desc">{{ description() }}</p>
+    </div>
+  </div>
+}

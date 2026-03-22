@@ -1,0 +1,49 @@
+<div class="writing-page">
+  <div class="page-header">
+    <h2 class="page-title">Writing</h2>
+    <a routerLink="/writing/history" class="history-link"
+      ><app-icon [name]="historyIcon" [size]="16" aria-hidden="true" /> Historial</a
+    >
+  </div>
+  <div class="filters">
+    <button
+      class="filter-btn"
+      [class.active]="selectedLevel() === null"
+      (click)="filterByLevel(null)"
+    >
+      Todos
+    </button>
+    @for (level of levels; track level) {
+      <button
+        class="filter-btn"
+        [class.active]="selectedLevel() === level"
+        (click)="filterByLevel(level)"
+      >
+        {{ level | uppercase }}
+      </button>
+    }
+  </div>
+  @if (loading()) {
+    <div class="loading">Cargando ejercicios...</div>
+  } @else if (exercises().length === 0) {
+    <div class="empty">
+      <app-icon [name]="penIcon" [size]="32" aria-hidden="true" />
+      <p>No hay ejercicios disponibles</p>
+    </div>
+  } @else {
+    <div class="exercise-grid">
+      @for (exercise of exercises(); track exercise.id) {
+        <a class="exercise-card" [routerLink]="['/writing', exercise.id]">
+          <div class="exercise-header">
+            <span class="level-badge">{{ exercise.level | uppercase }}</span
+            ><span class="category-badge">{{ exercise.category }}</span>
+          </div>
+          <p class="exercise-prompt">{{ exercise.prompt }}</p>
+          <span class="exercise-meta"
+            >{{ exercise.minWords }}-{{ exercise.maxWords }} palabras</span
+          >
+        </a>
+      }
+    </div>
+  }
+</div>

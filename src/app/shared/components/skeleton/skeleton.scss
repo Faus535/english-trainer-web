@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+.skeleton {
+  background: var(--surface-1);
+  border-radius: var(--r-sm);
+  animation: pulse 1.5s ease-in-out infinite;
+  &.circle {
+    border-radius: 50%;
+  }
+  &.card {
+    border-radius: var(--r-lg);
+    min-height: 6rem;
+  }
+}
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}

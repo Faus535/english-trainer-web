@@ -122,6 +122,19 @@
   }
 }
 
+.forgot-link {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  text-decoration: none;
+  text-align: right;
+  margin-top: calc(-1 * var(--sp-2));
+  transition: color 0.2s var(--ease);
+
+  &:hover {
+    color: var(--primary);
+  }
+}
+
 .auth-button {
   padding: var(--sp-3);
   border: none;

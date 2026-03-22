@@ -2,7 +2,13 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from './environment';
-import { UserProfileResponse } from '../../shared/models/api.model';
+import {
+  ChangePasswordRequest,
+  DeleteAccountRequest,
+  UpdateProfileRequest,
+  UserAccountResponse,
+  UserProfileResponse,
+} from '../../shared/models/api.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileApiService {
@@ -14,13 +20,14 @@ export class ProfileApiService {
   }
 
   markTestCompleted(profileId: string): Observable<UserProfileResponse> {
-    return this.http.put<UserProfileResponse>(
-      `${this.baseUrl}/${profileId}/test-completed`,
-      {},
-    );
+    return this.http.put<UserProfileResponse>(`${this.baseUrl}/${profileId}/test-completed`, {});
   }
 
-  updateModuleLevel(profileId: string, module: string, level: string): Observable<UserProfileResponse> {
+  updateModuleLevel(
+    profileId: string,
+    module: string,
+    level: string,
+  ): Observable<UserProfileResponse> {
     return this.http.put<UserProfileResponse>(
       `${this.baseUrl}/${profileId}/modules/${module}/level`,
       { level },
@@ -28,16 +35,26 @@ export class ProfileApiService {
   }
 
   recordSession(profileId: string, data: { duration?: number }): Observable<UserProfileResponse> {
-    return this.http.post<UserProfileResponse>(
-      `${this.baseUrl}/${profileId}/sessions`,
-      data,
-    );
+    return this.http.post<UserProfileResponse>(`${this.baseUrl}/${profileId}/sessions`, data);
   }
 
   addXp(profileId: string, amount: number): Observable<UserProfileResponse> {
-    return this.http.post<UserProfileResponse>(
-      `${this.baseUrl}/${profileId}/xp`,
-      { amount },
-    );
+    return this.http.post<UserProfileResponse>(`${this.baseUrl}/${profileId}/xp`, { amount });
+  }
+
+  getCurrentUser(): Observable<UserAccountResponse> {
+    return this.http.get<UserAccountResponse>(`${environment.apiUrl}/auth/me`);
+  }
+
+  updateProfile(profileId: string, data: UpdateProfileRequest): Observable<UserAccountResponse> {
+    return this.http.put<UserAccountResponse>(`${this.baseUrl}/${profileId}`, data);
+  }
+
+  changePassword(data: ChangePasswordRequest): Observable<void> {
+    return this.http.put<void>(`${environment.apiUrl}/auth/password`, data);
+  }
+
+  deleteAccount(data: DeleteAccountRequest): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/auth/account`, { body: data });
   }
 }

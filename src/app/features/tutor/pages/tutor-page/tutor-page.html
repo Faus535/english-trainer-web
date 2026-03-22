@@ -20,10 +20,18 @@
       <p class="summary-text">{{ result.summary }}</p>
     }
 
-    <button class="summary-btn" (click)="startNew()">
-      <app-icon [name]="newChatIcon" [size]="18" aria-hidden="true" />
-      Nueva conversacion
-    </button>
+    <app-conversation-stats [messages]="messages()" />
+
+    <div class="summary-actions">
+      <button class="summary-btn" (click)="startNew()">
+        <app-icon [name]="newChatIcon" [size]="18" aria-hidden="true" />
+        Nueva conversacion
+      </button>
+      <button class="summary-btn summary-btn--secondary" (click)="exportConversation()">
+        <app-icon [name]="downloadIcon" [size]="18" aria-hidden="true" />
+        Exportar
+      </button>
+    </div>
   </div>
 } @else if (isActive()) {
   <app-conversation-header

@@ -2,6 +2,8 @@ import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@a
 import { Router } from '@angular/router';
 import { TtsService } from '../speak/services/tts.service';
 import { StateService } from '../../shared/services/state.service';
+import { I18nService, Locale } from '../../shared/services/i18n.service';
+import { FocusModeService } from '../../shared/services/focus-mode.service';
 
 @Component({
   selector: 'app-settings',
@@ -13,6 +15,11 @@ export class Settings {
   private readonly tts = inject(TtsService);
   private readonly state = inject(StateService);
   private readonly router = inject(Router);
+  private readonly i18n = inject(I18nService);
+  private readonly focusMode = inject(FocusModeService);
+
+  protected readonly locale = this.i18n.locale;
+  protected readonly isFocusMode = this.focusMode.active;
 
   protected readonly rate = this.tts.rate;
   protected readonly voices = computed(() => this.tts.getVoices());
@@ -20,7 +27,7 @@ export class Settings {
   protected readonly isDark = signal(!document.documentElement.classList.contains('light-theme'));
 
   protected toggleTheme(): void {
-    this.isDark.update(v => !v);
+    this.isDark.update((v) => !v);
     document.documentElement.classList.toggle('light-theme', !this.isDark());
     localStorage.setItem('english_plan_theme', this.isDark() ? 'dark' : 'light');
   }
@@ -51,16 +58,32 @@ export class Settings {
   }
 
   protected retakeTest(): void {
-    if (confirm('Repetir el test de nivel? Tu progreso en modulos se mantendra, pero se recalcularan tus niveles.')) {
+    if (
+      confirm(
+        'Repetir el test de nivel? Tu progreso en modulos se mantendra, pero se recalcularan tus niveles.',
+      )
+    ) {
       this.state.markTestIncomplete();
       this.router.navigate(['/level-test']);
     }
   }
 
   protected resetAll(): void {
-    if (confirm('Reiniciar todo el progreso? Esto borrara tu test de nivel y progreso en todos los modulos.')) {
+    if (
+      confirm(
+        'Reiniciar todo el progreso? Esto borrara tu test de nivel y progreso en todos los modulos.',
+      )
+    ) {
       this.state.resetProgress();
       this.router.navigate(['/level-test']);
     }
+  }
+
+  protected onLocaleChange(event: Event): void {
+    this.i18n.setLocale((event.target as HTMLSelectElement).value as Locale);
+  }
+
+  protected toggleFocusMode(): void {
+    this.focusMode.toggle();
   }
 }

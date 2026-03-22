@@ -1,0 +1,42 @@
+<div class="admin-page">
+  <h2 class="page-title">Panel de Administracion</h2>
+  @if (loading()) {
+    <div class="loading">Cargando...</div>
+  } @else if (stats()) {
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-value">{{ stats()!.totalUsers }}</span
+        ><span class="stat-label">Usuarios</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">{{ stats()!.activeUsersToday }}</span
+        ><span class="stat-label">Activos hoy</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">{{ stats()!.activeUsersWeek }}</span
+        ><span class="stat-label">Activos semana</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">{{ stats()!.totalSessions }}</span
+        ><span class="stat-label">Sesiones</span>
+      </div>
+    </div>
+    <h3 class="section-title">Gestion de contenido</h3>
+    <div class="nav-grid">
+      <a class="nav-card" routerLink="/admin/vocab"
+        ><span class="nav-count">{{ stats()!.vocabCount }}</span
+        ><span class="nav-label">Vocabulario</span></a
+      >
+      <a class="nav-card" routerLink="/admin/phrases"
+        ><span class="nav-count">{{ stats()!.phrasesCount }}</span
+        ><span class="nav-label">Frases</span></a
+      >
+      <a class="nav-card" routerLink="/admin/reading"
+        ><span class="nav-label">Textos de lectura</span></a
+      >
+      <a class="nav-card" routerLink="/admin/writing"
+        ><span class="nav-label">Ejercicios de escritura</span></a
+      >
+    </div>
+  }
+</div>

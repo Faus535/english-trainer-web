@@ -1,0 +1,16 @@
+<div class="weak-areas">
+  @for (area of areas(); track area.moduleName) {
+    <div class="area-card">
+      <div class="area-header">
+        <span class="area-module">{{ area.moduleName }}</span
+        ><span
+          class="area-accuracy"
+          [class.low]="area.accuracy < 50"
+          [class.medium]="area.accuracy >= 50 && area.accuracy < 75"
+          >{{ area.accuracy }}%</span
+        >
+      </div>
+      <p class="area-suggestion">{{ area.suggestion }}</p>
+    </div>
+  }
+</div>

@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard, guestGuard } from './core/guards/auth.guard';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -45,9 +46,46 @@ export const routes: Routes = [
     loadChildren: () => import('./features/tutor/tutor.routes'),
   },
   {
+    path: 'reading',
+    canActivate: [authGuard],
+    loadChildren: () => import('./features/reading/reading.routes'),
+    title: 'Reading',
+  },
+  {
+    path: 'writing',
+    canActivate: [authGuard],
+    loadChildren: () => import('./features/writing/writing.routes'),
+    title: 'Writing',
+  },
+  {
+    path: 'analytics',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/analytics/analytics').then((m) => m.Analytics),
+    title: 'Progreso',
+  },
+  {
+    path: 'profile',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/profile/profile').then((m) => m.Profile),
+    title: 'Mi Perfil',
+  },
+  {
+    path: 'notifications',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/notifications/notification-settings').then((m) => m.NotificationSettings),
+    title: 'Notificaciones',
+  },
+  {
     path: 'settings',
     canActivate: [authGuard],
     loadComponent: () => import('./features/settings/settings').then((m) => m.Settings),
     title: 'Ajustes',
+  },
+  {
+    path: 'admin',
+    canActivate: [authGuard, adminGuard],
+    loadChildren: () => import('./features/admin/admin.routes'),
+    title: 'Admin',
   },
 ];

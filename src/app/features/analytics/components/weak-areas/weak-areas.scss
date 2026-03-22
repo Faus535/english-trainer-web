@@ -1,0 +1,43 @@
+:host {
+  display: block;
+}
+.weak-areas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.area-card {
+  padding: var(--sp-4);
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.area-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.area-module {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  text-transform: capitalize;
+}
+.area-accuracy {
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  color: var(--success);
+  &.low {
+    color: var(--error);
+  }
+  &.medium {
+    color: var(--warning);
+  }
+}
+.area-suggestion {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  line-height: 1.5;
+}

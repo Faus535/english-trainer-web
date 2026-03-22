@@ -160,3 +160,137 @@ export interface ApiError {
   message: string;
   timestamp: string;
 }
+
+// Profile Management
+export interface UpdateProfileRequest {
+  name?: string;
+  avatarUrl?: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface DeleteAccountRequest {
+  password: string;
+}
+
+export interface UserAccountResponse {
+  id: string;
+  email: string;
+  name: string | null;
+  avatarUrl: string | null;
+  provider: 'local' | 'google';
+  createdAt: string;
+}
+
+// Password Recovery
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
+}
+
+// Reading
+export interface ReadingTextResponse {
+  id: string;
+  title: string;
+  content: string;
+  level: Level;
+  topic: string;
+  wordCount: number;
+  estimatedMinutes: number;
+}
+
+export interface ReadingQuestionResponse {
+  id: string;
+  textId: string;
+  question: string;
+  options: string[];
+  correctIndex: number;
+}
+
+export interface ReadingResultResponse {
+  textId: string;
+  score: number;
+  totalQuestions: number;
+  correctAnswers: number;
+}
+
+export interface SubmitReadingAnswersRequest {
+  answers: Record<string, number>;
+}
+
+// Writing
+export interface WritingExerciseResponse {
+  id: string;
+  prompt: string;
+  level: Level;
+  category: string;
+  minWords: number;
+  maxWords: number;
+}
+
+export interface WritingSubmissionRequest {
+  exerciseId: string;
+  content: string;
+}
+
+export interface WritingFeedbackResponse {
+  id: string;
+  exerciseId: string;
+  score: number;
+  corrections: WritingCorrection[];
+  suggestions: string[];
+  summary: string;
+  submittedAt: string;
+}
+
+export interface WritingCorrection {
+  original: string;
+  corrected: string;
+  type: 'grammar' | 'spelling' | 'style' | 'vocabulary';
+  explanation: string;
+}
+
+export interface WritingHistoryResponse {
+  id: string;
+  exerciseId: string;
+  prompt: string;
+  score: number;
+  wordCount: number;
+  submittedAt: string;
+}
+
+// Analytics
+export interface AnalyticsSummaryResponse {
+  totalSessions: number;
+  totalMinutes: number;
+  totalXp: number;
+  averageAccuracy: number;
+  currentStreak: number;
+  bestStreak: number;
+  sessionsThisWeek: number;
+  sessionsLastWeek: number;
+  minutesThisWeek: number;
+  minutesLastWeek: number;
+}
+
+export interface ModuleLevelHistoryResponse {
+  moduleName: string;
+  history: { date: string; level: string }[];
+}
+
+export interface ActivityHeatmapResponse {
+  dates: Record<string, number>;
+}
+
+export interface WeakAreaResponse {
+  moduleName: string;
+  accuracy: number;
+  suggestion: string;
+}

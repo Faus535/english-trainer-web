@@ -1,0 +1,51 @@
+@if (loading()) {
+  <div class="loading">Cargando preguntas...</div>
+} @else if (result()) {
+  <div class="quiz-result">
+    <h2 class="result-title">Resultado</h2>
+    <div class="result-score">
+      <span class="score-value">{{ result()!.correctAnswers }}/{{ result()!.totalQuestions }}</span>
+      <span class="score-label">respuestas correctas</span>
+    </div>
+    <div
+      class="result-percent"
+      [class.good]="result()!.score >= 70"
+      [class.bad]="result()!.score < 70"
+    >
+      {{ result()!.score }}%
+    </div>
+    <button class="primary-btn" (click)="goBack()">Volver a Reading</button>
+  </div>
+} @else if (currentQuestion()) {
+  <div class="quiz-page">
+    <div class="quiz-progress">
+      <div class="progress-bar"><div class="progress-fill" [style.width.%]="progress()"></div></div>
+      <span class="progress-text">{{ currentIndex() + 1 }} / {{ questions().length }}</span>
+    </div>
+    <h3 class="quiz-question">{{ currentQuestion()!.question }}</h3>
+    <div class="quiz-options">
+      @for (option of currentQuestion()!.options; track $index) {
+        <button
+          class="option-btn"
+          [class.selected]="selectedAnswer() === $index"
+          (click)="selectAnswer($index)"
+        >
+          <span class="option-letter">{{ 'ABCD'[$index] }}</span>
+          <span class="option-text">{{ option }}</span>
+        </button>
+      }
+    </div>
+    <div class="quiz-actions">
+      @if (currentIndex() > 0) {
+        <button class="secondary-btn" (click)="previous()">Anterior</button>
+      }
+      <button
+        class="primary-btn"
+        [disabled]="selectedAnswer() === -1 || submitting()"
+        (click)="next()"
+      >
+        {{ submitting() ? 'Enviando...' : isLast() ? 'Finalizar' : 'Siguiente' }}
+      </button>
+    </div>
+  </div>
+}

@@ -5,10 +5,12 @@ import { Observable, tap } from 'rxjs';
 import { environment } from './environment';
 import {
   AuthResponse,
+  ForgotPasswordRequest,
   GoogleAuthRequest,
   LoginRequest,
   RefreshRequest,
   RegisterRequest,
+  ResetPasswordRequest,
 } from '../../shared/models/api.model';
 
 const TOKEN_KEY = 'et_token';
@@ -63,6 +65,14 @@ export class AuthService {
     this._token.set(null);
     this._profileId.set(null);
     this.router.navigate(['/auth/login']);
+  }
+
+  forgotPassword(request: ForgotPasswordRequest): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/forgot-password`, request);
+  }
+
+  resetPassword(request: ResetPasswordRequest): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/reset-password`, request);
   }
 
   private storeAuth(res: AuthResponse): void {

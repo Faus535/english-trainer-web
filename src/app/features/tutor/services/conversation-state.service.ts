@@ -3,6 +3,7 @@ import { Level } from '../../../shared/models/learning.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { StateService } from '../../../shared/services/state.service';
 import { TutorApiService } from './tutor-api.service';
+import { TutorSseService } from './tutor-sse.service';
 import {
   ConversationMessage,
   ConversationStatus,
@@ -12,6 +13,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class ConversationStateService {
   private readonly tutorApi = inject(TutorApiService);
+  private readonly sseService = inject(TutorSseService);
   private readonly auth = inject(AuthService);
   private readonly state = inject(StateService);
 
@@ -21,6 +23,7 @@ export class ConversationStateService {
   private readonly _currentLevel = signal<Level>('a1');
   private readonly _error = signal<string | null>(null);
   private readonly _endResult = signal<EndConversationResponse | null>(null);
+  private readonly _streaming = signal(false);
 
   readonly conversationId = this._conversationId.asReadonly();
   readonly messages = this._messages.asReadonly();
@@ -28,6 +31,7 @@ export class ConversationStateService {
   readonly currentLevel = this._currentLevel.asReadonly();
   readonly error = this._error.asReadonly();
   readonly endResult = this._endResult.asReadonly();
+  readonly streaming = this._streaming.asReadonly();
   readonly isActive = computed(() => !!this._conversationId());
   readonly messageCount = computed(() => this._messages().length);
 
@@ -81,6 +85,52 @@ export class ConversationStateService {
       error: (err) => {
         this._status.set('error');
         this._error.set(err.error?.message ?? 'Error al enviar el mensaje');
+      },
+    });
+  }
+
+  sendMessageStreaming(content: string, confidence?: number): void {
+    const conversationId = this._conversationId();
+    if (!conversationId) return;
+
+    const userMessage: ConversationMessage = {
+      id: crypto.randomUUID(),
+      role: 'user',
+      content,
+      timestamp: new Date().toISOString(),
+      confidence,
+    };
+    this._messages.update((msgs) => [...msgs, userMessage]);
+    this._status.set('sending');
+    this._streaming.set(true);
+    this._error.set(null);
+
+    const assistantMessage: ConversationMessage = {
+      id: crypto.randomUUID(),
+      role: 'assistant',
+      content: '',
+      timestamp: new Date().toISOString(),
+    };
+    this._messages.update((msgs) => [...msgs, assistantMessage]);
+
+    let accumulated = '';
+    this.sseService.streamMessage(conversationId, content, confidence).subscribe({
+      next: (chunk) => {
+        accumulated += chunk;
+        this._messages.update((msgs) => {
+          const updated = [...msgs];
+          updated[updated.length - 1] = { ...updated[updated.length - 1], content: accumulated };
+          return updated;
+        });
+      },
+      complete: () => {
+        this._streaming.set(false);
+        this._status.set('speaking');
+      },
+      error: () => {
+        this._streaming.set(false);
+        this._status.set('error');
+        this._error.set('Error en el streaming de respuesta');
       },
     });
   }

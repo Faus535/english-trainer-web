@@ -1,0 +1,129 @@
+<div class="profile-page">
+  <h2 class="page-title">Mi Perfil</h2>
+
+  @if (loading()) {
+    <div class="loading">Cargando...</div>
+  } @else if (account()) {
+    <section class="setting-group">
+      <div class="account-header">
+        <div class="avatar">{{ getInitials() }}</div>
+        <div class="account-info">
+          <span class="account-name">{{ account()!.name ?? account()!.email }}</span>
+          <span class="account-email">{{ account()!.email }}</span>
+          <span class="account-badge" [class.google]="isGoogle()">
+            {{ isGoogle() ? 'Google' : 'Email' }}
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <section class="setting-group">
+      <h3 class="group-title">Editar perfil</h3>
+      <form [formGroup]="profileForm" (ngSubmit)="onSaveProfile()" class="edit-form">
+        <div class="field">
+          <label for="profile-name">Nombre</label>
+          <input id="profile-name" formControlName="name" placeholder="Tu nombre" />
+        </div>
+        <div class="field">
+          <label for="profile-avatar">URL del avatar</label>
+          <input id="profile-avatar" formControlName="avatarUrl" placeholder="https://..." />
+        </div>
+        <button type="submit" class="btn-primary" [disabled]="savingProfile()">
+          {{ savingProfile() ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+      </form>
+    </section>
+
+    @if (!isGoogle()) {
+      <section class="setting-group">
+        <h3 class="group-title">Cambiar contrasena</h3>
+        <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="edit-form">
+          <div class="field">
+            <label for="current-pw">Contrasena actual</label>
+            <input
+              id="current-pw"
+              type="password"
+              formControlName="currentPassword"
+              autocomplete="current-password"
+            />
+            @if (
+              passwordForm.controls.currentPassword.hasError('required') &&
+              passwordForm.controls.currentPassword.touched
+            ) {
+              <span class="field-error" role="alert">Obligatorio</span>
+            }
+          </div>
+          <div class="field">
+            <label for="new-pw">Nueva contrasena</label>
+            <input
+              id="new-pw"
+              type="password"
+              formControlName="newPassword"
+              autocomplete="new-password"
+            />
+            @if (
+              passwordForm.controls.newPassword.hasError('minlength') &&
+              passwordForm.controls.newPassword.touched
+            ) {
+              <span class="field-error" role="alert">Minimo 6 caracteres</span>
+            }
+          </div>
+          <div class="field">
+            <label for="confirm-pw">Confirmar contrasena</label>
+            <input
+              id="confirm-pw"
+              type="password"
+              formControlName="confirmPassword"
+              autocomplete="new-password"
+            />
+            @if (
+              passwordForm.controls.confirmPassword.touched &&
+              passwordForm.hasError('passwordsMismatch')
+            ) {
+              <span class="field-error" role="alert">Las contrasenas no coinciden</span>
+            }
+          </div>
+          <button type="submit" class="btn-primary" [disabled]="savingPassword()">
+            {{ savingPassword() ? 'Cambiando...' : 'Cambiar contrasena' }}
+          </button>
+        </form>
+      </section>
+    }
+
+    <section class="setting-group danger">
+      <h3 class="group-title">Zona peligrosa</h3>
+      @if (!showDeleteConfirm()) {
+        <button class="btn-action danger" (click)="showDeleteConfirm.set(true)">
+          Eliminar mi cuenta
+        </button>
+      } @else {
+        <p class="danger-text">
+          Esta accion es irreversible. Se eliminaran todos tus datos, progreso y logros.
+        </p>
+        @if (!isGoogle()) {
+          <form [formGroup]="deleteForm" (ngSubmit)="onDeleteAccount()" class="edit-form">
+            <div class="field">
+              <label for="delete-pw">Confirma tu contrasena</label>
+              <input id="delete-pw" type="password" formControlName="password" />
+            </div>
+            <div class="danger-actions">
+              <button type="button" class="btn-secondary" (click)="showDeleteConfirm.set(false)">
+                Cancelar
+              </button>
+              <button type="submit" class="btn-danger" [disabled]="deleting()">
+                {{ deleting() ? 'Eliminando...' : 'Eliminar cuenta' }}
+              </button>
+            </div>
+          </form>
+        } @else {
+          <div class="danger-actions">
+            <button class="btn-secondary" (click)="showDeleteConfirm.set(false)">Cancelar</button>
+            <button class="btn-danger" (click)="onDeleteAccount()" [disabled]="deleting()">
+              {{ deleting() ? 'Eliminando...' : 'Eliminar cuenta' }}
+            </button>
+          </div>
+        }
+      }
+    </section>
+  }
+</div>

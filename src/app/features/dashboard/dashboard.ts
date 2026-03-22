@@ -8,11 +8,13 @@ import { PhraseRoulette } from './components/phrase-roulette/phrase-roulette';
 import { Motivation } from './components/motivation/motivation';
 import { CurrentLevels } from './components/current-levels/current-levels';
 import { StateService } from '../../shared/services/state.service';
+import { Onboarding } from '../../shared/components/onboarding/onboarding';
 
 @Component({
   selector: 'app-dashboard',
   imports: [
     QuickStart,
+    Onboarding,
     ModuleCard,
     StatsSummary,
     SoundOfDay,

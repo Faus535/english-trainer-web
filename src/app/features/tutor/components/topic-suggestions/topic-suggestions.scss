@@ -1,0 +1,42 @@
+:host {
+  display: block;
+}
+.suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.suggestions-title {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+  margin-bottom: var(--sp-1);
+}
+.suggestion-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  text-align: left;
+  cursor: pointer;
+  transition: all 200ms var(--ease);
+  color: var(--text);
+  font-family: inherit;
+  &:hover {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+  }
+}
+.suggestion-label {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+.suggestion-reason {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}
