@@ -109,6 +109,20 @@
   color: var(--text-3);
 }
 
+.menu-item--logout {
+  width: 100%;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--border);
+  font-family: inherit;
+  cursor: pointer;
+  color: var(--error);
+
+  &:hover {
+    background: var(--error-soft);
+  }
+}
+
 // ---- Account section ----
 .account-section {
   display: flex;
@@ -265,28 +279,4 @@
   font-size: var(--fs-sm);
   color: var(--error);
   line-height: 1.5;
-}
-
-// ---- Logout ----
-.logout-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--sp-2);
-  width: 100%;
-  padding: var(--sp-3);
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: var(--r-xl);
-  color: var(--text-3);
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-  transition: all 200ms var(--ease);
-
-  &:hover {
-    border-color: var(--error);
-    color: var(--error);
-  }
 }
