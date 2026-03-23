@@ -37,16 +37,15 @@ export class WritingExercise implements OnInit {
       this.router.navigate(['/writing']);
       return;
     }
-    this.writingApi.getExercise(this.exerciseId).subscribe({
-      next: (ex) => {
-        this.exercise.set(ex);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.loading.set(false);
-        this.notification.error('No se pudo cargar el ejercicio');
-      },
-    });
+
+    const navState = history.state as { exercise?: WritingExerciseResponse };
+    if (navState?.exercise) {
+      this.exercise.set(navState.exercise);
+      this.loading.set(false);
+    } else {
+      this.router.navigate(['/writing']);
+      return;
+    }
     this.form.controls.content.valueChanges.subscribe((val) => {
       this.wordCount.set(val.trim() ? val.trim().split(/\s+/).length : 0);
     });

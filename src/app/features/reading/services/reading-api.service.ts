@@ -19,15 +19,15 @@ export class ReadingApiService {
     let params = new HttpParams();
     if (level) params = params.set('level', level);
     if (topic) params = params.set('topic', topic);
-    return this.http.get<ReadingTextResponse[]>(`${this.baseUrl}/texts`, { params });
+    return this.http.get<ReadingTextResponse[]>(`${this.baseUrl}/passages`, { params });
   }
 
   getText(textId: string): Observable<ReadingTextResponse> {
-    return this.http.get<ReadingTextResponse>(`${this.baseUrl}/texts/${textId}`);
+    return this.http.get<ReadingTextResponse>(`${this.baseUrl}/passages/${textId}`);
   }
 
   getQuestions(textId: string): Observable<ReadingQuestionResponse[]> {
-    return this.http.get<ReadingQuestionResponse[]>(`${this.baseUrl}/texts/${textId}/questions`);
+    return this.http.get<ReadingQuestionResponse[]>(`${this.baseUrl}/passages/${textId}/questions`);
   }
 
   submitAnswers(
@@ -35,7 +35,7 @@ export class ReadingApiService {
     request: SubmitReadingAnswersRequest,
   ): Observable<ReadingResultResponse> {
     return this.http.post<ReadingResultResponse>(
-      `${this.baseUrl}/texts/${textId}/answers`,
+      `${this.baseUrl}/passages/${textId}/answers`,
       request,
     );
   }

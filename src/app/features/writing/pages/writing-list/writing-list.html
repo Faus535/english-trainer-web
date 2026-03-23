@@ -33,7 +33,7 @@
   } @else {
     <div class="exercise-grid">
       @for (exercise of exercises(); track exercise.id) {
-        <a class="exercise-card" [routerLink]="['/writing', exercise.id]">
+        <a class="exercise-card" [routerLink]="['/writing', exercise.id]" [state]="{ exercise }">
           <div class="exercise-header">
             <span class="level-badge">{{ exercise.level | uppercase }}</span
             ><span class="category-badge">{{ exercise.category }}</span>

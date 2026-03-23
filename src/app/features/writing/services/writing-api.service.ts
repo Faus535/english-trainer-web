@@ -21,10 +21,6 @@ export class WritingApiService {
     return this.http.get<WritingExerciseResponse[]>(`${this.baseUrl}/exercises`, { params });
   }
 
-  getExercise(id: string): Observable<WritingExerciseResponse> {
-    return this.http.get<WritingExerciseResponse>(`${this.baseUrl}/exercises/${id}`);
-  }
-
   submitWriting(request: WritingSubmissionRequest): Observable<WritingFeedbackResponse> {
     return this.http.post<WritingFeedbackResponse>(`${this.baseUrl}/submissions`, request);
   }
