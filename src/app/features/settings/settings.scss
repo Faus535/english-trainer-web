@@ -1,4 +1,6 @@
-:host { display: block; }
+:host {
+  display: block;
+}
 
 .settings-page {
   display: flex;
@@ -123,7 +125,9 @@
   font-family: inherit;
   outline: none;
 
-  &:focus { border-color: var(--primary); }
+  &:focus {
+    border-color: var(--primary);
+  }
 }
 
 .btn-action {
@@ -142,16 +146,22 @@
   align-items: center;
   justify-content: space-between;
 
-  &:hover { border-color: var(--border-active); }
+  &:hover {
+    border-color: var(--border-active);
+  }
 
   &.warning {
     color: var(--warning);
-    &:hover { background: var(--warning-soft); }
+    &:hover {
+      background: var(--warning-soft);
+    }
   }
 
   &.danger {
     color: var(--error);
-    &:hover { background: var(--error-soft); }
+    &:hover {
+      background: var(--error-soft);
+    }
   }
 }
 
@@ -159,4 +169,29 @@
   font-size: var(--fs-xs);
   color: var(--success);
   font-weight: 600;
+}
+
+.attempts-info {
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+}
+
+.practice-tip {
+  font-size: var(--fs-sm);
+  color: var(--primary);
+  background: var(--surface-1);
+  padding: var(--sp-3);
+  border-radius: var(--r-md);
+  border-left: 3px solid var(--primary);
+  line-height: 1.5;
+}
+
+.btn-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+
+  &:hover {
+    border-color: var(--border);
+    background: var(--surface-1);
+  }
 }

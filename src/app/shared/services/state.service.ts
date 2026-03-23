@@ -51,6 +51,14 @@ export class StateService {
     this.profileState.markTestIncomplete();
   }
 
+  refreshFromBackend(): void {
+    this.profileState.refreshFromBackend();
+  }
+
+  applyLevelsFromBackend(levels: Partial<Record<ModuleName, Level>>): void {
+    this.profileState.applyLevelsFromBackend(levels);
+  }
+
   // Progress methods
   getModuleProgress(moduleName: ModuleName): ModuleProgress {
     return this.progressState.getModuleProgress(moduleName);

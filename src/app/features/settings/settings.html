@@ -79,7 +79,31 @@
   <section class="setting-group danger">
     <h3 class="group-title">Zona peligrosa</h3>
 
-    <button class="btn-action warning" (click)="retakeTest()">Repetir test de nivel</button>
+    @if (testAttempts() > 0) {
+      <p class="attempts-info">
+        Has realizado {{ testAttempts() }} test{{ testAttempts() > 1 ? 's' : '' }} de nivel
+      </p>
+    }
+
+    @if (showPracticeTip()) {
+      <div class="practice-tip">
+        Tip: Practica con las sesiones para mejorar tu nivel de forma natural
+      </div>
+    }
+
+    <button
+      class="btn-action warning"
+      [disabled]="!!cooldownRemaining() || retaking()"
+      (click)="retakeTest()"
+    >
+      @if (retaking()) {
+        Preparando...
+      } @else if (cooldownRemaining(); as remaining) {
+        Repetir test de nivel (disponible en {{ remaining }})
+      } @else {
+        Repetir test de nivel
+      }
+    </button>
 
     <button class="btn-action danger" (click)="resetAll()">Resetear todo el progreso</button>
   </section>

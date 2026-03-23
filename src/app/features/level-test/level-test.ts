@@ -21,6 +21,7 @@ export class LevelTest {
   private readonly router = inject(Router);
 
   protected readonly phase = this.testService.phase;
+  protected readonly loading = this.testService.loading;
 
   protected onStart(): void {
     this.testService.startTest();

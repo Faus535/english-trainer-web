@@ -68,6 +68,50 @@ export interface LevelTestResultResponse {
   id: string;
   levels: Record<ModuleName, Level>;
   scores: Record<ModuleName, number>;
+  completedAt?: string;
+}
+
+export interface TestQuestionsResponse {
+  vocabulary: VocabQuestionResponse[];
+  grammar: GrammarQuestionResponse[];
+  listening: ListeningQuestionResponse[];
+  pronunciation: PronunciationQuestionResponse[];
+}
+
+export interface VocabQuestionResponse {
+  es: string;
+  answer: string;
+  alts?: string[];
+  level: Level;
+}
+
+export interface GrammarQuestionResponse {
+  sentence: string;
+  options: string[];
+  answer: number;
+  level: Level;
+}
+
+export interface ListeningQuestionResponse {
+  text: string;
+  level: Level;
+  speed: number;
+}
+
+export interface PronunciationQuestionResponse {
+  word: string;
+  options: string[];
+  answer: number;
+  level: Level;
+  special?: 'syllables' | 'words' | 'stress';
+}
+
+export interface TestHistoryResponse {
+  id: string;
+  levels: Record<ModuleName, Level>;
+  scores: Record<ModuleName, number>;
+  completedAt: string;
+  attemptNumber: number;
 }
 
 // Gamification

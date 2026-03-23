@@ -92,6 +92,24 @@ export class ProfileStateService {
     this.persistProfile();
   }
 
+  refreshFromBackend(): void {
+    const profileId = this.auth.profileId();
+    if (!profileId) return;
+
+    this.profileApi.getProfile(profileId).subscribe({
+      next: (res) => this.applyBackendProfile(res),
+    });
+  }
+
+  applyLevelsFromBackend(levels: Partial<Record<ModuleName, Level>>): void {
+    this._profile.update((p) => ({
+      ...p,
+      testCompleted: true,
+      levels,
+    }));
+    this.persistProfile();
+  }
+
   recordSession(duration?: number): void {
     this._profile.update((p) => {
       const weekStart = this.getCurrentWeekStart();

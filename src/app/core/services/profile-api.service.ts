@@ -23,6 +23,10 @@ export class ProfileApiService {
     return this.http.put<UserProfileResponse>(`${this.baseUrl}/${profileId}/test-completed`, {});
   }
 
+  resetTest(profileId: string): Observable<UserProfileResponse> {
+    return this.http.put<UserProfileResponse>(`${this.baseUrl}/${profileId}/reset-test`, {});
+  }
+
   updateModuleLevel(
     profileId: string,
     module: string,

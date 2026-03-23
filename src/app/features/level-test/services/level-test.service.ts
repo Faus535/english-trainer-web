@@ -1,10 +1,27 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
-import { Level, CEFR_LEVELS, MODULE_NAMES, ModuleName } from '../../../shared/models/learning.model';
+import {
+  Level,
+  CEFR_LEVELS,
+  MODULE_NAMES,
+  ModuleName,
+} from '../../../shared/models/learning.model';
 import { StateService } from '../../../shared/services/state.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { AssessmentApiService } from '../../../core/services/assessment-api.service';
-import { TestPhase, TestAnswer, ProfileType } from '../models/level-test.model';
-import { TEST_VOCABULARY, TEST_GRAMMAR, TEST_LISTENING, TEST_PRONUNCIATION } from '../data/test-questions.data';
+import {
+  TestPhase,
+  TestAnswer,
+  VocabQuestion,
+  GrammarQuestion,
+  ListeningQuestion,
+  PronunciationQuestion,
+} from '../models/level-test.model';
+import {
+  TEST_VOCABULARY,
+  TEST_GRAMMAR,
+  TEST_LISTENING,
+  TEST_PRONUNCIATION,
+} from '../data/test-questions.data';
 import { getProfileType, estimateSessions, PROFILE_MESSAGES } from '../data/profile-types.data';
 
 @Injectable({ providedIn: 'root' })
@@ -15,37 +32,68 @@ export class LevelTestService {
 
   private readonly _phase = signal<TestPhase>('intro');
   private readonly _currentQuestion = signal(0);
+  private readonly _loading = signal(false);
   private readonly _vocabAnswers = signal<TestAnswer[]>([]);
   private readonly _grammarAnswers = signal<TestAnswer[]>([]);
   private readonly _listeningAnswers = signal<TestAnswer[]>([]);
   private readonly _pronunciationAnswers = signal<TestAnswer[]>([]);
 
+  private readonly _vocabulary = signal<VocabQuestion[]>(TEST_VOCABULARY);
+  private readonly _grammar = signal<GrammarQuestion[]>(TEST_GRAMMAR);
+  private readonly _listening = signal<ListeningQuestion[]>(TEST_LISTENING);
+  private readonly _pronunciation = signal<PronunciationQuestion[]>(TEST_PRONUNCIATION);
+
+  private readonly _previousLevels = signal<Partial<Record<ModuleName, Level>> | null>(null);
+
   readonly phase = this._phase.asReadonly();
   readonly currentQuestion = this._currentQuestion.asReadonly();
+  readonly loading = this._loading.asReadonly();
+  readonly previousLevels = this._previousLevels.asReadonly();
 
   readonly currentVocabQuestion = computed(() =>
-    this._phase() === 'vocabulary' ? TEST_VOCABULARY[this._currentQuestion()] : null
+    this._phase() === 'vocabulary' ? this._vocabulary()[this._currentQuestion()] : null,
   );
 
   readonly currentGrammarQuestion = computed(() =>
-    this._phase() === 'grammar' ? TEST_GRAMMAR[this._currentQuestion()] : null
+    this._phase() === 'grammar' ? this._grammar()[this._currentQuestion()] : null,
   );
 
   readonly currentListeningQuestion = computed(() =>
-    this._phase() === 'listening' ? TEST_LISTENING[this._currentQuestion()] : null
+    this._phase() === 'listening' ? this._listening()[this._currentQuestion()] : null,
   );
 
   readonly currentPronunciationQuestion = computed(() =>
-    this._phase() === 'pronunciation' ? TEST_PRONUNCIATION[this._currentQuestion()] : null
+    this._phase() === 'pronunciation' ? this._pronunciation()[this._currentQuestion()] : null,
   );
 
   readonly progress = computed(() => {
     switch (this._phase()) {
-      case 'vocabulary': return { current: this._currentQuestion() + 1, total: TEST_VOCABULARY.length, label: 'Vocabulario' };
-      case 'grammar': return { current: this._currentQuestion() + 1, total: TEST_GRAMMAR.length, label: 'Gramatica' };
-      case 'listening': return { current: this._currentQuestion() + 1, total: TEST_LISTENING.length, label: 'Listening' };
-      case 'pronunciation': return { current: this._currentQuestion() + 1, total: TEST_PRONUNCIATION.length, label: 'Pronunciacion' };
-      default: return null;
+      case 'vocabulary':
+        return {
+          current: this._currentQuestion() + 1,
+          total: this._vocabulary().length,
+          label: 'Vocabulario',
+        };
+      case 'grammar':
+        return {
+          current: this._currentQuestion() + 1,
+          total: this._grammar().length,
+          label: 'Gramatica',
+        };
+      case 'listening':
+        return {
+          current: this._currentQuestion() + 1,
+          total: this._listening().length,
+          label: 'Listening',
+        };
+      case 'pronunciation':
+        return {
+          current: this._currentQuestion() + 1,
+          total: this._pronunciation().length,
+          label: 'Pronunciacion',
+        };
+      default:
+        return null;
     }
   });
 
@@ -56,44 +104,74 @@ export class LevelTestService {
     const profileType = getProfileType(levels);
     const message = PROFILE_MESSAGES[profileType.id];
     const sessions = estimateSessions(levels);
-    return { levels, profileType, message, sessions };
+    const previousLevels = this._previousLevels();
+    return { levels, profileType, message, sessions, previousLevels };
   });
 
   startTest(): void {
-    this._phase.set('vocabulary');
+    const profile = this.state.profile();
+    if (profile.testCompleted && Object.keys(profile.levels).length > 0) {
+      this._previousLevels.set({ ...profile.levels });
+    } else {
+      this._previousLevels.set(null);
+    }
+
     this._currentQuestion.set(0);
     this._vocabAnswers.set([]);
     this._grammarAnswers.set([]);
     this._listeningAnswers.set([]);
     this._pronunciationAnswers.set([]);
+    this._loading.set(true);
+    this._phase.set('vocabulary');
+
+    this.assessmentApi.getTestQuestions().subscribe({
+      next: (res) => {
+        if (res.vocabulary?.length) this._vocabulary.set(res.vocabulary);
+        if (res.grammar?.length) this._grammar.set(res.grammar);
+        if (res.listening?.length) this._listening.set(res.listening);
+        if (res.pronunciation?.length) this._pronunciation.set(res.pronunciation);
+        this._loading.set(false);
+      },
+      error: () => {
+        this._vocabulary.set(TEST_VOCABULARY);
+        this._grammar.set(TEST_GRAMMAR);
+        this._listening.set(TEST_LISTENING);
+        this._pronunciation.set(TEST_PRONUNCIATION);
+        this._loading.set(false);
+      },
+    });
   }
 
   submitVocabAnswer(input: string): void {
-    const q = TEST_VOCABULARY[this._currentQuestion()];
+    const q = this._vocabulary()[this._currentQuestion()];
     const answer = input.trim().toLowerCase();
-    const correct = answer === q.answer.toLowerCase() ||
-      (q.alts?.some(a => answer === a.toLowerCase()) ?? false);
+    const correct =
+      answer === q.answer.toLowerCase() ||
+      (q.alts?.some((a) => answer === a.toLowerCase()) ?? false);
 
-    this._vocabAnswers.update(a => [...a, { level: q.level, correct }]);
-    this.advanceOrNextPhase(TEST_VOCABULARY.length, 'grammar');
+    this._vocabAnswers.update((a) => [...a, { level: q.level, correct }]);
+    this.advanceOrNextPhase(this._vocabulary().length, 'grammar');
   }
 
   skipVocab(): void {
-    const q = TEST_VOCABULARY[this._currentQuestion()];
-    this._vocabAnswers.update(a => [...a, { level: q.level, correct: false }]);
-    this.advanceOrNextPhase(TEST_VOCABULARY.length, 'grammar');
+    const q = this._vocabulary()[this._currentQuestion()];
+    this._vocabAnswers.update((a) => [...a, { level: q.level, correct: false }]);
+    this.advanceOrNextPhase(this._vocabulary().length, 'grammar');
   }
 
   submitGrammarAnswer(optionIndex: number): void {
-    const q = TEST_GRAMMAR[this._currentQuestion()];
+    const q = this._grammar()[this._currentQuestion()];
     const correct = optionIndex === q.answer;
-    this._grammarAnswers.update(a => [...a, { level: q.level, correct }]);
-    this.advanceOrNextPhase(TEST_GRAMMAR.length, 'listening');
+    this._grammarAnswers.update((a) => [...a, { level: q.level, correct }]);
+    this.advanceOrNextPhase(this._grammar().length, 'listening');
   }
 
   submitListeningAnswer(input: string): void {
-    const q = TEST_LISTENING[this._currentQuestion()];
-    const answer = input.trim().toLowerCase().replace(/[^a-z\s']/g, '');
+    const q = this._listening()[this._currentQuestion()];
+    const answer = input
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z\s']/g, '');
     const expected = q.text.toLowerCase().replace(/[^a-z\s']/g, '');
     const words = expected.split(/\s+/);
     const answerWords = answer.split(/\s+/);
@@ -104,23 +182,23 @@ export class LevelTestService {
     }
     const score = words.length > 0 ? matched / words.length : 0;
 
-    this._listeningAnswers.update(a => [...a, { level: q.level, correct: score >= 0.6, score }]);
-    this.advanceOrNextPhase(TEST_LISTENING.length, 'pronunciation');
+    this._listeningAnswers.update((a) => [...a, { level: q.level, correct: score >= 0.6, score }]);
+    this.advanceOrNextPhase(this._listening().length, 'pronunciation');
   }
 
   skipListening(): void {
-    const q = TEST_LISTENING[this._currentQuestion()];
-    this._listeningAnswers.update(a => [...a, { level: q.level, correct: false, score: 0 }]);
-    this.advanceOrNextPhase(TEST_LISTENING.length, 'pronunciation');
+    const q = this._listening()[this._currentQuestion()];
+    this._listeningAnswers.update((a) => [...a, { level: q.level, correct: false, score: 0 }]);
+    this.advanceOrNextPhase(this._listening().length, 'pronunciation');
   }
 
   submitPronunciationAnswer(optionIndex: number): void {
-    const q = TEST_PRONUNCIATION[this._currentQuestion()];
+    const q = this._pronunciation()[this._currentQuestion()];
     const correct = optionIndex === q.answer;
-    this._pronunciationAnswers.update(a => [...a, { level: q.level, correct }]);
+    this._pronunciationAnswers.update((a) => [...a, { level: q.level, correct }]);
 
     const next = this._currentQuestion() + 1;
-    if (next >= TEST_PRONUNCIATION.length) {
+    if (next >= this._pronunciation().length) {
       this.calculateResults();
       this._phase.set('results');
     } else {
@@ -176,7 +254,7 @@ export class LevelTestService {
     });
   }
 
-  private submitToBackend(levels: Record<ModuleName, Level>): void {
+  private submitToBackend(_levels: Record<ModuleName, Level>): void {
     const profileId = this.auth.profileId();
     if (!profileId) return;
 
@@ -188,12 +266,18 @@ export class LevelTestService {
       phrases: 0,
     };
 
-    this.assessmentApi.submitLevelTest(profileId, { answers: {}, scores }).subscribe();
+    this.assessmentApi.submitLevelTest(profileId, { answers: {}, scores }).subscribe({
+      next: (res) => {
+        if (res.levels) {
+          this.state.applyLevelsFromBackend(res.levels);
+        }
+      },
+    });
   }
 
   private calculateScore(answers: TestAnswer[]): number {
     if (answers.length === 0) return 0;
-    const correct = answers.filter(a => a.correct).length;
+    const correct = answers.filter((a) => a.correct).length;
     return Math.round((correct / answers.length) * 100);
   }
 
@@ -208,7 +292,7 @@ export class LevelTestService {
     let bestLevel: Level = 'a1';
     for (const level of CEFR_LEVELS) {
       const stats = byLevel[level];
-      if (stats && stats.total > 0 && (stats.correct / stats.total) >= 0.5) {
+      if (stats && stats.total > 0 && stats.correct / stats.total >= 0.5) {
         bestLevel = level;
       } else if (stats && stats.total > 0) {
         break;

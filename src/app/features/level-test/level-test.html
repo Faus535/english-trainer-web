@@ -1,3 +1,10 @@
+@if (loading()) {
+  <div class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Preparando preguntas...</p>
+  </div>
+}
+
 @switch (phase()) {
   @case ('intro') {
     <app-test-intro (start)="onStart()" (skip)="onSkip($event)" />
@@ -15,6 +22,6 @@
     <app-test-pronunciation />
   }
   @case ('results') {
-    <app-test-results (finish)="onFinish()" />
+    <app-test-results (testFinished)="onFinish()" />
   }
 }

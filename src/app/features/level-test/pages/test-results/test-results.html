@@ -4,11 +4,32 @@
     <div class="profile-type">{{ r.profileType.label }}</div>
     <p class="profile-msg" [innerHTML]="r.message"></p>
 
+    @if (isRetake()) {
+      <p class="retake-label">Comparativa con tu test anterior</p>
+    }
+
     <div class="levels-grid">
       @for (mod of modules; track mod) {
-        <div class="level-card">
+        <div
+          class="level-card"
+          [class.level-up]="levelDiff(mod) === 'up'"
+          [class.level-down]="levelDiff(mod) === 'down'"
+        >
           <span class="level-module">{{ label(mod) }}</span>
           <span class="level-value">{{ (r.levels[mod] || 'a1').toUpperCase() }}</span>
+          @if (isRetake()) {
+            @switch (levelDiff(mod)) {
+              @case ('up') {
+                <span class="level-change up">{{ previousLevel(mod) }} &rarr;</span>
+              }
+              @case ('down') {
+                <span class="level-change down">{{ previousLevel(mod) }} &rarr;</span>
+              }
+              @case ('same') {
+                <span class="level-change same">=</span>
+              }
+            }
+          }
         </div>
       }
     </div>
@@ -16,10 +37,12 @@
     <div class="plan-preview">
       <h3 class="plan-title">Tu plan personalizado</h3>
       <p>Listening sera el <strong>40%</strong> de cada sesion (tu mayor area de mejora).</p>
-      <p><strong>{{ r.sessions }}</strong> sesiones estimadas hasta C1.</p>
+      <p>
+        <strong>{{ r.sessions }}</strong> sesiones estimadas hasta C1.
+      </p>
       <p>3-4 sesiones por semana, 15-20 minutos cada una.</p>
     </div>
 
-    <button class="btn-finish" (click)="finish.emit()">Empezar a aprender</button>
+    <button class="btn-finish" (click)="testFinished.emit()">Empezar a aprender</button>
   </div>
 }
