@@ -11,7 +11,7 @@ import { StreakBanner } from './components/streak-banner/streak-banner';
 import { LevelUpPopup } from './components/level-up-popup/level-up-popup';
 import { StateService } from '../../shared/services/state.service';
 import { GamificationService } from './services/gamification.service';
-import { Onboarding } from '../../shared/components/onboarding/onboarding';
+
 import { ReviewWidget } from './components/review-widget/review-widget';
 import { GamesWidget } from './components/games-widget/games-widget';
 
@@ -19,7 +19,6 @@ import { GamesWidget } from './components/games-widget/games-widget';
   selector: 'app-dashboard',
   imports: [
     QuickStart,
-    Onboarding,
     ModuleCard,
     StatsSummary,
     SoundOfDay,
