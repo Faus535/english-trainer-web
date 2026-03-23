@@ -23,7 +23,7 @@ export const routes: Routes = [
   },
   {
     path: 'speak',
-    canActivate: [authGuard, adminGuard],
+    canActivate: [authGuard],
     loadChildren: () => import('./features/speak/speak.routes'),
   },
   {

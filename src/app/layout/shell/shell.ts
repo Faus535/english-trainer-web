@@ -98,7 +98,7 @@ export class Shell {
 
   private readonly _allTabs: NavTab[] = [
     { path: '/dashboard', label: 'Sesiones', icon: LayoutDashboard },
-    { path: '/speak', label: 'Hablar', icon: Mic, adminOnly: true },
+    { path: '/speak', label: 'Hablar', icon: Mic },
     { path: '/tutor', label: 'Tutor', icon: BotMessageSquare, adminOnly: true },
     { path: '/practice', label: 'Mejorar', icon: GraduationCap },
     { path: '/profile', label: 'Perfil', icon: UserCircle },
