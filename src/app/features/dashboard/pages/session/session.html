@@ -118,6 +118,31 @@
               }
             </div>
           }
+          @case ('listening') {
+            @if (block.unit; as unit) {
+              <app-listening-exercise [level]="unit.level" [unitTitle]="unit.unit.title" />
+            }
+          }
+          @case ('pronunciation') {
+            @if (block.unit; as unit) {
+              <app-pronunciation-exercise [level]="unit.level" [unitTitle]="unit.unit.title" />
+            }
+          }
+          @case ('secondary') {
+            @if (block.unit; as unit) {
+              @switch (unit.module) {
+                @case ('vocabulary') {
+                  <app-vocabulary-exercise [level]="unit.level" [unitTitle]="unit.unit.title" />
+                }
+                @case ('grammar') {
+                  <app-grammar-exercise [level]="unit.level" [unitTitle]="unit.unit.title" />
+                }
+                @case ('phrases') {
+                  <app-phrases-exercise [level]="unit.level" [unitTitle]="unit.unit.title" />
+                }
+              }
+            }
+          }
           @case ('practice') {
             <div class="block-instructions">
               <p>Practica activa: intenta usar lo aprendido.</p>

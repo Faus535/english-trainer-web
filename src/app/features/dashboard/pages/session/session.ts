@@ -4,9 +4,21 @@ import { SessionService } from '../../services/session.service';
 import { GamificationService } from '../../services/gamification.service';
 import { TtsService } from '../../../../features/speak/services/tts.service';
 import { XP_PER_SESSION } from '../../data/gamification.data';
+import { ListeningExercise } from './exercises/listening-exercise';
+import { PronunciationExercise } from './exercises/pronunciation-exercise';
+import { VocabularyExercise } from './exercises/vocabulary-exercise';
+import { GrammarExercise } from './exercises/grammar-exercise';
+import { PhrasesExercise } from './exercises/phrases-exercise';
 
 @Component({
   selector: 'app-session',
+  imports: [
+    ListeningExercise,
+    PronunciationExercise,
+    VocabularyExercise,
+    GrammarExercise,
+    PhrasesExercise,
+  ],
   templateUrl: './session.html',
   styleUrl: './session.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,0 +1,83 @@
+@switch (phase()) {
+  @case ('learn') {
+    @if (currentLearn(); as word) {
+      <div class="exercise-card">
+        <h3 class="exercise-title">Vocabulario — {{ unitTitle() }}</h3>
+        <span class="exercise-progress">{{ learnIndex() + 1 }} / {{ items().length }}</span>
+
+        <div class="vocab-card">
+          <button class="vocab-word" (click)="speak(word.en)">
+            {{ word.en }}
+            <span class="vocab-ipa">{{ word.ipa }}</span>
+          </button>
+          <span class="vocab-es">{{ word.es }}</span>
+          <p class="vocab-example">{{ word.example }}</p>
+        </div>
+
+        <button class="exercise-btn primary full-width" (click)="nextLearn()">
+          {{ learnIndex() + 1 >= items().length ? 'Empezar quiz' : 'Siguiente palabra' }}
+        </button>
+      </div>
+    }
+  }
+  @case ('quiz') {
+    @if (currentQuiz(); as word) {
+      <div class="exercise-card">
+        <h3 class="exercise-title">Quiz — Traduce al ingles</h3>
+        <span class="exercise-progress">{{ quizIndex() + 1 }} / {{ items().length }}</span>
+
+        <p class="quiz-prompt">{{ word.es }}</p>
+
+        <input
+          class="exercise-input"
+          type="text"
+          [value]="userInput()"
+          (input)="onInput($event)"
+          (keydown)="onKeydown($event)"
+          placeholder="Escribe en ingles..."
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+          [disabled]="showAnswer()"
+        />
+
+        @if (showAnswer()) {
+          <div
+            class="exercise-feedback"
+            [class.correct]="quizResults()[quizResults().length - 1].correct"
+            [class.wrong]="!quizResults()[quizResults().length - 1].correct"
+          >
+            <p class="feedback-label">
+              {{
+                quizResults()[quizResults().length - 1].correct ? 'Correcto!' : 'La respuesta es:'
+              }}
+            </p>
+            <p class="feedback-expected">{{ word.en }}</p>
+          </div>
+          <button class="exercise-btn primary" (click)="nextQuiz()">Siguiente</button>
+        } @else {
+          <button
+            class="exercise-btn primary"
+            (click)="checkQuiz()"
+            [disabled]="!userInput().trim()"
+          >
+            Comprobar
+          </button>
+        }
+      </div>
+    }
+  }
+  @case ('done') {
+    <div class="exercise-summary">
+      <h3 class="exercise-summary-title">Resultado: {{ score() }}%</h3>
+      <div class="exercise-results-list">
+        @for (r of quizResults(); track $index) {
+          <div class="result-row" [class.correct]="r.correct" [class.wrong]="!r.correct">
+            <span class="result-icon">{{ r.correct ? '&#10003;' : '&#10007;' }}</span>
+            <span class="result-expected">{{ r.word }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  }
+}

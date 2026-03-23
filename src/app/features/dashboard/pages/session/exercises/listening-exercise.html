@@ -1,0 +1,63 @@
+@if (finished()) {
+  <div class="exercise-summary">
+    <h3 class="exercise-summary-title">Resultado: {{ score() }}%</h3>
+    <div class="exercise-results-list">
+      @for (r of results(); track $index) {
+        <div class="result-row" [class.correct]="r.correct" [class.wrong]="!r.correct">
+          <span class="result-icon">{{ r.correct ? '&#10003;' : '&#10007;' }}</span>
+          <div class="result-detail">
+            <span class="result-expected">{{ r.expected }}</span>
+            @if (!r.correct && r.given) {
+              <span class="result-given">Tu respuesta: {{ r.given }}</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+} @else if (current(); as item) {
+  <div class="exercise-card">
+    <h3 class="exercise-title">Dictado — {{ unitTitle() }}</h3>
+    <p class="exercise-instruction">Escucha la frase y escribe lo que oyes.</p>
+    <span class="exercise-progress">{{ progress() }}</span>
+
+    <div class="exercise-play-row">
+      <button class="exercise-play-btn" (click)="play()">Reproducir</button>
+      <button class="exercise-play-btn secondary" (click)="play()">Repetir</button>
+    </div>
+
+    <input
+      class="exercise-input"
+      type="text"
+      [value]="userInput()"
+      (input)="onInput($event)"
+      (keydown)="onKeydown($event)"
+      placeholder="Escribe lo que has oido..."
+      autocomplete="off"
+      autocapitalize="off"
+      spellcheck="false"
+      [disabled]="showResult()"
+    />
+
+    @if (showResult()) {
+      <div
+        class="exercise-feedback"
+        [class.correct]="results()[results().length - 1].correct"
+        [class.wrong]="!results()[results().length - 1].correct"
+      >
+        <p class="feedback-label">
+          {{ results()[results().length - 1].correct ? 'Correcto!' : 'No del todo...' }}
+        </p>
+        <p class="feedback-expected">{{ item.text }}</p>
+      </div>
+      <button class="exercise-btn primary" (click)="next()">Siguiente</button>
+    } @else {
+      <div class="exercise-actions">
+        <button class="exercise-btn primary" (click)="check()" [disabled]="!userInput().trim()">
+          Comprobar
+        </button>
+        <button class="exercise-btn" (click)="skip()">No lo se</button>
+      </div>
+    }
+  </div>
+}
