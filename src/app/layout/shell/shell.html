@@ -9,7 +9,7 @@
   </header>
 
   <aside class="sidebar" aria-label="Navegacion principal">
-    @for (tab of tabs; track tab.path) {
+    @for (tab of visibleTabs(); track tab.path) {
       <a
         class="sidebar-item"
         [routerLink]="tab.path"
@@ -29,7 +29,7 @@
 
 @if (showChrome()) {
   <nav class="nav" aria-label="Navegacion principal">
-    @for (tab of tabs; track tab.path) {
+    @for (tab of visibleTabs(); track tab.path) {
       <a
         class="nav-item"
         [routerLink]="tab.path"
