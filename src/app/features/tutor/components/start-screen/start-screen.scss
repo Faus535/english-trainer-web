@@ -70,6 +70,26 @@
       color: #fff;
     }
   }
+
+  &--locked {
+    opacity: 0.5;
+    cursor: not-allowed;
+    gap: var(--sp-1);
+
+    &:hover {
+      border-color: var(--border);
+      color: var(--text-3);
+    }
+  }
+}
+
+.selector-chip-level {
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 0.0625rem var(--sp-1);
+  background: var(--surface-1);
+  border-radius: var(--r-full);
+  color: var(--text-3);
 }
 
 // Goals

@@ -7,12 +7,18 @@
         <strong>Completa tu test de nivel</strong>
         <span>Personalizaremos tu experiencia segun tu nivel de ingles</span>
       </span>
-      <span class="test-banner-arrow">→</span>
+      <span class="test-banner-arrow">&rarr;</span>
     </a>
   }
 
+  <!-- Streak Banner -->
+  <app-streak-banner />
+
   <!-- Hero: Quick Start + Gamification -->
   <app-quick-start (sessionStarted)="onSessionStarted()" />
+
+  <!-- Review widget -->
+  <app-review-widget />
 
   <!-- Primary Modules -->
   <section class="zone">
@@ -39,6 +45,21 @@
     <app-phrase-roulette />
   </section>
 
+  <!-- Games -->
+  <section class="zone">
+    <app-games-widget />
+  </section>
+
   <!-- Motivation -->
   <app-motivation />
 </div>
+
+<!-- Level-up popup overlay -->
+@if (pendingLevelUp(); as levelUp) {
+  <app-level-up-popup
+    [type]="levelUp.type"
+    [level]="levelUp.level"
+    [module]="levelUp.module"
+    (dismissed)="onLevelUpDismissed()"
+  />
+}

@@ -1,0 +1,75 @@
+:host {
+  display: block;
+}
+
+.games-widget {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.gw-title {
+  font-size: var(--fs-base);
+  font-weight: 800;
+}
+
+.gw-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-3);
+}
+
+.gw-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  text-decoration: none;
+  color: var(--text);
+  transition:
+    background 200ms var(--ease),
+    border-color 200ms var(--ease),
+    transform 200ms var(--ease);
+
+  &:hover {
+    background: var(--surface-2);
+    border-color: var(--primary);
+    transform: translateY(-0.0625rem);
+  }
+}
+
+.gw-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--r-sm);
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.gw-card-name {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-align: center;
+}
+
+.gw-card-score {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--warning);
+}
+
+@media (max-width: 480px) {
+  .gw-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

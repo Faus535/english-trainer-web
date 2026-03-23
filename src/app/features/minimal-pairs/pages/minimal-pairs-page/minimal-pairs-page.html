@@ -1,0 +1,191 @@
+<div class="page">
+  <!-- Header -->
+  <div class="header">
+    <a class="back-btn" routerLink="/speak">
+      <app-icon [name]="backIcon" [size]="20" aria-hidden="true" />
+    </a>
+    <h2 class="page-title">Pares Minimos</h2>
+  </div>
+
+  <!-- Category filter chips -->
+  <div class="filters">
+    <button
+      class="chip"
+      [class.chip--active]="categoryFilter() === 'All'"
+      (click)="setCategory('All')"
+    >
+      Todos
+    </button>
+    <button
+      class="chip"
+      [class.chip--active]="categoryFilter() === 'Vowels'"
+      (click)="setCategory('Vowels')"
+    >
+      Vocales
+    </button>
+    <button
+      class="chip"
+      [class.chip--active]="categoryFilter() === 'Consonants'"
+      (click)="setCategory('Consonants')"
+    >
+      Consonantes
+    </button>
+  </div>
+
+  <!-- Mode tabs -->
+  <div class="tabs">
+    <button class="tab" [class.tab--active]="mode() === 'listen'" (click)="setMode('listen')">
+      <app-icon [name]="volumeIcon" [size]="16" aria-hidden="true" />
+      Escuchar
+    </button>
+    <button class="tab" [class.tab--active]="mode() === 'speak'" (click)="setMode('speak')">
+      <app-icon [name]="micIcon" [size]="16" aria-hidden="true" />
+      Hablar
+    </button>
+  </div>
+
+  @if (finished()) {
+    <!-- Final score -->
+    <div class="score-card">
+      <h3 class="score-title">Resultado</h3>
+      <div class="score-value">{{ score() }} / {{ totalExercises() }}</div>
+      <div class="score-percent">{{ scorePercent() }}%</div>
+
+      <div class="score-details">
+        @for (r of results(); track $index) {
+          <div
+            class="score-row"
+            [class.score-row--correct]="r.correct"
+            [class.score-row--wrong]="!r.correct"
+          >
+            <span class="score-pair">{{ r.item.pair.word1 }} / {{ r.item.pair.word2 }}</span>
+            <span class="score-target">{{ r.item.targetWord }}</span>
+            <span class="score-answer">{{ r.userAnswer }}</span>
+            <span class="score-icon">{{ r.correct ? '&#10003;' : '&#10007;' }}</span>
+          </div>
+        }
+      </div>
+
+      <button class="btn-primary" (click)="restart()">Volver a jugar</button>
+    </div>
+  } @else if (currentExercise(); as exercise) {
+    <!-- Progress -->
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="progress()"></div>
+      </div>
+      <span class="progress-text">{{ currentIndex() + 1 }} / {{ totalExercises() }}</span>
+    </div>
+
+    <!-- Sound label -->
+    <div class="sound-label">
+      <span class="ipa">{{ exercise.pair.sound1 }}</span>
+      <span class="vs">vs</span>
+      <span class="ipa">{{ exercise.pair.sound2 }}</span>
+    </div>
+
+    @switch (mode()) {
+      @case ('listen') {
+        <!-- Listen mode -->
+        <div class="exercise-card">
+          <button class="listen-btn" (click)="playTarget()" [disabled]="answered()">
+            <app-icon [name]="volumeIcon" [size]="24" aria-hidden="true" />
+            Escuchar
+          </button>
+          <p class="exercise-hint">Que palabra has escuchado?</p>
+
+          <div class="choices">
+            <button
+              class="choice-btn"
+              [class.choice-btn--correct]="
+                answered() && exercise.pair.word1 === exercise.targetWord
+              "
+              [class.choice-btn--wrong]="
+                answered() &&
+                lastUserAnswer() === exercise.pair.word1 &&
+                exercise.pair.word1 !== exercise.targetWord
+              "
+              [disabled]="answered()"
+              (click)="chooseWord(exercise.pair.word1)"
+            >
+              {{ exercise.pair.word1 }}
+            </button>
+            <button
+              class="choice-btn"
+              [class.choice-btn--correct]="
+                answered() && exercise.pair.word2 === exercise.targetWord
+              "
+              [class.choice-btn--wrong]="
+                answered() &&
+                lastUserAnswer() === exercise.pair.word2 &&
+                exercise.pair.word2 !== exercise.targetWord
+              "
+              [disabled]="answered()"
+              (click)="chooseWord(exercise.pair.word2)"
+            >
+              {{ exercise.pair.word2 }}
+            </button>
+          </div>
+
+          @if (answered()) {
+            <div
+              class="feedback"
+              [class.feedback--correct]="lastCorrect()"
+              [class.feedback--wrong]="!lastCorrect()"
+            >
+              @if (lastCorrect()) {
+                <span>Correcto!</span>
+              } @else {
+                <span
+                  >Incorrecto. La respuesta era <strong>{{ exercise.targetWord }}</strong
+                  >.</span
+                >
+              }
+            </div>
+          }
+        </div>
+      }
+      @case ('speak') {
+        <!-- Speak mode -->
+        <div class="exercise-card">
+          <p class="target-label">Di esta palabra:</p>
+          <div class="target-word">{{ exercise.targetWord }}</div>
+
+          <button class="listen-small" (click)="tts.speak(exercise.targetWord)">
+            <app-icon [name]="volumeIcon" [size]="16" aria-hidden="true" />
+            Escuchar ejemplo
+          </button>
+
+          @if (!answered()) {
+            @if (recording()) {
+              <button class="record-btn record-btn--active" (click)="stopRecording()">
+                <app-icon [name]="micIcon" [size]="24" aria-hidden="true" />
+                Grabando...
+              </button>
+            } @else {
+              <button class="record-btn" (click)="speakTarget()">
+                <app-icon [name]="micIcon" [size]="24" aria-hidden="true" />
+                Grabar
+              </button>
+            }
+          }
+
+          @if (speakFeedback()) {
+            <div
+              class="feedback"
+              [class.feedback--correct]="lastCorrect()"
+              [class.feedback--wrong]="lastCorrect() === false"
+            >
+              {{ speakFeedback() }}
+            </div>
+          }
+        </div>
+      }
+    }
+
+    <!-- Next button -->
+    @if (answered()) {
+      <button class="btn-primary btn-next" (click)="nextExercise()">Siguiente</button>
+    }
+  }
+</div>

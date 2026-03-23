@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 
-import { PronunciationResult } from '../../models/speak.model';
+import { WordResult } from '../../models/speak.model';
 import { SpeechRecognitionService } from '../../services/speech-recognition.service';
 import { TtsService } from '../../services/tts.service';
 import { getPronunciationFeedback } from '../../utils/pronunciation-feedback.util';
@@ -16,6 +16,7 @@ export class PronunciationCheck {
   private readonly tts = inject(TtsService);
 
   readonly phrase = input.required<string>();
+  readonly resultReady = output<{ expected: string; words: WordResult[] }>();
 
   protected readonly state = this.recognition.state;
   protected readonly result = this.recognition.result;
@@ -30,7 +31,19 @@ export class PronunciationCheck {
   protected readonly failedWords = computed(() => {
     const r = this.result();
     if (!r || r.error) return [];
-    return r.words.filter(w => !w.correct);
+    return r.words.filter((w) => !w.correct);
+  });
+
+  protected readonly correctCount = computed(() => {
+    const r = this.result();
+    if (!r || r.error) return 0;
+    return r.words.filter((w) => w.correct).length;
+  });
+
+  protected readonly totalWordCount = computed(() => {
+    const r = this.result();
+    if (!r || r.error) return 0;
+    return r.words.length;
   });
 
   protected readonly errorMessage = computed(() => {
@@ -56,6 +69,14 @@ export class PronunciationCheck {
 
   protected stopRecording(): void {
     this.recognition.stopRecording();
+
+    // Emit result after a short delay to allow processing
+    setTimeout(() => {
+      const r = this.result();
+      if (r && !r.error) {
+        this.resultReady.emit({ expected: r.expected, words: r.words });
+      }
+    }, 500);
   }
 
   protected speakWord(word: string): void {

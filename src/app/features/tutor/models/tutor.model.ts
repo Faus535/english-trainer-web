@@ -97,12 +97,12 @@ export type TutorTopic =
   | 'shopping'
   | 'daily_life';
 
-export const TUTOR_TOPICS: { value: TutorTopic; label: string }[] = [
+export const TUTOR_TOPICS: { value: TutorTopic; label: string; minLevel?: Level }[] = [
   { value: 'free', label: 'Conversacion libre' },
-  { value: 'job_interview', label: 'Entrevista de trabajo' },
+  { value: 'job_interview', label: 'Entrevista de trabajo', minLevel: 'b1' },
   { value: 'restaurant', label: 'En el restaurante' },
   { value: 'travel', label: 'Viajando' },
-  { value: 'shopping', label: 'De compras' },
+  { value: 'shopping', label: 'De compras', minLevel: 'a2' },
   { value: 'daily_life', label: 'Vida diaria' },
 ];
 

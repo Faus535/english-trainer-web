@@ -13,7 +13,9 @@
   &::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0;
+    top: 0;
+    left: 0;
+    right: 0;
     height: 2px;
     background: var(--primary);
   }
@@ -93,7 +95,9 @@
     transform: translateY(-1px);
   }
 
-  &:active { transform: translateY(0); }
+  &:active {
+    transform: translateY(0);
+  }
 }
 
 .btn-secondary {
@@ -128,11 +132,42 @@
   cursor: pointer;
   transition: all 200ms var(--ease);
 
-  &:hover { border-color: var(--border-active); }
+  &:hover {
+    border-color: var(--border-active);
+  }
 }
 
 .btn-badge {
   font-size: var(--fs-xs);
   opacity: 0.6;
   font-weight: 500;
+}
+
+.weakness-hint {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--border);
+}
+
+.weakness-label {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.weakness-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--sp-1) var(--sp-3);
+  background: var(--warning-soft, rgba(234, 179, 8, 0.1));
+  color: var(--warning, #eab308);
+  border-radius: var(--r-full);
+  font-size: var(--fs-xs);
+  font-weight: 600;
 }

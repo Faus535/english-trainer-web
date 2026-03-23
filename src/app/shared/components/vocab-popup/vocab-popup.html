@@ -1,0 +1,35 @@
+@if (visible()) {
+  <div
+    class="backdrop"
+    role="dialog"
+    aria-modal="true"
+    (click)="onBackdropClick($event)"
+    (keydown.escape)="close()"
+    tabindex="0"
+  >
+    <div class="popup">
+      <button class="close-btn" (click)="close()" aria-label="Cerrar">
+        <app-icon [name]="closeIcon" [size]="18" aria-hidden="true" />
+      </button>
+
+      <div class="popup-word">{{ word() }}</div>
+
+      <button class="audio-btn" (click)="speak()" aria-label="Escuchar pronunciacion">
+        <app-icon [name]="speakIcon" [size]="18" aria-hidden="true" />
+        Escuchar
+      </button>
+
+      <div class="examples">
+        <h4 class="examples-title">Ejemplos</h4>
+        @for (example of examples(); track $index) {
+          <p class="example">{{ example }}</p>
+        }
+      </div>
+
+      <button class="add-btn" (click)="add()">
+        <app-icon [name]="addIcon" [size]="16" aria-hidden="true" />
+        Anadir a repaso
+      </button>
+    </div>
+  </div>
+}

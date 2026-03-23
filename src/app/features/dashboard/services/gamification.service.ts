@@ -1,4 +1,4 @@
-import { Injectable, inject, computed, signal, effect } from '@angular/core';
+import { Injectable, inject, computed, signal } from '@angular/core';
 import { CEFR_LEVELS, MODULE_NAMES } from '../../../shared/models/learning.model';
 import { StateService } from '../../../shared/services/state.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -23,7 +23,13 @@ export class GamificationService {
   private readonly gamificationApi = inject(GamificationApiService);
   private readonly _rouletteIndex = signal(-1);
   private readonly _rouletteRevealed = signal(false);
+  private readonly _pendingLevelUp = signal<{
+    type: 'xp' | 'cefr';
+    level: string;
+    module?: string;
+  } | null>(null);
   private _lastXp = 0;
+  private _lastLevelIndex = -1;
 
   readonly xp = computed(() => {
     const sessions = this.state.totalSessions();
@@ -36,7 +42,12 @@ export class GamificationService {
       levelUps += CEFR_LEVELS.indexOf(this.state.getModuleLevel(mod));
     }
 
-    return (sessions * XP_PER_SESSION) + (flashcards * XP_PER_FLASHCARD) + (levelUps * XP_PER_LEVEL_UP) + streakBonus;
+    return (
+      sessions * XP_PER_SESSION +
+      flashcards * XP_PER_FLASHCARD +
+      levelUps * XP_PER_LEVEL_UP +
+      streakBonus
+    );
   });
 
   readonly level = computed<GamificationStatus>(() => {
@@ -60,36 +71,87 @@ export class GamificationService {
     const bestStreak = this.state.bestStreak();
     const flashcards = this.state.flashcardCount();
 
-    return ACHIEVEMENTS.filter(a => {
+    return ACHIEVEMENTS.filter((a) => {
       switch (a.id) {
-        case 'first_session': return sessions >= 1;
-        case 'week_complete': return sessionsWeek >= 3;
-        case 'sessions_10': return sessions >= 10;
-        case 'sessions_25': return sessions >= 25;
-        case 'sessions_50': return sessions >= 50;
-        case 'sessions_100': return sessions >= 100;
-        case 'streak_3': return streak >= 3 || bestStreak >= 3;
-        case 'streak_7': return streak >= 7 || bestStreak >= 7;
-        case 'streak_14': return streak >= 14 || bestStreak >= 14;
-        case 'flash_50': return flashcards >= 50;
-        case 'flash_200': return flashcards >= 200;
-        case 'listening_a2': return CEFR_LEVELS.indexOf(this.state.getModuleLevel('listening')) >= 1;
-        case 'listening_b1': return CEFR_LEVELS.indexOf(this.state.getModuleLevel('listening')) >= 2;
-        case 'listening_b2': return CEFR_LEVELS.indexOf(this.state.getModuleLevel('listening')) >= 3;
-        case 'listening_c1': return CEFR_LEVELS.indexOf(this.state.getModuleLevel('listening')) >= 4;
-        case 'pron_a2': return CEFR_LEVELS.indexOf(this.state.getModuleLevel('pronunciation')) >= 1;
-        case 'pron_b1': return CEFR_LEVELS.indexOf(this.state.getModuleLevel('pronunciation')) >= 2;
-        case 'pron_b2': return CEFR_LEVELS.indexOf(this.state.getModuleLevel('pronunciation')) >= 3;
-        case 'all_b1': return MODULE_NAMES.every(m => CEFR_LEVELS.indexOf(this.state.getModuleLevel(m)) >= 2);
-        case 'all_b2': return MODULE_NAMES.every(m => CEFR_LEVELS.indexOf(this.state.getModuleLevel(m)) >= 3);
-        case 'graduate': return MODULE_NAMES.every(m => CEFR_LEVELS.indexOf(this.state.getModuleLevel(m)) >= 4);
-        case 'review_7': return sessions >= 7;
-        default: return false;
+        case 'first_session':
+          return sessions >= 1;
+        case 'week_complete':
+          return sessionsWeek >= 3;
+        case 'sessions_10':
+          return sessions >= 10;
+        case 'sessions_25':
+          return sessions >= 25;
+        case 'sessions_50':
+          return sessions >= 50;
+        case 'sessions_100':
+          return sessions >= 100;
+        case 'streak_3':
+          return streak >= 3 || bestStreak >= 3;
+        case 'streak_7':
+          return streak >= 7 || bestStreak >= 7;
+        case 'streak_14':
+          return streak >= 14 || bestStreak >= 14;
+        case 'flash_50':
+          return flashcards >= 50;
+        case 'flash_200':
+          return flashcards >= 200;
+        case 'listening_a2':
+          return CEFR_LEVELS.indexOf(this.state.getModuleLevel('listening')) >= 1;
+        case 'listening_b1':
+          return CEFR_LEVELS.indexOf(this.state.getModuleLevel('listening')) >= 2;
+        case 'listening_b2':
+          return CEFR_LEVELS.indexOf(this.state.getModuleLevel('listening')) >= 3;
+        case 'listening_c1':
+          return CEFR_LEVELS.indexOf(this.state.getModuleLevel('listening')) >= 4;
+        case 'pron_a2':
+          return CEFR_LEVELS.indexOf(this.state.getModuleLevel('pronunciation')) >= 1;
+        case 'pron_b1':
+          return CEFR_LEVELS.indexOf(this.state.getModuleLevel('pronunciation')) >= 2;
+        case 'pron_b2':
+          return CEFR_LEVELS.indexOf(this.state.getModuleLevel('pronunciation')) >= 3;
+        case 'all_b1':
+          return MODULE_NAMES.every((m) => CEFR_LEVELS.indexOf(this.state.getModuleLevel(m)) >= 2);
+        case 'all_b2':
+          return MODULE_NAMES.every((m) => CEFR_LEVELS.indexOf(this.state.getModuleLevel(m)) >= 3);
+        case 'graduate':
+          return MODULE_NAMES.every((m) => CEFR_LEVELS.indexOf(this.state.getModuleLevel(m)) >= 4);
+        case 'review_7':
+          return sessions >= 7;
+        default:
+          return false;
       }
     });
   });
 
   readonly allAchievements = ACHIEVEMENTS;
+  readonly pendingLevelUp = this._pendingLevelUp.asReadonly();
+
+  dismissLevelUp(): void {
+    this._pendingLevelUp.set(null);
+  }
+
+  checkForLevelUp(): void {
+    const currentLevel = this.level();
+    if (this._lastLevelIndex === -1) {
+      this._lastLevelIndex = currentLevel.index;
+      return;
+    }
+    if (currentLevel.index > this._lastLevelIndex) {
+      this._pendingLevelUp.set({
+        type: 'xp',
+        level: currentLevel.name,
+      });
+      this._lastLevelIndex = currentLevel.index;
+    }
+  }
+
+  triggerCefrLevelUp(module: string, newLevel: string): void {
+    this._pendingLevelUp.set({
+      type: 'cefr',
+      level: newLevel.toUpperCase(),
+      module,
+    });
+  }
 
   /**
    * Syncs XP and checks achievements on the backend.

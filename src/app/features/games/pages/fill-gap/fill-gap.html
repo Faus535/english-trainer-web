@@ -1,0 +1,108 @@
+<div class="fill-gap">
+  <header class="fg-header">
+    <a class="fg-back" routerLink="/games" aria-label="Volver a juegos">
+      <app-icon [name]="backIcon" [size]="20" aria-hidden="true" />
+    </a>
+    <h1 class="fg-title">Completa la frase</h1>
+  </header>
+
+  @switch (gameState()) {
+    @case ('menu') {
+      <div class="fg-menu">
+        <p class="fg-instructions">
+          Elige la palabra correcta para completar cada frase. 8 preguntas, 90 segundos.
+        </p>
+
+        <div class="fg-level-select">
+          <span class="fg-level-label">Nivel:</span>
+          <div class="fg-levels">
+            @for (lvl of levels; track lvl) {
+              <button
+                class="fg-level-btn"
+                [class.fg-level-btn--active]="level() === lvl"
+                (click)="selectLevel(lvl)"
+              >
+                {{ lvl.toUpperCase() }}
+              </button>
+            }
+          </div>
+        </div>
+
+        @if (bestScore() > 0) {
+          <div class="fg-best-score">
+            <app-icon [name]="trophyIcon" [size]="16" aria-hidden="true" />
+            <span>Mejor puntuacion: {{ bestScore() }}</span>
+          </div>
+        }
+
+        <button class="fg-start-btn" (click)="startGame()">Empezar</button>
+      </div>
+    }
+
+    @case ('playing') {
+      <div class="fg-game-bar">
+        <div class="fg-timer">
+          <app-icon [name]="timerIcon" [size]="16" aria-hidden="true" />
+          <span>{{ timeLeft() }}s</span>
+        </div>
+        <div class="fg-counter">{{ currentIndex() + 1 }} / {{ questions().length }}</div>
+      </div>
+
+      <div class="fg-progress-track">
+        <div class="fg-progress-fill" [style.width.%]="progressPercent()"></div>
+      </div>
+
+      @let q = currentQuestion();
+      @if (q) {
+        <div class="fg-question">
+          <p class="fg-sentence">{{ q.sentence }}</p>
+
+          <div class="fg-options" role="list">
+            @for (option of q.options; track option; let i = $index) {
+              <button
+                class="fg-option"
+                [class.fg-option--correct]="isCorrectOption(i)"
+                [class.fg-option--wrong]="isWrongSelection(i)"
+                [disabled]="answered()"
+                role="listitem"
+                (click)="selectAnswer(i)"
+              >
+                {{ option }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+    }
+
+    @case ('finished') {
+      <div class="fg-results">
+        <div class="fg-results-icon">
+          <app-icon [name]="trophyIcon" [size]="40" aria-hidden="true" />
+        </div>
+        <h2 class="fg-results-title">Resultado</h2>
+        <div class="fg-results-stats">
+          <div class="fg-results-stat">
+            <span class="fg-results-stat-value">{{ correctCount() }}/{{ questions().length }}</span>
+            <span class="fg-results-stat-label">Correctas</span>
+          </div>
+          <div class="fg-results-stat">
+            <span class="fg-results-stat-value">{{ score() }}</span>
+            <span class="fg-results-stat-label">Puntuacion</span>
+          </div>
+          <div class="fg-results-stat">
+            <span class="fg-results-stat-value">{{ bestScore() }}</span>
+            <span class="fg-results-stat-label">Mejor</span>
+          </div>
+        </div>
+        <div class="fg-results-actions">
+          <button class="fg-start-btn" (click)="playAgain()">
+            <app-icon [name]="retryIcon" [size]="16" aria-hidden="true" />
+            Jugar de nuevo
+          </button>
+          <a class="fg-back-link" routerLink="/games">Volver a juegos</a>
+        </div>
+      </div>
+    }
+  }
+</div>

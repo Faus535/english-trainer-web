@@ -6,14 +6,16 @@ import {
   signal,
   effect,
   inject,
+  computed,
 } from '@angular/core';
 import { Level, CEFR_LEVELS } from '../../../../shared/models/learning.model';
 import { Conversation, TUTOR_TOPICS, TutorTopic, SuggestedGoal } from '../../models/tutor.model';
 import { TutorApiService } from '../../services/tutor-api.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { StateService } from '../../../../shared/services/state.service';
 import { ConversationList } from '../conversation-list/conversation-list';
 import { Icon } from '../../../../shared/components/icon/icon';
-import { LucideIconData, MessageSquarePlus, Sparkles, X } from 'lucide-angular';
+import { LucideIconData, Lock, MessageSquarePlus, Sparkles, X } from 'lucide-angular';
 
 @Component({
   selector: 'app-start-screen',
@@ -25,6 +27,7 @@ import { LucideIconData, MessageSquarePlus, Sparkles, X } from 'lucide-angular';
 export class StartScreen {
   private readonly tutorApi = inject(TutorApiService);
   private readonly auth = inject(AuthService);
+  private readonly state = inject(StateService);
 
   readonly pastConversations = input.required<Conversation[]>();
   readonly defaultLevel = input<Level>('a1');
@@ -51,6 +54,16 @@ export class StartScreen {
   protected readonly newChatIcon: LucideIconData = MessageSquarePlus;
   protected readonly suggestIcon: LucideIconData = Sparkles;
   protected readonly removeIcon: LucideIconData = X;
+  protected readonly lockIcon: LucideIconData = Lock;
+
+  protected readonly userPronLevel = computed(() => this.state.getModuleLevel('pronunciation'));
+
+  protected isTopicLocked(minLevel?: Level): boolean {
+    if (!minLevel) return false;
+    const userLevelIndex = CEFR_LEVELS.indexOf(this.userPronLevel());
+    const requiredIndex = CEFR_LEVELS.indexOf(minLevel);
+    return userLevelIndex < requiredIndex;
+  }
 
   protected selectLevel(level: Level): void {
     this.selectedLevel.set(level);

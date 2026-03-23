@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Icon } from '../../../../shared/components/icon/icon';
+import { VocabPopup } from '../../../../shared/components/vocab-popup/vocab-popup';
 import {
   LucideIconData,
   ChevronDown,
@@ -21,7 +22,7 @@ import { TutorFeedback } from '../../models/tutor.model';
 
 @Component({
   selector: 'app-feedback-card',
-  imports: [Icon],
+  imports: [Icon, VocabPopup],
   templateUrl: './feedback-card.html',
   styleUrl: './feedback-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,6 +41,9 @@ export class FeedbackCard {
   protected readonly addIcon: LucideIconData = BookPlus;
   protected readonly historyIcon: LucideIconData = BarChart3;
 
+  protected readonly selectedVocabWord = signal('');
+  protected readonly showVocabPopup = signal(false);
+
   protected readonly hasFeedback = computed(() => {
     const fb = this.feedback();
     return (
@@ -55,5 +59,19 @@ export class FeedbackCard {
 
   protected goToErrorHistory(): void {
     this.router.navigate(['/analytics']);
+  }
+
+  protected openVocabPopup(word: string): void {
+    this.selectedVocabWord.set(word);
+    this.showVocabPopup.set(true);
+  }
+
+  protected closeVocabPopup(): void {
+    this.showVocabPopup.set(false);
+  }
+
+  protected onVocabAddToReview(word: string): void {
+    this.addToReview.emit(word);
+    this.showVocabPopup.set(false);
   }
 }

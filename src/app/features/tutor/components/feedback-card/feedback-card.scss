@@ -150,6 +150,17 @@
 .vocab-word {
   font-size: var(--fs-sm);
   color: var(--primary);
+
+  &--clickable {
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 0.125rem;
+
+    &:hover {
+      text-decoration-style: solid;
+    }
+  }
 }
 
 .vocab-action {

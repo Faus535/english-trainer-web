@@ -58,7 +58,13 @@
             @for (vocab of fb.vocabularySuggestions; track vocab.word) {
               <div class="vocab-item">
                 <div class="vocab-header">
-                  <strong class="vocab-word">{{ vocab.word }}</strong>
+                  <strong
+                    class="vocab-word vocab-word--clickable"
+                    role="button"
+                    tabindex="0"
+                    (click)="openVocabPopup(vocab.word)"
+                    >{{ vocab.word }}</strong
+                  >
                   <button
                     class="vocab-action"
                     (click)="addToReview.emit(vocab.word)"
@@ -98,4 +104,13 @@
       </div>
     }
   </div>
+
+  @if (showVocabPopup() && selectedVocabWord()) {
+    <app-vocab-popup
+      [word]="selectedVocabWord()"
+      [visible]="showVocabPopup()"
+      (closed)="closeVocabPopup()"
+      (addToReview)="onVocabAddToReview($event)"
+    />
+  }
 }

@@ -1,4 +1,61 @@
-@if (session(); as s) {
+@if (sessionCompleted()) {
+  <div class="feedback-screen">
+    <div class="feedback-card">
+      <div class="feedback-header">
+        <span class="feedback-icon">&#127881;</span>
+        <h2 class="feedback-title">Sesion completada</h2>
+      </div>
+
+      <div class="feedback-stats">
+        <div class="feedback-stat">
+          <span class="feedback-stat-value">{{ sessionDuration() }}</span>
+          <span class="feedback-stat-label">minutos</span>
+        </div>
+        <div class="feedback-stat">
+          <span class="feedback-stat-value">{{ completedBlockCount() }}</span>
+          <span class="feedback-stat-label">bloques</span>
+        </div>
+        <div class="feedback-stat feedback-stat--xp">
+          <span class="feedback-stat-value">+{{ xpEarned }}</span>
+          <span class="feedback-stat-label">XP</span>
+        </div>
+      </div>
+
+      @if (improvedAreas().length > 0) {
+        <div class="feedback-section">
+          <h3 class="feedback-section-title feedback-section-title--success">
+            Areas que mejoraste
+          </h3>
+          <div class="feedback-list">
+            @for (area of improvedAreas(); track area) {
+              <span class="feedback-chip feedback-chip--success">{{ area }}</span>
+            }
+          </div>
+        </div>
+      }
+
+      @if (practiceAreas().length > 0) {
+        <div class="feedback-section">
+          <h3 class="feedback-section-title feedback-section-title--warning">
+            Areas a seguir practicando
+          </h3>
+          <div class="feedback-list">
+            @for (area of practiceAreas(); track area) {
+              <span class="feedback-chip feedback-chip--warning">{{ area }}</span>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="feedback-actions">
+        <button class="nav-btn primary" (click)="startNextSession()">
+          Siguiente sesion sugerida
+        </button>
+        <button class="nav-btn" (click)="exitSession()">Ir al dashboard</button>
+      </div>
+    </div>
+  </div>
+} @else if (session(); as s) {
   <div class="session-page">
     <div class="session-header">
       <button class="back-btn" (click)="exitSession()">&larr; Salir</button>
@@ -49,7 +106,10 @@
         @switch (block.type) {
           @case ('warmup') {
             <div class="block-instructions">
-              <p>Toma unos minutos para calentar. Repasa contenido anterior y prepara tu mente para la sesion.</p>
+              <p>
+                Toma unos minutos para calentar. Repasa contenido anterior y prepara tu mente para
+                la sesion.
+              </p>
               @for (item of s.warmup; track item.desc) {
                 <div class="warmup-item">
                   <span class="warmup-icon">{{ item.icon }}</span>
@@ -80,7 +140,9 @@
           }
           @default {
             <div class="block-instructions">
-              <p>Sigue las instrucciones de esta unidad. Cuando termines, avanza al siguiente bloque.</p>
+              <p>
+                Sigue las instrucciones de esta unidad. Cuando termines, avanza al siguiente bloque.
+              </p>
             </div>
           }
         }

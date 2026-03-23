@@ -27,14 +27,23 @@
       aria-labelledby="topic-label"
     >
       @for (topic of topics; track topic.value) {
+        @let locked = isTopicLocked(topic.minLevel);
         <button
           class="selector-chip"
           [class.selector-chip--active]="selectedTopic() === topic.value"
-          (click)="selectTopic(topic.value)"
+          [class.selector-chip--locked]="locked"
+          (click)="locked ? null : selectTopic(topic.value)"
+          [disabled]="locked"
           role="radio"
           [attr.aria-checked]="selectedTopic() === topic.value"
         >
+          @if (locked) {
+            <app-icon [name]="lockIcon" [size]="14" aria-hidden="true" />
+          }
           {{ topic.label }}
+          @if (locked && topic.minLevel) {
+            <span class="selector-chip-level">{{ topic.minLevel.toUpperCase() }}</span>
+          }
         </button>
       }
     </div>

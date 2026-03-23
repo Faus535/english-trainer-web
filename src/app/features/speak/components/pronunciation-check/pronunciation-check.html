@@ -16,9 +16,7 @@
     </button>
 
     @if (state() === 'recording') {
-      <button class="btn-check" (click)="stopRecording()">
-        &#9989; Comprobar
-      </button>
+      <button class="btn-check" (click)="stopRecording()">&#9989; Comprobar</button>
     }
 
     <!-- Error -->
@@ -34,21 +32,22 @@
       <div class="pron-feedback" [class]="'feedback-' + fb.level">
         <div class="pron-score">{{ r.score }}%</div>
         <div class="pron-msg">{{ fb.message }}</div>
+        <div class="pron-precision">
+          {{ correctCount() }}/{{ totalWordCount() }} palabras correctas
+        </div>
       </div>
 
-      <!-- Word-by-word -->
-      <div class="pron-words">
+      <!-- Word-by-word comparison -->
+      <div class="pron-words-grid">
         @for (w of r.words; track w.word) {
-          <span
-            class="pron-word"
-            [class.ok]="w.correct"
-            [class.fail]="!w.correct"
-            role="button"
-            tabindex="0"
-            (click)="speakWord(w.word)"
-          >
-            {{ w.word }}
-          </span>
+          <div class="pron-word-cell" [class.ok]="w.correct" [class.fail]="!w.correct">
+            <span class="pron-word-text" role="button" tabindex="0" (click)="speakWord(w.word)">
+              {{ w.word }}
+            </span>
+            @if (!w.correct) {
+              <span class="pron-word-expected">{{ w.word }}</span>
+            }
+          </div>
         }
       </div>
       <div class="pron-words-hint">Pulsa cualquier palabra para escucharla</div>

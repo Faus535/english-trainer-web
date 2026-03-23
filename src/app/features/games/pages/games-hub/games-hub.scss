@@ -1,0 +1,96 @@
+:host {
+  display: block;
+}
+
+.games-hub {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+.gh-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.gh-title {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+}
+
+.gh-subtitle {
+  font-size: var(--fs-sm);
+  color: var(--text-3);
+}
+
+.gh-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.gh-card {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-4) var(--sp-5);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  text-decoration: none;
+  color: var(--text);
+  transition:
+    background 200ms var(--ease),
+    border-color 200ms var(--ease),
+    transform 200ms var(--ease);
+
+  &:hover {
+    background: var(--surface-2);
+    border-color: var(--primary);
+    transform: translateY(-0.125rem);
+  }
+}
+
+.gh-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--r-md);
+  background: var(--primary-soft);
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.gh-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  flex: 1;
+  min-width: 0;
+}
+
+.gh-card-name {
+  font-size: var(--fs-base);
+  font-weight: 700;
+}
+
+.gh-card-desc {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}
+
+.gh-card-score {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-1) var(--sp-2);
+  background: rgba(234, 179, 8, 0.1);
+  color: var(--warning);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  flex-shrink: 0;
+}

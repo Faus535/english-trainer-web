@@ -11,8 +11,25 @@
       {{ text()!.wordCount }} palabras &middot; {{ text()!.estimatedMinutes }} min
     </p>
     <div class="reading-content">
-      <p>{{ text()!.content }}</p>
+      <p class="reading-words">
+        @for (word of contentWords(); track $index) {
+          <span class="clickable-word" role="button" tabindex="0" (click)="onWordClick(word)">{{
+            word
+          }}</span
+          >{{ ' ' }}
+        }
+      </p>
     </div>
+    <p class="word-hint">Pulsa una palabra para ver su significado</p>
     <button class="quiz-btn" (click)="startQuiz()">Iniciar preguntas de comprension</button>
   </div>
+
+  @if (showVocabPopup() && selectedWord()) {
+    <app-vocab-popup
+      [word]="selectedWord()"
+      [visible]="showVocabPopup()"
+      (closed)="closeVocabPopup()"
+      (addToReview)="onAddToReview($event)"
+    />
+  }
 }

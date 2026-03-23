@@ -1,0 +1,23 @@
+@if (loaded()) {
+  <a class="review-widget" routerLink="/review">
+    <div class="review-widget-left">
+      <div class="review-widget-icon">
+        <app-icon [name]="repeatIcon" [size]="20" aria-hidden="true" />
+      </div>
+      <div class="review-widget-info">
+        <span class="review-widget-title">Repaso del dia</span>
+        @if (dueToday() > 0) {
+          <span class="review-widget-desc">{{ dueToday() }} tarjetas pendientes</span>
+        } @else {
+          <span class="review-widget-desc review-widget-done">Todo al dia</span>
+        }
+      </div>
+    </div>
+    <div class="review-widget-right">
+      @if (dueToday() > 0) {
+        <span class="review-badge">{{ dueToday() }}</span>
+      }
+      <app-icon [name]="chevronIcon" [size]="18" aria-hidden="true" />
+    </div>
+  </a>
+}

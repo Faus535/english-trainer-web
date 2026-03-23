@@ -33,5 +33,14 @@
         <span class="btn-badge">31m</span>
       </button>
     </div>
+
+    @if (weaknessHints().length > 0) {
+      <div class="weakness-hint">
+        <span class="weakness-label">Hoy priorizamos:</span>
+        @for (hint of weaknessHints(); track hint) {
+          <span class="weakness-chip">{{ hint }}</span>
+        }
+      </div>
+    }
   }
 </div>

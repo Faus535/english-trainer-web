@@ -50,6 +50,28 @@
   line-height: 1.8;
   font-size: var(--fs-base);
 }
+.reading-words {
+  display: inline;
+}
+
+.clickable-word {
+  cursor: pointer;
+  border-radius: var(--r-sm);
+  padding: 0 0.0625rem;
+  transition: all 150ms var(--ease);
+
+  &:hover {
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+}
+
+.word-hint {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  text-align: center;
+}
+
 .quiz-btn {
   padding: var(--sp-3);
   background: var(--primary);

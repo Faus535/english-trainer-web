@@ -1,4 +1,6 @@
-:host { display: block; }
+:host {
+  display: block;
+}
 
 .speak-page {
   max-width: 31.25rem;
@@ -12,8 +14,14 @@
   text-align: center;
   padding-top: var(--sp-10);
 
-  h3 { margin-bottom: var(--sp-2); font-weight: 700; }
-  p { color: var(--text-3); font-size: var(--fs-sm); }
+  h3 {
+    margin-bottom: var(--sp-2);
+    font-weight: 700;
+  }
+  p {
+    color: var(--text-3);
+    font-size: var(--fs-sm);
+  }
 }
 
 .stats {
@@ -64,8 +72,13 @@
   align-items: center;
   gap: var(--sp-2);
 
-  &:hover { filter: brightness(1.1); transform: translateY(-1px); }
-  &:active { transform: translateY(0); }
+  &:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+  }
+  &:active {
+    transform: translateY(0);
+  }
 }
 
 .phrase-text {
@@ -94,7 +107,10 @@
   }
 }
 
-.phrase-hint { font-size: var(--fs-xs); color: var(--text-3); }
+.phrase-hint {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}
 
 .translation {
   font-size: var(--fs-base);
@@ -114,7 +130,28 @@
   cursor: pointer;
   transition: all 200ms var(--ease);
 
-  &:hover { border-color: var(--border-active); }
+  &:hover {
+    border-color: var(--border-active);
+  }
+}
+
+.minimal-pairs-link {
+  display: block;
+  text-align: center;
+  padding: var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface-0);
+  color: var(--primary);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 200ms var(--ease);
+
+  &:hover {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+  }
 }
 
 .nav {
@@ -135,8 +172,13 @@
   cursor: pointer;
   transition: all 200ms var(--ease);
 
-  &:hover:not(:disabled) { border-color: var(--border-active); }
-  &:disabled { opacity: 0.25; cursor: not-allowed; }
+  &:hover:not(:disabled) {
+    border-color: var(--border-active);
+  }
+  &:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+  }
 }
 
 .nav-next {
@@ -144,5 +186,134 @@
   border: none;
   color: #fff;
 
-  &:hover { background: var(--primary-hover); transform: translateY(-1px); }
+  &:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+  }
+}
+
+// Difficult words section
+.difficult-words-section {
+  display: flex;
+  justify-content: center;
+}
+
+.difficult-words-btn {
+  padding: var(--sp-3) var(--sp-6);
+  border: 1px solid var(--warning);
+  border-radius: var(--r-full);
+  background: var(--warning-soft);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 200ms var(--ease);
+
+  &:hover {
+    background: var(--warning);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+}
+
+// Drill mode
+.drill-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.drill-title {
+  font-size: var(--fs-lg);
+  font-weight: 800;
+}
+
+.drill-exit {
+  padding: var(--sp-2) var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface-1);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 200ms var(--ease);
+
+  &:hover {
+    border-color: var(--border-active);
+  }
+}
+
+.drill-progress {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  font-weight: 500;
+  text-align: center;
+}
+
+.drill-card {
+  background: var(--surface-0);
+  border-radius: var(--r-xl);
+  padding: var(--sp-6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+  border: 1px solid var(--border);
+}
+
+.drill-word {
+  font-size: var(--fs-2xl);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.drill-fail-count {
+  font-size: var(--fs-xs);
+  color: var(--error);
+  font-weight: 500;
+}
+
+.drill-actions {
+  display: flex;
+  gap: var(--sp-3);
+}
+
+.drill-listen-btn,
+.drill-record-btn {
+  padding: var(--sp-3) var(--sp-5);
+  border: none;
+  border-radius: var(--r-full);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 200ms var(--ease);
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.drill-listen-btn {
+  background: var(--color-vocabulary);
+  color: #fff;
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+}
+
+.drill-record-btn {
+  background: var(--primary);
+  color: #fff;
+
+  &:hover {
+    background: var(--primary-hover);
+  }
+}
+
+.drill-nav {
+  display: flex;
+  justify-content: center;
 }

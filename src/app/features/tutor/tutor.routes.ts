@@ -14,4 +14,9 @@ export default [
       ),
     title: 'Ejercicios',
   },
+  {
+    path: 'errors',
+    loadComponent: () => import('./pages/error-history/error-history').then((m) => m.ErrorHistory),
+    title: 'Historial de errores',
+  },
 ] satisfies Routes;

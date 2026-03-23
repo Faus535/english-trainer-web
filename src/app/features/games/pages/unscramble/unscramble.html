@@ -1,0 +1,124 @@
+<div class="unscramble">
+  <header class="us-header">
+    <a class="us-back" routerLink="/games" aria-label="Volver a juegos">
+      <app-icon [name]="backIcon" [size]="20" aria-hidden="true" />
+    </a>
+    <h1 class="us-title">Ordena las letras</h1>
+  </header>
+
+  @switch (gameState()) {
+    @case ('menu') {
+      <div class="us-menu">
+        <p class="us-instructions">
+          Toca las letras en el orden correcto para formar la palabra. 8 palabras, 90 segundos.
+        </p>
+
+        <div class="us-level-select">
+          <span class="us-level-label">Nivel:</span>
+          <div class="us-levels">
+            @for (lvl of levels; track lvl) {
+              <button
+                class="us-level-btn"
+                [class.us-level-btn--active]="level() === lvl"
+                (click)="selectLevel(lvl)"
+              >
+                {{ lvl.toUpperCase() }}
+              </button>
+            }
+          </div>
+        </div>
+
+        @if (bestScore() > 0) {
+          <div class="us-best-score">
+            <app-icon [name]="trophyIcon" [size]="16" aria-hidden="true" />
+            <span>Mejor puntuacion: {{ bestScore() }}</span>
+          </div>
+        }
+
+        <button class="us-start-btn" (click)="startGame()">Empezar</button>
+      </div>
+    }
+
+    @case ('playing') {
+      <div class="us-game-bar">
+        <div class="us-timer">
+          <app-icon [name]="timerIcon" [size]="16" aria-hidden="true" />
+          <span>{{ timeLeft() }}s</span>
+        </div>
+        <div class="us-counter">{{ currentIndex() + 1 }} / {{ words().length }}</div>
+      </div>
+
+      <div class="us-progress-track">
+        <div class="us-progress-fill" [style.width.%]="progressPercent()"></div>
+      </div>
+
+      <div class="us-game-area">
+        <div
+          class="us-built"
+          [class.us-built--correct]="showCorrect()"
+          [class.us-built--wrong]="showWrong()"
+          role="region"
+          aria-label="Palabra formada"
+        >
+          @if (builtLetters().length === 0) {
+            <span class="us-built-placeholder">Toca las letras...</span>
+          } @else {
+            @for (letter of builtLetters(); track letter.originalIndex; let i = $index) {
+              <button
+                class="us-built-letter"
+                (click)="tapBuiltLetter(i)"
+                aria-label="Quitar letra {{ letter.char }}"
+              >
+                {{ letter.char }}
+              </button>
+            }
+          }
+        </div>
+
+        <div class="us-scrambled" role="list" aria-label="Letras disponibles">
+          @for (letter of scrambledLetters(); track letter.originalIndex; let i = $index) {
+            <button
+              class="us-letter"
+              [class.us-letter--used]="letter.used"
+              [disabled]="letter.used"
+              role="listitem"
+              (click)="tapScrambledLetter(i)"
+            >
+              {{ letter.char }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    @case ('finished') {
+      <div class="us-results">
+        <div class="us-results-icon">
+          <app-icon [name]="trophyIcon" [size]="40" aria-hidden="true" />
+        </div>
+        <h2 class="us-results-title">Resultado</h2>
+        <div class="us-results-stats">
+          <div class="us-results-stat">
+            <span class="us-results-stat-value">{{ completedCount() }}/{{ words().length }}</span>
+            <span class="us-results-stat-label">Palabras</span>
+          </div>
+          <div class="us-results-stat">
+            <span class="us-results-stat-value">{{ score() }}</span>
+            <span class="us-results-stat-label">Puntuacion</span>
+          </div>
+          <div class="us-results-stat">
+            <span class="us-results-stat-value">{{ bestScore() }}</span>
+            <span class="us-results-stat-label">Mejor</span>
+          </div>
+        </div>
+        <div class="us-results-actions">
+          <button class="us-start-btn" (click)="playAgain()">
+            <app-icon [name]="retryIcon" [size]="16" aria-hidden="true" />
+            Jugar de nuevo
+          </button>
+          <a class="us-back-link" routerLink="/games">Volver a juegos</a>
+        </div>
+      </div>
+    }
+  }
+</div>

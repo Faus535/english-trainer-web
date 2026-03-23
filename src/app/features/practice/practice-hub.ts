@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Icon } from '../../shared/components/icon/icon';
-import { LucideIconData, BookOpen, PenLine } from 'lucide-angular';
+import { LucideIconData, BookOpen, PenLine, Repeat } from 'lucide-angular';
 
 @Component({
   selector: 'app-practice-hub',
@@ -13,4 +13,5 @@ import { LucideIconData, BookOpen, PenLine } from 'lucide-angular';
 export class PracticeHub {
   protected readonly bookIcon: LucideIconData = BookOpen;
   protected readonly penIcon: LucideIconData = PenLine;
+  protected readonly repeatIcon: LucideIconData = Repeat;
 }

@@ -1,5 +1,5 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
-import { ModuleName, MODULE_NAMES } from '../../../shared/models/learning.model';
+import { ModuleName } from '../../../shared/models/learning.model';
 import { StateService } from '../../../shared/services/state.service';
 import { GamificationService } from './gamification.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -20,9 +20,15 @@ export class SessionService {
   private readonly _currentSession = signal<StudySession | null>(this.loadSession());
   private readonly _currentBlockIndex = signal(0);
   private readonly _completedBlocks = signal<Set<number>>(new Set());
+  private readonly _sessionCompleted = signal(false);
+  private readonly _completedSession = signal<StudySession | null>(null);
+  private readonly _sessionStartTime = signal<number>(Date.now());
 
   readonly currentSession = this._currentSession.asReadonly();
   readonly currentBlockIndex = this._currentBlockIndex.asReadonly();
+  readonly sessionCompleted = this._sessionCompleted.asReadonly();
+  readonly completedSession = this._completedSession.asReadonly();
+  readonly sessionStartTime = this._sessionStartTime.asReadonly();
 
   readonly currentBlock = computed<SessionBlock | null>(() => {
     const session = this._currentSession();
@@ -48,6 +54,9 @@ export class SessionService {
     this._currentSession.set(session);
     this._currentBlockIndex.set(0);
     this._completedBlocks.set(new Set());
+    this._sessionCompleted.set(false);
+    this._completedSession.set(null);
+    this._sessionStartTime.set(Date.now());
     this.persistSession(session);
   }
 
@@ -64,7 +73,7 @@ export class SessionService {
     const session = this._currentSession();
     if (!session) return;
 
-    this._completedBlocks.update(s => {
+    this._completedBlocks.update((s) => {
       const next = new Set(s);
       next.add(this._currentBlockIndex());
       return next;
@@ -132,10 +141,17 @@ export class SessionService {
 
     this.gamification.syncToBackend();
 
+    this._completedSession.set(session);
+    this._sessionCompleted.set(true);
     this._currentSession.set(null);
     this._currentBlockIndex.set(0);
     this._completedBlocks.set(new Set());
     localStorage.removeItem(STORAGE_KEY);
+  }
+
+  dismissCompletion(): void {
+    this._sessionCompleted.set(false);
+    this._completedSession.set(null);
   }
 
   private generateSession(mode: SessionMode): StudySession {
@@ -162,7 +178,13 @@ export class SessionService {
       secondaryModule,
       warmup,
       duration: mode === 'short' ? 14 : mode === 'extended' ? 31 : 21,
-      blocks: this.buildBlocks(mode, listeningUnit, pronunciationUnit, secondaryUnit, secondaryModule),
+      blocks: this.buildBlocks(
+        mode,
+        listeningUnit,
+        pronunciationUnit,
+        secondaryUnit,
+        secondaryModule,
+      ),
     };
 
     return session;
@@ -234,7 +256,7 @@ export class SessionService {
   private loadSession(): StudySession | null {
     try {
       const val = localStorage.getItem(STORAGE_KEY);
-      return val ? JSON.parse(val) as StudySession : null;
+      return val ? (JSON.parse(val) as StudySession) : null;
     } catch {
       return null;
     }

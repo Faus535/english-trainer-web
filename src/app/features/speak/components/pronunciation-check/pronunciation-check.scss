@@ -1,4 +1,6 @@
-:host { display: block; }
+:host {
+  display: block;
+}
 
 .pronunciation-check {
   display: flex;
@@ -21,7 +23,10 @@
   cursor: pointer;
   transition: all 200ms var(--ease);
 
-  &:hover { background: var(--primary-hover); transform: translateY(-1px); }
+  &:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+  }
 
   &.recording {
     background: var(--accent);
@@ -29,12 +34,19 @@
   }
 }
 
-.btn-record-small { padding: var(--sp-2) var(--sp-4); font-size: var(--fs-sm); }
-.record-icon { font-size: 1.125rem; line-height: 1; }
+.btn-record-small {
+  padding: var(--sp-2) var(--sp-4);
+  font-size: var(--fs-sm);
+}
+.record-icon {
+  font-size: 1.125rem;
+  line-height: 1;
+}
 
 .record-pulse {
   display: inline-block;
-  width: 6px; height: 6px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #fff;
   animation: pulse-dot 1s infinite;
@@ -50,7 +62,9 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 200ms var(--ease);
-  &:hover { filter: brightness(1.1); }
+  &:hover {
+    filter: brightness(1.1);
+  }
 }
 
 .pron-feedback {
@@ -60,7 +74,8 @@
   text-align: center;
   border: 1px solid transparent;
 
-  &.feedback-excellent, &.feedback-good {
+  &.feedback-excellent,
+  &.feedback-good {
     background: var(--success-soft);
     color: var(--success);
     border-color: rgba(34, 197, 94, 0.15);
@@ -77,31 +92,80 @@
   }
 }
 
-.pron-score { font-size: var(--fs-3xl); font-weight: 800; letter-spacing: -0.03em; }
-.pron-msg { font-size: var(--fs-sm); margin-top: var(--sp-1); font-weight: 500; }
+.pron-score {
+  font-size: var(--fs-3xl);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.pron-msg {
+  font-size: var(--fs-sm);
+  margin-top: var(--sp-1);
+  font-weight: 500;
+}
+.pron-precision {
+  font-size: var(--fs-xs);
+  margin-top: var(--sp-1);
+  opacity: 0.8;
+}
 
-.pron-words {
+.pron-words-grid {
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-2);
   justify-content: center;
+  width: 100%;
 }
 
-.pron-word {
+.pron-word-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+
+  &.ok .pron-word-text {
+    background: var(--success-soft);
+    color: var(--success);
+    border-color: rgba(34, 197, 94, 0.2);
+  }
+
+  &.fail .pron-word-text {
+    background: var(--error-soft);
+    color: var(--error);
+    border-color: rgba(239, 68, 68, 0.2);
+    text-decoration: line-through;
+  }
+}
+
+.pron-word-text {
   padding: var(--sp-1) var(--sp-3);
   border-radius: var(--r-sm);
   font-size: var(--fs-sm);
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 200ms var(--ease);
+  border: 1px solid transparent;
 
-  &.ok { background: var(--success-soft); color: var(--success); }
-  &.fail { background: var(--error-soft); color: var(--error); text-decoration: line-through; }
-  &:hover { transform: translateY(-1px); }
+  &:hover {
+    transform: translateY(-1px);
+  }
 }
 
-.pron-words-hint { font-size: var(--fs-xs); color: var(--text-3); }
-.pron-heard { font-size: var(--fs-xs); color: var(--text-3); font-style: italic; }
+.pron-word-expected {
+  font-size: 0.5625rem;
+  color: var(--error);
+  font-weight: 500;
+  opacity: 0.7;
+}
+
+.pron-words-hint {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}
+.pron-heard {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  font-style: italic;
+}
 
 .pron-practice {
   width: 100%;
@@ -111,8 +175,17 @@
   border: 1px solid var(--border);
 }
 
-.pron-practice-title { font-size: var(--fs-sm); font-weight: 600; margin-bottom: var(--sp-2); }
-.pron-practice-word { display: flex; align-items: center; gap: var(--sp-2); margin-bottom: var(--sp-2); }
+.pron-practice-title {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  margin-bottom: var(--sp-2);
+}
+.pron-practice-word {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
+}
 
 .pron-practice-listen {
   padding: var(--sp-1) var(--sp-3);
@@ -124,15 +197,29 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 200ms var(--ease);
-  &:hover { border-color: var(--border-active); }
+  &:hover {
+    border-color: var(--border-active);
+  }
 }
 
 @keyframes pulse-dot {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.4); }
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.4);
+  }
 }
 
 @keyframes pulse-border {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.4); }
-  50% { box-shadow: 0 0 0 8px rgba(236, 72, 153, 0); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(236, 72, 153, 0);
+  }
 }

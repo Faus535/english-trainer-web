@@ -1,0 +1,122 @@
+<div class="word-match">
+  <header class="wm-header">
+    <a class="wm-back" routerLink="/games" aria-label="Volver a juegos">
+      <app-icon [name]="backIcon" [size]="20" aria-hidden="true" />
+    </a>
+    <h1 class="wm-title">Empareja palabras</h1>
+  </header>
+
+  @switch (gameState()) {
+    @case ('menu') {
+      <div class="wm-menu">
+        <p class="wm-instructions">
+          Conecta cada palabra en ingles con su traduccion al espanol. Tienes 60 segundos.
+        </p>
+
+        <div class="wm-level-select">
+          <span class="wm-level-label">Nivel:</span>
+          <div class="wm-levels">
+            @for (lvl of levels; track lvl) {
+              <button
+                class="wm-level-btn"
+                [class.wm-level-btn--active]="level() === lvl"
+                (click)="selectLevel(lvl)"
+              >
+                {{ lvl.toUpperCase() }}
+              </button>
+            }
+          </div>
+        </div>
+
+        @if (bestScore() > 0) {
+          <div class="wm-best-score">
+            <app-icon [name]="trophyIcon" [size]="16" aria-hidden="true" />
+            <span>Mejor puntuacion: {{ bestScore() }}</span>
+          </div>
+        }
+
+        <button class="wm-start-btn" (click)="startGame()">Empezar</button>
+      </div>
+    }
+
+    @case ('playing') {
+      <div class="wm-game-bar">
+        <div class="wm-timer">
+          <app-icon [name]="timerIcon" [size]="16" aria-hidden="true" />
+          <span>{{ timeLeft() }}s</span>
+        </div>
+        <div class="wm-progress">{{ matchedCount() }} / 8</div>
+      </div>
+
+      <div class="wm-columns">
+        <div class="wm-column" role="list" aria-label="Palabras en ingles">
+          @for (item of enItems(); track item.text; let i = $index) {
+            <button
+              class="wm-word"
+              [class.wm-word--selected]="item.selected"
+              [class.wm-word--matched]="item.matched"
+              [class.wm-word--incorrect]="item.incorrect"
+              [disabled]="item.matched"
+              role="listitem"
+              (click)="selectEnWord(i)"
+            >
+              {{ item.text }}
+            </button>
+          }
+        </div>
+
+        <div class="wm-column" role="list" aria-label="Palabras en espanol">
+          @for (item of esItems(); track item.text; let i = $index) {
+            <button
+              class="wm-word"
+              [class.wm-word--selected]="item.selected"
+              [class.wm-word--matched]="item.matched"
+              [class.wm-word--incorrect]="item.incorrect"
+              [disabled]="item.matched"
+              role="listitem"
+              (click)="selectEsWord(i)"
+            >
+              {{ item.text }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    @case ('finished') {
+      <div class="wm-results">
+        <div class="wm-results-icon">
+          <app-icon [name]="trophyIcon" [size]="40" aria-hidden="true" />
+        </div>
+        <h2 class="wm-results-title">
+          @if (allMatched()) {
+            Completado!
+          } @else {
+            Tiempo agotado
+          }
+        </h2>
+        <div class="wm-results-stats">
+          <div class="wm-results-stat">
+            <span class="wm-results-stat-value">{{ matchedCount() }}</span>
+            <span class="wm-results-stat-label">Parejas</span>
+          </div>
+          <div class="wm-results-stat">
+            <span class="wm-results-stat-value">{{ score() }}</span>
+            <span class="wm-results-stat-label">Puntuacion</span>
+          </div>
+          <div class="wm-results-stat">
+            <span class="wm-results-stat-value">{{ bestScore() }}</span>
+            <span class="wm-results-stat-label">Mejor</span>
+          </div>
+        </div>
+        <div class="wm-results-actions">
+          <button class="wm-start-btn" (click)="playAgain()">
+            <app-icon [name]="retryIcon" [size]="16" aria-hidden="true" />
+            Jugar de nuevo
+          </button>
+          <a class="wm-back-link" routerLink="/games">Volver a juegos</a>
+        </div>
+      </div>
+    }
+  }
+</div>

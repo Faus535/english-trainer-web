@@ -41,9 +41,21 @@ export const routes: Routes = [
     title: 'Sesion',
   },
   {
+    path: 'minimal-pairs',
+    canActivate: [authGuard],
+    loadChildren: () => import('./features/minimal-pairs/minimal-pairs.routes'),
+    title: 'Pares Minimos',
+  },
+  {
     path: 'tutor',
     canActivate: [authGuard],
     loadChildren: () => import('./features/tutor/tutor.routes'),
+  },
+  {
+    path: 'games',
+    canActivate: [authGuard],
+    loadChildren: () => import('./features/games/games.routes'),
+    title: 'Juegos',
   },
   {
     path: 'practice',
@@ -62,6 +74,12 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadChildren: () => import('./features/writing/writing.routes'),
     title: 'Writing',
+  },
+  {
+    path: 'review',
+    canActivate: [authGuard],
+    loadChildren: () => import('./features/review/review.routes'),
+    title: 'Repaso',
   },
   {
     path: 'analytics',
