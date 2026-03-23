@@ -83,3 +83,19 @@
   font-size: var(--fs-xs);
   margin-top: var(--sp-1);
 }
+
+// Feedback fade-in animation for streaming
+:host app-feedback-card {
+  animation: feedback-fade-in 0.4s var(--ease);
+}
+
+@keyframes feedback-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

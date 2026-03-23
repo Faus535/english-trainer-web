@@ -17,7 +17,12 @@
           <span class="summary-stat-label">XP</span>
         </div>
       </div>
-      <p class="summary-text">{{ result.summary }}</p>
+
+      @if (result.evaluation) {
+        <app-evaluation-card [evaluation]="result.evaluation" [selectedLevel]="currentLevel()" />
+      } @else {
+        <p class="summary-text">{{ result.summary }}</p>
+      }
     }
 
     <app-conversation-stats [messages]="messages()" />
@@ -27,6 +32,12 @@
         <app-icon [name]="newChatIcon" [size]="18" aria-hidden="true" />
         Nueva conversacion
       </button>
+      @if (result && conversationState.conversationId()) {
+        <button class="summary-btn summary-btn--exercises" (click)="goToExercises()">
+          <app-icon [name]="exercisesIcon" [size]="18" aria-hidden="true" />
+          Practicar errores
+        </button>
+      }
       <button class="summary-btn summary-btn--secondary" (click)="exportConversation()">
         <app-icon [name]="downloadIcon" [size]="18" aria-hidden="true" />
         Exportar
@@ -39,6 +50,10 @@
     [messageCount]="messageCount()"
     (endConversation)="endConversation()"
   />
+
+  @if (goals().length > 0) {
+    <app-goals-tracker [goals]="goals()" />
+  }
 
   <div class="chat-area" #chatContainer>
     @if (status() === 'sending' && messages().length === 0) {

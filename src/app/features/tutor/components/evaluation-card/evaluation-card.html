@@ -1,0 +1,91 @@
+@let ev = evaluation();
+
+<div class="eval-card" role="region" aria-label="Evaluacion de conversacion">
+  <div class="eval-overall" [class]="overallClass()">
+    <span class="eval-overall-score">{{ ev.overallScore }}</span>
+    <span class="eval-overall-label">Puntuacion</span>
+  </div>
+
+  <div class="eval-level">
+    <app-icon [name]="awardIcon" [size]="16" aria-hidden="true" />
+    <span
+      >Nivel demostrado: <strong>{{ ev.levelDemonstrated.toUpperCase() }}</strong></span
+    >
+    @if (levelComparison(); as cmp) {
+      <span class="eval-level-diff">(seleccionado: {{ cmp.selected }})</span>
+    }
+  </div>
+
+  <div class="eval-bars">
+    @for (score of scores(); track score.label) {
+      <div class="eval-bar-row">
+        <span class="eval-bar-label">{{ score.label }}</span>
+        <div class="eval-bar-track">
+          <div
+            class="eval-bar-fill"
+            [class]="score.cssClass"
+            [style.width.%]="score.value"
+            role="progressbar"
+            [attr.aria-valuenow]="score.value"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          ></div>
+        </div>
+        <span class="eval-bar-value">{{ score.value }}</span>
+      </div>
+    }
+  </div>
+
+  @if (ev.strengths.length > 0) {
+    <div class="eval-section">
+      <h4 class="eval-section-title">Fortalezas</h4>
+      @for (item of ev.strengths; track item) {
+        <div class="eval-item eval-item--strength">
+          <app-icon [name]="checkIcon" [size]="14" aria-hidden="true" />
+          <span>{{ item }}</span>
+        </div>
+      }
+    </div>
+  }
+
+  @if (ev.areasToImprove.length > 0) {
+    <div class="eval-section">
+      <h4 class="eval-section-title">Areas de mejora</h4>
+      @for (item of ev.areasToImprove; track item) {
+        <div class="eval-item eval-item--improve">
+          <app-icon [name]="arrowUpIcon" [size]="14" aria-hidden="true" />
+          <span>{{ item }}</span>
+        </div>
+      }
+    </div>
+  }
+
+  @if (ev.goalResults && ev.goalResults.length > 0) {
+    <div class="eval-section">
+      <h4 class="eval-section-title">Objetivos</h4>
+      @for (goal of ev.goalResults; track goal.goalDescription) {
+        <div class="eval-goal" [class.eval-goal--achieved]="goal.achieved">
+          <div class="eval-goal-header">
+            <app-icon
+              [name]="goal.achieved ? checkIcon : arrowUpIcon"
+              [size]="14"
+              aria-hidden="true"
+            />
+            <span class="eval-goal-desc">{{ goal.goalDescription }}</span>
+          </div>
+          @if (!goal.achieved) {
+            <div class="eval-goal-progress">
+              <div class="eval-goal-bar">
+                <div class="eval-goal-fill" [style.width.%]="goal.progress"></div>
+              </div>
+              <span class="eval-goal-pct">{{ goal.progress }}%</span>
+            </div>
+          }
+          @if (goal.evidence) {
+            <span class="eval-goal-evidence">{{ goal.evidence }}</span>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

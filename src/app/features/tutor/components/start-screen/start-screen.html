@@ -40,6 +40,63 @@
     </div>
   </div>
 
+  <div class="selector-section">
+    <div class="goals-header">
+      <span class="selector-label" id="goals-label">Objetivos de aprendizaje</span>
+      <button class="goals-suggest-btn" (click)="loadSuggestedGoals()" [disabled]="loadingGoals()">
+        <app-icon [name]="suggestIcon" [size]="14" aria-hidden="true" />
+        {{ loadingGoals() ? 'Cargando...' : 'Sugerir' }}
+      </button>
+    </div>
+
+    @if (selectedGoals().length > 0) {
+      <div class="goals-selected">
+        @for (goal of selectedGoals(); track goal) {
+          <span class="goal-chip goal-chip--selected">
+            {{ goal }}
+            <button class="goal-remove" (click)="removeGoal(goal)" aria-label="Quitar objetivo">
+              <app-icon [name]="removeIcon" [size]="12" aria-hidden="true" />
+            </button>
+          </span>
+        }
+      </div>
+    }
+
+    @if (suggestedGoals().length > 0) {
+      <div
+        class="selector-options selector-options--wrap"
+        role="group"
+        aria-labelledby="goals-label"
+      >
+        @for (goal of suggestedGoals(); track goal.id) {
+          <button
+            class="goal-chip"
+            [class.goal-chip--selected]="selectedGoals().includes(goal.description)"
+            [disabled]="!selectedGoals().includes(goal.description) && selectedGoals().length >= 3"
+            (click)="toggleGoal(goal.description)"
+          >
+            {{ goal.description }}
+          </button>
+        }
+      </div>
+    }
+
+    <div class="goal-custom">
+      <input
+        class="goal-input"
+        type="text"
+        placeholder="Objetivo personalizado..."
+        [value]="customGoal()"
+        (input)="customGoal.set($any($event.target).value)"
+        (keydown.enter)="addCustomGoal()"
+        [disabled]="selectedGoals().length >= 3"
+      />
+    </div>
+    @if (selectedGoals().length > 0) {
+      <span class="goals-count">{{ selectedGoals().length }}/3 objetivos</span>
+    }
+  </div>
+
   <button class="start-btn" (click)="startConversation()" [disabled]="sending()">
     <app-icon [name]="newChatIcon" [size]="20" aria-hidden="true" />
     Iniciar conversacion

@@ -2,6 +2,19 @@ import { Injectable, inject, NgZone } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../core/services/environment';
 import { AuthService } from '../../../core/services/auth.service';
+import { TutorFeedback } from '../models/tutor.model';
+
+export interface SseChunkEvent {
+  type: 'chunk';
+  text: string;
+}
+
+export interface SseFeedbackEvent {
+  type: 'feedback';
+  data: TutorFeedback;
+}
+
+export type SseEvent = SseChunkEvent | SseFeedbackEvent;
 
 @Injectable({ providedIn: 'root' })
 export class TutorSseService {
@@ -9,7 +22,11 @@ export class TutorSseService {
   private readonly auth = inject(AuthService);
   private readonly baseUrl = `${environment.apiUrl}/conversations`;
 
-  streamMessage(conversationId: string, content: string, confidence?: number): Observable<string> {
+  streamMessage(
+    conversationId: string,
+    content: string,
+    confidence?: number,
+  ): Observable<SseEvent> {
     return new Observable((subscriber) => {
       const token = this.auth.token();
       const url = `${this.baseUrl}/${conversationId}/messages/stream`;
@@ -40,12 +57,15 @@ export class TutorSseService {
             buffer = lines.pop() ?? '';
             for (const line of lines) {
               if (line.startsWith('data: ')) {
-                const data = line.slice(6);
+                const data = line.slice(6).trim();
                 if (data === '[DONE]') {
                   this.zone.run(() => subscriber.complete());
                   return;
                 }
-                this.zone.run(() => subscriber.next(data));
+                const event = this.parseEvent(data);
+                if (event) {
+                  this.zone.run(() => subscriber.next(event));
+                }
               }
             }
           }
@@ -55,5 +75,21 @@ export class TutorSseService {
           this.zone.run(() => subscriber.error(err));
         });
     });
+  }
+
+  private parseEvent(data: string): SseEvent | null {
+    try {
+      const parsed = JSON.parse(data);
+      if (parsed.type === 'chunk') {
+        return { type: 'chunk', text: parsed.text };
+      }
+      if (parsed.type === 'feedback') {
+        return { type: 'feedback', data: parsed.data };
+      }
+      return null;
+    } catch {
+      // Fallback: plain text chunk (backwards compatibility)
+      return { type: 'chunk', text: data };
+    }
   }
 }

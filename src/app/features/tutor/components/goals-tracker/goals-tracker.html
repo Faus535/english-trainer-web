@@ -1,0 +1,16 @@
+@if (goals().length > 0) {
+  <div class="goals-banner" role="region" aria-label="Objetivos de aprendizaje">
+    <div class="goals-title">
+      <app-icon [name]="targetIcon" [size]="14" aria-hidden="true" />
+      <span>Objetivos</span>
+    </div>
+    <div class="goals-list">
+      @for (goal of goals(); track goal) {
+        <div class="goal-item">
+          <app-icon [name]="circleIcon" [size]="12" aria-hidden="true" />
+          <span>{{ goal }}</span>
+        </div>
+      }
+    </div>
+  </div>
+}

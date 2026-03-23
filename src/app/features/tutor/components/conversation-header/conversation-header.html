@@ -3,6 +3,11 @@
     <span class="conv-level" [attr.aria-label]="'Nivel ' + level().toUpperCase()">
       {{ level().toUpperCase() }}
     </span>
+    @let mode = feedbackMode();
+    <span class="conv-mode" [class]="mode.cssClass" [attr.aria-label]="'Modo: ' + mode.label">
+      <app-icon [name]="mode.icon" [size]="12" aria-hidden="true" />
+      {{ mode.label }}
+    </span>
     <span class="conv-messages">{{ messageCount() }} mensajes</span>
   </div>
 

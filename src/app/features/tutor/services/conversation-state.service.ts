@@ -24,6 +24,7 @@ export class ConversationStateService {
   private readonly _error = signal<string | null>(null);
   private readonly _endResult = signal<EndConversationResponse | null>(null);
   private readonly _streaming = signal(false);
+  private readonly _goals = signal<string[]>([]);
 
   readonly conversationId = this._conversationId.asReadonly();
   readonly messages = this._messages.asReadonly();
@@ -32,6 +33,7 @@ export class ConversationStateService {
   readonly error = this._error.asReadonly();
   readonly endResult = this._endResult.asReadonly();
   readonly streaming = this._streaming.asReadonly();
+  readonly goals = this._goals.asReadonly();
   readonly isActive = computed(() => !!this._conversationId());
   readonly messageCount = computed(() => this._messages().length);
 
@@ -39,7 +41,7 @@ export class ConversationStateService {
     this._status.set(status);
   }
 
-  startConversation(level: Level, topic?: string): void {
+  startConversation(level: Level, topic?: string, goals?: string[]): void {
     const profileId = this.auth.profileId();
     if (!profileId) return;
 
@@ -47,8 +49,9 @@ export class ConversationStateService {
     this._error.set(null);
     this._endResult.set(null);
     this._currentLevel.set(level);
+    this._goals.set(goals ?? []);
 
-    this.tutorApi.startConversation(profileId, { level, topic }).subscribe({
+    this.tutorApi.startConversation(profileId, { level, topic, goals }).subscribe({
       next: (res) => {
         this._conversationId.set(res.id);
         this._messages.set(res.messages);
@@ -115,13 +118,21 @@ export class ConversationStateService {
 
     let accumulated = '';
     this.sseService.streamMessage(conversationId, content, confidence).subscribe({
-      next: (chunk) => {
-        accumulated += chunk;
-        this._messages.update((msgs) => {
-          const updated = [...msgs];
-          updated[updated.length - 1] = { ...updated[updated.length - 1], content: accumulated };
-          return updated;
-        });
+      next: (event) => {
+        if (event.type === 'chunk') {
+          accumulated += event.text;
+          this._messages.update((msgs) => {
+            const updated = [...msgs];
+            updated[updated.length - 1] = { ...updated[updated.length - 1], content: accumulated };
+            return updated;
+          });
+        } else if (event.type === 'feedback') {
+          this._messages.update((msgs) => {
+            const updated = [...msgs];
+            updated[updated.length - 1] = { ...updated[updated.length - 1], feedback: event.data };
+            return updated;
+          });
+        }
       },
       complete: () => {
         this._streaming.set(false);
@@ -158,6 +169,7 @@ export class ConversationStateService {
     this._status.set('idle');
     this._error.set(null);
     this._endResult.set(null);
+    this._goals.set([]);
   }
 
   clearError(): void {

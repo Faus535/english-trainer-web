@@ -9,6 +9,7 @@ import {
   SendMessageRequest,
   SendMessageResponse,
   StartConversationRequest,
+  SuggestedGoal,
 } from '../models/tutor.model';
 
 @Injectable({ providedIn: 'root' })
@@ -46,5 +47,9 @@ export class TutorApiService {
 
   endConversation(conversationId: string): Observable<EndConversationResponse> {
     return this.http.put<EndConversationResponse>(`${this.baseUrl}/${conversationId}/end`, {});
+  }
+
+  getSuggestedGoals(profileId: string): Observable<SuggestedGoal[]> {
+    return this.http.get<SuggestedGoal[]>(`${this.baseUrl}/suggested-goals?profileId=${profileId}`);
   }
 }

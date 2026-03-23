@@ -1,0 +1,160 @@
+:host {
+  display: block;
+}
+
+.error-trends {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+.et-title {
+  font-size: var(--fs-lg);
+  font-weight: 800;
+}
+
+.et-summary-row {
+  display: flex;
+  gap: var(--sp-6);
+}
+
+.et-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+
+  &--resolved .et-stat-value {
+    color: var(--success);
+  }
+}
+
+.et-stat-value {
+  font-size: var(--fs-2xl);
+  font-weight: 800;
+  color: var(--error);
+}
+
+.et-stat-label {
+  font-size: var(--fs-sm);
+  color: var(--text-3);
+}
+
+.et-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.et-section-title {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+}
+
+// Bars
+.et-bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.et-bar-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.et-bar-label {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-2);
+  width: 7rem;
+  flex-shrink: 0;
+}
+
+.et-bar-track {
+  flex: 1;
+  height: 0.5rem;
+  background: var(--surface-2);
+  border-radius: var(--r-full);
+  overflow: hidden;
+}
+
+.et-bar-fill {
+  height: 100%;
+  background: var(--error);
+  border-radius: var(--r-full);
+  transition: width 0.6s var(--ease);
+}
+
+.et-bar-count {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--text-2);
+  width: 2rem;
+  text-align: right;
+}
+
+// Patterns
+.et-pattern {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding: var(--sp-3);
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+
+.et-pattern-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.et-pattern-category {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--error);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.et-pattern-count {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--text-3);
+}
+
+.et-pattern-text {
+  font-size: var(--fs-sm);
+  color: var(--text);
+}
+
+.et-pattern-examples {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.et-pattern-example {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  font-style: italic;
+}
+
+// Resolved
+.et-resolved {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-sm);
+  color: var(--success);
+
+  span {
+    color: var(--text-2);
+    text-decoration: line-through;
+  }
+}

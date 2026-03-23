@@ -1,9 +1,19 @@
-import { Component, ChangeDetectionStrategy, input, output, signal, effect } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  input,
+  output,
+  signal,
+  effect,
+  inject,
+} from '@angular/core';
 import { Level, CEFR_LEVELS } from '../../../../shared/models/learning.model';
-import { Conversation, TUTOR_TOPICS, TutorTopic } from '../../models/tutor.model';
+import { Conversation, TUTOR_TOPICS, TutorTopic, SuggestedGoal } from '../../models/tutor.model';
+import { TutorApiService } from '../../services/tutor-api.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import { ConversationList } from '../conversation-list/conversation-list';
 import { Icon } from '../../../../shared/components/icon/icon';
-import { LucideIconData, MessageSquarePlus } from 'lucide-angular';
+import { LucideIconData, MessageSquarePlus, Sparkles, X } from 'lucide-angular';
 
 @Component({
   selector: 'app-start-screen',
@@ -13,15 +23,22 @@ import { LucideIconData, MessageSquarePlus } from 'lucide-angular';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StartScreen {
+  private readonly tutorApi = inject(TutorApiService);
+  private readonly auth = inject(AuthService);
+
   readonly pastConversations = input.required<Conversation[]>();
   readonly defaultLevel = input<Level>('a1');
   readonly sending = input(false);
   readonly loadingHistory = input(false);
-  readonly startConvo = output<{ level: Level; topic?: string }>();
+  readonly startConvo = output<{ level: Level; topic?: string; goals?: string[] }>();
   readonly selectConversation = output<string>();
 
   protected readonly selectedLevel = signal<Level>('a1');
   protected readonly selectedTopic = signal<TutorTopic>('free');
+  protected readonly suggestedGoals = signal<SuggestedGoal[]>([]);
+  protected readonly selectedGoals = signal<string[]>([]);
+  protected readonly customGoal = signal('');
+  protected readonly loadingGoals = signal(false);
 
   constructor() {
     effect(() => {
@@ -32,6 +49,8 @@ export class StartScreen {
   protected readonly levels = CEFR_LEVELS;
   protected readonly topics = TUTOR_TOPICS;
   protected readonly newChatIcon: LucideIconData = MessageSquarePlus;
+  protected readonly suggestIcon: LucideIconData = Sparkles;
+  protected readonly removeIcon: LucideIconData = X;
 
   protected selectLevel(level: Level): void {
     this.selectedLevel.set(level);
@@ -41,8 +60,44 @@ export class StartScreen {
     this.selectedTopic.set(topic);
   }
 
+  protected loadSuggestedGoals(): void {
+    const profileId = this.auth.profileId();
+    if (!profileId) return;
+
+    this.loadingGoals.set(true);
+    this.tutorApi.getSuggestedGoals(profileId).subscribe({
+      next: (goals) => {
+        this.suggestedGoals.set(goals);
+        this.loadingGoals.set(false);
+      },
+      error: () => this.loadingGoals.set(false),
+    });
+  }
+
+  protected toggleGoal(description: string): void {
+    this.selectedGoals.update((goals) => {
+      if (goals.includes(description)) {
+        return goals.filter((g) => g !== description);
+      }
+      if (goals.length >= 3) return goals;
+      return [...goals, description];
+    });
+  }
+
+  protected addCustomGoal(): void {
+    const goal = this.customGoal().trim();
+    if (!goal || this.selectedGoals().length >= 3) return;
+    this.selectedGoals.update((goals) => [...goals, goal]);
+    this.customGoal.set('');
+  }
+
+  protected removeGoal(goal: string): void {
+    this.selectedGoals.update((goals) => goals.filter((g) => g !== goal));
+  }
+
   protected startConversation(): void {
     const topic = this.selectedTopic() === 'free' ? undefined : this.selectedTopic();
-    this.startConvo.emit({ level: this.selectedLevel(), topic });
+    const goals = this.selectedGoals().length > 0 ? this.selectedGoals() : undefined;
+    this.startConvo.emit({ level: this.selectedLevel(), topic, goals });
   }
 }

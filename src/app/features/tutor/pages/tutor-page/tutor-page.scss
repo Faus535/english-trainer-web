@@ -151,6 +151,13 @@
   line-height: 1.6;
 }
 
+.summary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  justify-content: center;
+}
+
 .summary-btn {
   display: flex;
   align-items: center;
@@ -168,6 +175,26 @@
 
   &:hover {
     background: var(--primary-hover);
+  }
+
+  &--secondary {
+    background: var(--surface-1);
+    color: var(--text-2);
+    border: 1px solid var(--border);
+
+    &:hover {
+      background: var(--surface-2);
+      color: var(--text);
+    }
+  }
+
+  &--exercises {
+    background: var(--success);
+
+    &:hover {
+      background: var(--success-hover, var(--success));
+      filter: brightness(0.9);
+    }
   }
 }
 

@@ -1,6 +1,22 @@
-import { Component, ChangeDetectionStrategy, input, output, signal, computed } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  input,
+  output,
+  signal,
+  computed,
+  inject,
+} from '@angular/core';
+import { Router } from '@angular/router';
 import { Icon } from '../../../../shared/components/icon/icon';
-import { LucideIconData, ChevronDown, ChevronUp, Volume2, BookPlus } from 'lucide-angular';
+import {
+  LucideIconData,
+  ChevronDown,
+  ChevronUp,
+  Volume2,
+  BookPlus,
+  BarChart3,
+} from 'lucide-angular';
 import { TutorFeedback } from '../../models/tutor.model';
 
 @Component({
@@ -11,6 +27,8 @@ import { TutorFeedback } from '../../models/tutor.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeedbackCard {
+  private readonly router = inject(Router);
+
   readonly feedback = input.required<TutorFeedback>();
   readonly speakWord = output<string>();
   readonly addToReview = output<string>();
@@ -20,6 +38,7 @@ export class FeedbackCard {
   protected readonly collapseIcon: LucideIconData = ChevronUp;
   protected readonly speakIcon: LucideIconData = Volume2;
   protected readonly addIcon: LucideIconData = BookPlus;
+  protected readonly historyIcon: LucideIconData = BarChart3;
 
   protected readonly hasFeedback = computed(() => {
     const fb = this.feedback();
@@ -32,5 +51,9 @@ export class FeedbackCard {
 
   protected toggle(): void {
     this.expanded.update((v) => !v);
+  }
+
+  protected goToErrorHistory(): void {
+    this.router.navigate(['/analytics']);
   }
 }

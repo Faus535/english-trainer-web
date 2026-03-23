@@ -20,6 +20,7 @@ export interface GrammarCorrection {
   original: string;
   corrected: string;
   rule: string;
+  category?: string;
 }
 
 export interface VocabSuggestion {
@@ -57,6 +58,7 @@ export interface ConversationDetailResponse {
 export interface StartConversationRequest {
   level: Level;
   topic?: string;
+  goals?: string[];
 }
 
 export interface SendMessageRequest {
@@ -72,6 +74,19 @@ export interface EndConversationResponse {
   xpEarned: number;
   messagesCount: number;
   summary: string;
+  evaluation?: ConversationEvaluation;
+}
+
+export interface ConversationEvaluation {
+  grammarAccuracy: number;
+  vocabularyRange: number;
+  fluency: number;
+  taskCompletion: number;
+  overallScore: number;
+  levelDemonstrated: string;
+  strengths: string[];
+  areasToImprove: string[];
+  goalResults?: GoalResult[];
 }
 
 export type TutorTopic =
@@ -105,4 +120,23 @@ export interface TopicSuggestion {
   topic: TutorTopic;
   label: string;
   reason: string;
+}
+
+export interface SuggestedGoal {
+  id: string;
+  description: string;
+  category: string;
+}
+
+export interface GoalResult {
+  goalDescription: string;
+  achieved: boolean;
+  progress: number;
+  evidence: string;
+}
+
+export interface StartConversationGoals {
+  level: Level;
+  topic?: string;
+  goals?: string[];
 }

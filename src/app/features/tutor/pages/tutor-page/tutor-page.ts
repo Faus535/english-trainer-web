@@ -8,6 +8,7 @@ import {
   viewChild,
   effect,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { Level } from '../../../../shared/models/learning.model';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ReviewApiService } from '../../../../core/services/review-api.service';
@@ -22,24 +23,36 @@ import { VoiceInput } from '../../components/voice-input/voice-input';
 import { ConversationHeader } from '../../components/conversation-header/conversation-header';
 import { StartScreen } from '../../components/start-screen/start-screen';
 import { ConversationStats } from '../../components/conversation-stats/conversation-stats';
+import { EvaluationCard } from '../../components/evaluation-card/evaluation-card';
+import { GoalsTracker } from '../../components/goals-tracker/goals-tracker';
 import { Icon } from '../../../../shared/components/icon/icon';
-import { LucideIconData, MessageSquarePlus, Trophy, Download } from 'lucide-angular';
+import { LucideIconData, MessageSquarePlus, Trophy, Download, BookOpen } from 'lucide-angular';
 
 @Component({
   selector: 'app-tutor-page',
-  imports: [ChatBubble, VoiceInput, ConversationHeader, StartScreen, ConversationStats, Icon],
+  imports: [
+    ChatBubble,
+    VoiceInput,
+    ConversationHeader,
+    StartScreen,
+    ConversationStats,
+    EvaluationCard,
+    GoalsTracker,
+    Icon,
+  ],
   templateUrl: './tutor-page.html',
   styleUrl: './tutor-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TutorPage {
-  private readonly conversationState = inject(ConversationStateService);
+  protected readonly conversationState = inject(ConversationStateService);
   private readonly speech = inject(SpeechRecognitionService);
   private readonly tts = inject(TtsService);
   private readonly auth = inject(AuthService);
   private readonly tutorApi = inject(TutorApiService);
   private readonly reviewApi = inject(ReviewApiService);
   private readonly notification = inject(NotificationService);
+  private readonly router = inject(Router);
 
   private readonly chatContainer = viewChild<ElementRef<HTMLElement>>('chatContainer');
 
@@ -61,7 +74,9 @@ export class TutorPage {
   protected readonly newChatIcon: LucideIconData = MessageSquarePlus;
   protected readonly trophyIcon: LucideIconData = Trophy;
   protected readonly downloadIcon: LucideIconData = Download;
+  protected readonly exercisesIcon: LucideIconData = BookOpen;
   protected readonly streaming = this.conversationState.streaming;
+  protected readonly goals = this.conversationState.goals;
 
   constructor() {
     this.loadHistory();
@@ -85,8 +100,8 @@ export class TutorPage {
     });
   }
 
-  protected onStart(event: { level: Level; topic?: string }): void {
-    this.conversationState.startConversation(event.level, event.topic);
+  protected onStart(event: { level: Level; topic?: string; goals?: string[] }): void {
+    this.conversationState.startConversation(event.level, event.topic, event.goals);
   }
 
   protected async toggleRecord(): Promise<void> {
@@ -150,6 +165,13 @@ export class TutorPage {
       next: () => this.notification.success(`"${word}" anadido a repaso`),
       error: () => this.notification.error('No se pudo anadir al repaso'),
     });
+  }
+
+  protected goToExercises(): void {
+    const id = this.conversationState.conversationId();
+    if (id) {
+      this.router.navigate(['/tutor', 'exercises', id]);
+    }
   }
 
   protected clearError(): void {

@@ -25,9 +25,22 @@
 
         @if (fb.grammarCorrections.length > 0) {
           <div class="feedback-section">
-            <h4 class="feedback-section-title">Gramatica</h4>
+            <div class="feedback-section-header">
+              <h4 class="feedback-section-title">Gramatica</h4>
+              <button
+                class="feedback-history-link"
+                (click)="goToErrorHistory()"
+                aria-label="Ver historial de errores"
+              >
+                <app-icon [name]="historyIcon" [size]="12" aria-hidden="true" />
+                Historial
+              </button>
+            </div>
             @for (correction of fb.grammarCorrections; track correction.original) {
               <div class="grammar-item">
+                @if (correction.category) {
+                  <span class="grammar-category">{{ correction.category }}</span>
+                }
                 <div class="grammar-diff">
                   <span class="grammar-original">{{ correction.original }}</span>
                   <span class="grammar-arrow" aria-hidden="true">&rarr;</span>

@@ -53,6 +53,12 @@
   gap: var(--sp-2);
 }
 
+.feedback-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .feedback-section-title {
   font-size: var(--fs-xs);
   font-weight: 700;
@@ -61,11 +67,44 @@
   color: var(--text-3);
 }
 
+.feedback-history-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  cursor: pointer;
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--r-sm);
+  transition: all 200ms var(--ease);
+  min-height: 1.75rem;
+
+  &:hover {
+    background: var(--primary-soft);
+  }
+}
+
 // Grammar
 .grammar-item {
   display: flex;
   flex-direction: column;
   gap: var(--sp-1);
+}
+
+.grammar-category {
+  display: inline-block;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--error);
+  background: var(--error-soft);
+  padding: 0.0625rem var(--sp-2);
+  border-radius: var(--r-sm);
+  align-self: flex-start;
 }
 
 .grammar-diff {
