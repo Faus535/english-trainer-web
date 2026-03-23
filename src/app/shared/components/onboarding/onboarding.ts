@@ -44,9 +44,16 @@ export class Onboarding {
   readonly completed = output<void>();
   protected readonly currentStep = signal(0);
   protected readonly steps = STEPS;
-  protected readonly visible = signal(!localStorage.getItem(STORAGE_KEY));
+  protected readonly visible = signal(false);
   protected readonly step = () => this.steps[this.currentStep()];
   protected readonly isLast = () => this.currentStep() >= this.steps.length - 1;
+
+  constructor() {
+    if (!localStorage.getItem(STORAGE_KEY)) {
+      localStorage.setItem(STORAGE_KEY, 'true');
+      this.visible.set(true);
+    }
+  }
 
   protected next(): void {
     if (this.isLast()) this.finish();
@@ -59,7 +66,6 @@ export class Onboarding {
     this.finish();
   }
   private finish(): void {
-    localStorage.setItem(STORAGE_KEY, 'true');
     this.visible.set(false);
     this.completed.emit();
   }
