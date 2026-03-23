@@ -11,4 +11,5 @@ COPY --from=build /app/dist/english-trainer-web/browser /usr/share/nginx/html
 
 EXPOSE 80
 
-CMD ["/bin/sh", "-c", "envsubst '\\$PORT,\\$BACKEND_URL' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
+ENV PORT=80
+CMD ["/bin/sh", "-c", "envsubst '$PORT,$BACKEND_URL' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
