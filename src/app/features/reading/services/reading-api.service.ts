@@ -22,10 +22,6 @@ export class ReadingApiService {
     return this.http.get<ReadingTextResponse[]>(`${this.baseUrl}/passages`, { params });
   }
 
-  getText(textId: string): Observable<ReadingTextResponse> {
-    return this.http.get<ReadingTextResponse>(`${this.baseUrl}/passages/${textId}`);
-  }
-
   getQuestions(textId: string): Observable<ReadingQuestionResponse[]> {
     return this.http.get<ReadingQuestionResponse[]>(`${this.baseUrl}/passages/${textId}/questions`);
   }

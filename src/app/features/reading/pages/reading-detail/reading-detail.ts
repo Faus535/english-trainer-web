@@ -26,16 +26,14 @@ export class ReadingDetail implements OnInit {
       this.router.navigate(['/reading']);
       return;
     }
-    this.readingApi.getText(id).subscribe({
-      next: (t) => {
-        this.text.set(t);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.loading.set(false);
-        this.notification.error('No se pudo cargar el texto');
-      },
-    });
+    const navState = history.state as { text?: ReadingTextResponse };
+    if (navState?.text) {
+      this.text.set(navState.text);
+      this.loading.set(false);
+    } else {
+      this.router.navigate(['/reading']);
+      return;
+    }
   }
 
   protected startQuiz(): void {

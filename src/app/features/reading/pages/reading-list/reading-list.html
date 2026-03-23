@@ -28,7 +28,7 @@
   } @else {
     <div class="text-grid">
       @for (text of texts(); track text.id) {
-        <a class="text-card" [routerLink]="['/reading', text.id]">
+        <a class="text-card" [routerLink]="['/reading', text.id]" [state]="{ text }">
           <div class="text-card-header">
             <span class="level-badge">{{ text.level | uppercase }}</span>
             <span class="topic-badge">{{ text.topic }}</span>
