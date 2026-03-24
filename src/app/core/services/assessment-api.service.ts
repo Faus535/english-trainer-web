@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from './environment';
+import { AuthService } from './auth.service';
 import {
   LevelTestSubmitRequest,
   LevelTestResultResponse,
@@ -12,10 +13,14 @@ import {
 @Injectable({ providedIn: 'root' })
 export class AssessmentApiService {
   private readonly http = inject(HttpClient);
+  private readonly auth = inject(AuthService);
   private readonly baseUrl = `${environment.apiUrl}`;
 
   getTestQuestions(): Observable<TestQuestionsResponse> {
-    return this.http.get<TestQuestionsResponse>(`${this.baseUrl}/assessments/level-test/questions`);
+    const profileId = this.auth.profileId();
+    return this.http.get<TestQuestionsResponse>(
+      `${this.baseUrl}/profiles/${profileId}/assessments/level-test/questions`,
+    );
   }
 
   submitLevelTest(
