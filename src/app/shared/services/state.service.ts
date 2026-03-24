@@ -39,12 +39,12 @@ export class StateService {
     return this.profileState.getModuleLevel(moduleName);
   }
 
-  setModuleLevel(moduleName: ModuleName, level: Level): void {
-    this.profileState.setModuleLevel(moduleName, level);
+  setModuleLevel(moduleName: ModuleName, level: Level, syncToBackend = true): void {
+    this.profileState.setModuleLevel(moduleName, level, syncToBackend);
   }
 
-  markTestCompleted(): void {
-    this.profileState.markTestCompleted();
+  markTestCompleted(syncToBackend = true): void {
+    this.profileState.markTestCompleted(syncToBackend);
   }
 
   markTestIncomplete(): void {

@@ -238,12 +238,12 @@ export class LevelTestService {
     const phraseIdx = Math.min(vocIdx, gramIdx);
     const phrasesLevel = CEFR_LEVELS[phraseIdx];
 
-    this.state.setModuleLevel('vocabulary', vocabLevel);
-    this.state.setModuleLevel('grammar', grammarLevel);
-    this.state.setModuleLevel('listening', listeningLevel);
-    this.state.setModuleLevel('pronunciation', pronunciationLevel);
-    this.state.setModuleLevel('phrases', phrasesLevel);
-    this.state.markTestCompleted();
+    this.state.setModuleLevel('vocabulary', vocabLevel, false);
+    this.state.setModuleLevel('grammar', grammarLevel, false);
+    this.state.setModuleLevel('listening', listeningLevel, false);
+    this.state.setModuleLevel('pronunciation', pronunciationLevel, false);
+    this.state.setModuleLevel('phrases', phrasesLevel, false);
+    this.state.markTestCompleted(false);
 
     this.submitToBackend({
       vocabulary: vocabLevel,

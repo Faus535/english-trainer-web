@@ -64,26 +64,30 @@ export class ProfileStateService {
     return this._profile().levels[moduleName] || 'a1';
   }
 
-  setModuleLevel(moduleName: ModuleName, level: Level): void {
+  setModuleLevel(moduleName: ModuleName, level: Level, syncToBackend = true): void {
     this._profile.update((p) => ({
       ...p,
       levels: { ...p.levels, [moduleName]: level },
     }));
     this.persistProfile();
 
-    const profileId = this.auth.profileId();
-    if (profileId) {
-      this.profileApi.updateModuleLevel(profileId, moduleName, level).subscribe();
+    if (syncToBackend) {
+      const profileId = this.auth.profileId();
+      if (profileId) {
+        this.profileApi.updateModuleLevel(profileId, moduleName, level).subscribe();
+      }
     }
   }
 
-  markTestCompleted(): void {
+  markTestCompleted(syncToBackend = true): void {
     this._profile.update((p) => ({ ...p, testCompleted: true }));
     this.persistProfile();
 
-    const profileId = this.auth.profileId();
-    if (profileId) {
-      this.profileApi.markTestCompleted(profileId).subscribe();
+    if (syncToBackend) {
+      const profileId = this.auth.profileId();
+      if (profileId) {
+        this.profileApi.markTestCompleted(profileId).subscribe();
+      }
     }
   }
 
