@@ -1,11 +1,10 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, EMPTY, Observable, switchMap, throwError, finalize, share } from 'rxjs';
+import { catchError, EMPTY, Observable, switchMap, throwError, tap, share } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { NotificationService } from '../../shared/services/notification.service';
-import { AuthResponse } from '../../shared/models/api.model';
 
-let refreshing$: Observable<AuthResponse> | null = null;
+let refreshing$: Observable<unknown> | null = null;
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
@@ -16,8 +15,14 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       if (error.status === 401 && !req.url.includes('/auth/')) {
         if (!refreshing$) {
           refreshing$ = auth.refresh().pipe(
-            finalize(() => {
+            tap(() => {
               refreshing$ = null;
+            }),
+            catchError(() => {
+              refreshing$ = null;
+              notification.warning('Tu sesion ha expirado. Inicia sesion de nuevo.');
+              auth.logout();
+              return EMPTY;
             }),
             share(),
           );
@@ -31,15 +36,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
               }),
             ),
           ),
-          catchError((refreshError: HttpErrorResponse) => {
-            if (refreshError.status === 401 || refreshError.status === 403) {
-              notification.warning('Tu sesion ha expirado. Inicia sesion de nuevo.');
-              auth.logout();
-            } else {
-              notification.warning('Sin conexion. Se reintentara automaticamente.');
-            }
-            return EMPTY;
-          }),
         );
       }
 

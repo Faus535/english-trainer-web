@@ -9,9 +9,11 @@ interface QueuedRequest {
   body: unknown;
   timestamp: number;
   retryCount?: number;
+  lastAttempt?: number;
 }
 
 const QUEUE_KEY = 'et_offline_queue';
+const FLUSH_COOLDOWN_MS = 5000;
 
 @Injectable({ providedIn: 'root' })
 export class OfflineQueueService implements OnDestroy {
@@ -23,6 +25,7 @@ export class OfflineQueueService implements OnDestroy {
   private readonly _queue = signal<QueuedRequest[]>(this.loadQueue());
   private readonly onlineHandler = () => this.handleOnline();
   private readonly offlineHandler = () => this._online.set(false);
+  private lastFlushTime = 0;
 
   readonly online = this._online.asReadonly();
   readonly pendingCount = computed(() => this._queue().length);
@@ -46,7 +49,15 @@ export class OfflineQueueService implements OnDestroy {
       timestamp: Date.now(),
     };
 
-    this._queue.update((q) => [...q, request]);
+    this._queue.update((q) => {
+      const existingIndex = q.findIndex((item) => item.method === method && item.url === url);
+      if (existingIndex >= 0) {
+        const updated = [...q];
+        updated[existingIndex] = { ...request, retryCount: 0 };
+        return updated;
+      }
+      return [...q, request];
+    });
     this.persistQueue();
 
     if (this._online()) {
@@ -55,10 +66,18 @@ export class OfflineQueueService implements OnDestroy {
   }
 
   flush(): void {
+    const now = Date.now();
+    if (now - this.lastFlushTime < FLUSH_COOLDOWN_MS) return;
+    this.lastFlushTime = now;
+
     const queue = this._queue();
     if (queue.length === 0) return;
 
     for (const req of queue) {
+      const attempt = req.retryCount ?? 0;
+      const backoff = Math.min(1000 * Math.pow(2, attempt), 30000);
+      if (req.lastAttempt && now - req.lastAttempt < backoff) continue;
+
       this.executeWithRetry(req);
     }
   }
@@ -74,15 +93,20 @@ export class OfflineQueueService implements OnDestroy {
       return;
     }
 
+    this._queue.update((q) =>
+      q.map((r) => (r.id === req.id ? { ...r, lastAttempt: Date.now() } : r)),
+    );
+
     this.executeRequest(req).subscribe({
       next: () => this.removeFromQueue(req.id),
       error: () => {
+        const nextAttempt = attempt + 1;
         this._queue.update((q) =>
-          q.map((r) => (r.id === req.id ? { ...r, retryCount: attempt + 1 } : r)),
+          q.map((r) => (r.id === req.id ? { ...r, retryCount: nextAttempt } : r)),
         );
         this.persistQueue();
 
-        const delay = Math.min(1000 * Math.pow(2, attempt), 30000);
+        const delay = Math.min(1000 * Math.pow(2, nextAttempt), 30000);
         setTimeout(() => {
           if (this._online()) {
             const current = this._queue().find((r) => r.id === req.id);
