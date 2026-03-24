@@ -6,6 +6,12 @@ import { provideRouter } from '@angular/router';
 import { authInterceptor } from './auth.interceptor';
 import { AuthService } from '../services/auth.service';
 
+function createJwt(expInSeconds: number): string {
+  const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+  const payload = btoa(JSON.stringify({ exp: expInSeconds }));
+  return `${header}.${payload}.signature`;
+}
+
 describe('authInterceptor', () => {
   let http: HttpClient;
   let httpMock: HttpTestingController;
@@ -41,10 +47,10 @@ describe('authInterceptor', () => {
   });
 
   it('should add Authorization header when token exists', () => {
-    // We need to set the token through the service
-    sessionStorage.setItem('et_token', 'my-jwt-token');
+    const futureExp = Math.floor(Date.now() / 1000) + 3600; // 1h from now
+    const token = createJwt(futureExp);
+    sessionStorage.setItem('et_token', token);
 
-    // Recreate the service to pick up the token
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       providers: [
@@ -58,12 +64,19 @@ describe('authInterceptor', () => {
     httpMock = TestBed.inject(HttpTestingController);
     const auth = TestBed.inject(AuthService);
 
-    // If the token was loaded from storage
     if (auth.token()) {
       http.get('/api/test').subscribe();
       const req = httpMock.expectOne('/api/test');
-      expect(req.request.headers.get('Authorization')).toBe('Bearer my-jwt-token');
+      expect(req.request.headers.get('Authorization')).toBe(`Bearer ${token}`);
       req.flush({});
     }
+  });
+
+  it('should not add header for auth endpoints', () => {
+    http.get('/api/auth/login').subscribe();
+
+    const req = httpMock.expectOne('/api/auth/login');
+    expect(req.request.headers.has('Authorization')).toBe(false);
+    req.flush({});
   });
 });

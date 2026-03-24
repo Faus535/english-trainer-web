@@ -59,6 +59,12 @@ export class AuthService {
 
   logout(): void {
     if (!this._token()) return;
+
+    const refreshToken = sessionStorage.getItem(REFRESH_KEY);
+    if (refreshToken) {
+      this.http.post<void>(`${this.baseUrl}/logout`, { refreshToken }).subscribe();
+    }
+
     sessionStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(REFRESH_KEY);
     sessionStorage.removeItem(PROFILE_ID_KEY);

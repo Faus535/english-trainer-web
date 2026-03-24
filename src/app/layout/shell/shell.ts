@@ -5,6 +5,7 @@ import {
   DestroyRef,
   signal,
   computed,
+  effect,
 } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -14,6 +15,9 @@ import { TtsService } from '../../features/speak/services/tts.service';
 import { Icon } from '../../shared/components/icon/icon';
 import { ConnectionStatus } from '../../shared/components/connection-status/connection-status';
 import { Toast } from '../../shared/components/toast/toast';
+import { IdleWarningModal } from '../../shared/components/idle-warning-modal/idle-warning-modal';
+import { IdleService } from '../../core/services/idle.service';
+import { AuthService } from '../../core/services/auth.service';
 import { environment } from '../../core/services/environment';
 import { CurrentUserResponse } from '../../shared/models/api.model';
 import {
@@ -35,7 +39,15 @@ interface NavTab {
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Icon, ConnectionStatus, Toast],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    Icon,
+    ConnectionStatus,
+    Toast,
+    IdleWarningModal,
+  ],
   templateUrl: './shell.html',
   styleUrl: './shell.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -45,6 +57,8 @@ export class Shell {
   private readonly router = inject(Router);
   private readonly http = inject(HttpClient);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly idle = inject(IdleService);
+  private readonly auth = inject(AuthService);
 
   protected readonly speaking = this.tts.speaking;
   protected readonly stopIcon = Square;
@@ -70,6 +84,18 @@ export class Shell {
         const main = document.querySelector<HTMLElement>('main');
         main?.focus();
       });
+
+    this.idle.start();
+
+    effect(() => {
+      if (this.idle.isIdle()) {
+        this.auth.logout();
+      }
+    });
+  }
+
+  protected onIdleLogout(): void {
+    this.auth.logout();
   }
 
   protected stopAudio(): void {

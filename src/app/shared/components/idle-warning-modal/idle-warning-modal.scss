@@ -1,0 +1,106 @@
+:host {
+  display: contents;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  animation: fade-in 200ms var(--ease);
+}
+
+.modal {
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-6);
+  max-width: 24rem;
+  width: calc(100% - var(--sp-8));
+  box-shadow: var(--shadow-elevated);
+  animation: scale-in 200ms var(--ease);
+  text-align: center;
+}
+
+.modal-title {
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  margin-bottom: var(--sp-3);
+}
+
+.modal-desc {
+  font-size: var(--fs-base);
+  color: var(--text-2);
+  margin-bottom: var(--sp-6);
+  line-height: 1.6;
+}
+
+.countdown {
+  font-weight: 700;
+  font-size: var(--fs-xl);
+  color: var(--warning);
+  transition: color 300ms var(--ease);
+
+  &.urgent {
+    color: var(--error);
+  }
+}
+
+.modal-actions {
+  display: flex;
+  gap: var(--sp-3);
+  justify-content: center;
+}
+
+.btn {
+  padding: var(--sp-2) var(--sp-5);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-base);
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 200ms var(--ease);
+
+  &--primary {
+    background: var(--primary);
+    color: #fff;
+
+    &:hover {
+      background: var(--primary-hover);
+    }
+  }
+
+  &--secondary {
+    background: var(--surface-1);
+    color: var(--text-2);
+
+    &:hover {
+      background: var(--surface-3);
+      color: var(--text);
+    }
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

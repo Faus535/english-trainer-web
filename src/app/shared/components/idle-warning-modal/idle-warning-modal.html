@@ -1,0 +1,32 @@
+@if (showWarning()) {
+  <div
+    class="overlay"
+    role="presentation"
+    (click)="continueSession()"
+    (keydown.escape)="continueSession()"
+    tabindex="-1"
+  >
+    <div
+      class="modal"
+      role="alertdialog"
+      aria-labelledby="idle-title"
+      aria-describedby="idle-desc"
+      aria-modal="true"
+      (click)="$event.stopPropagation()"
+      (keydown.escape)="$event.stopPropagation()"
+    >
+      <h2 id="idle-title" class="modal-title">Sesion a punto de expirar</h2>
+      <p id="idle-desc" class="modal-desc">
+        Tu sesion se cerrara por inactividad en
+        <span class="countdown" [class.urgent]="remainingSeconds() <= 10">{{
+          remainingDisplay()
+        }}</span>
+        segundos.
+      </p>
+      <div class="modal-actions">
+        <button class="btn btn--primary" (click)="continueSession()">Continuar</button>
+        <button class="btn btn--secondary" (click)="closeSession()">Cerrar sesion</button>
+      </div>
+    </div>
+  </div>
+}
