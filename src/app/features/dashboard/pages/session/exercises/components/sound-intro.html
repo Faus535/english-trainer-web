@@ -1,0 +1,59 @@
+@let l = lesson();
+<div class="exercise-card">
+  <h3 class="exercise-title">Sonido: {{ l.title }}</h3>
+
+  <div class="ipa-display">
+    @for (symbol of l.ipa; track symbol) {
+      <span class="ipa-symbol">{{ symbol }}</span>
+    }
+  </div>
+
+  <div class="exercise-explanation">
+    <h4 class="exercise-subtitle">¿Que es?</h4>
+    <p>{{ l.explanation.what }}</p>
+
+    <h4 class="exercise-subtitle">¿Donde aparece?</h4>
+    <p>{{ l.explanation.where }}</p>
+
+    <h4 class="exercise-subtitle">¿Por que suena asi?</h4>
+    <p>{{ l.explanation.why }}</p>
+  </div>
+
+  <div class="exercise-tip warning">{{ l.explanation.commonMistake }}</div>
+
+  <div class="exercise-tip">{{ l.explanation.selfTest }}</div>
+
+  <div class="exercise-examples">
+    <h4 class="exercise-subtitle">Escucha y repite</h4>
+    @for (ex of l.examples; track ex.word) {
+      <button class="example-card" (click)="speak(ex.word)">
+        <span class="example-word">{{ ex.word }}</span>
+        <span class="example-ipa">{{ ex.ipa }}</span>
+        <span class="example-note">{{ ex.note }}</span>
+      </button>
+    }
+  </div>
+
+  @if (l.minimalPairs.length > 0) {
+    <div class="exercise-examples">
+      <h4 class="exercise-subtitle">Escucha la diferencia</h4>
+      @for (pair of l.minimalPairs; track pair.correct.word) {
+        <div class="minimal-pair-row">
+          <button class="example-card compact" (click)="speak(pair.correct.word)">
+            <span class="example-word">{{ pair.correct.word }}</span>
+            <span class="example-ipa">{{ pair.correct.ipa }}</span>
+          </button>
+          <span class="pair-vs">vs</span>
+          <button class="example-card compact" (click)="speak(pair.incorrect.word)">
+            <span class="example-word">{{ pair.incorrect.word }}</span>
+            <span class="example-ipa">{{ pair.incorrect.ipa }}</span>
+          </button>
+        </div>
+      }
+    </div>
+  }
+
+  <button class="exercise-btn primary full-width" (click)="onContinue()">
+    Continuar al ejercicio →
+  </button>
+</div>

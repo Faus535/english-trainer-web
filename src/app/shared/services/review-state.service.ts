@@ -99,7 +99,8 @@ export class ReviewStateService {
 
     const profileId = this.auth.profileId();
     if (profileId) {
-      this.reviewApi.addToReviewQueue(profileId, 'unit', unitId).subscribe();
+      const unitIndex = parseInt(unitId, 10) || 0;
+      this.reviewApi.addUnitToReview(profileId, moduleName, level, unitIndex).subscribe();
     }
   }
 }

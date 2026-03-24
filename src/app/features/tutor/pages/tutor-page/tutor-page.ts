@@ -161,7 +161,7 @@ export class TutorPage {
     const profileId = this.auth.profileId();
     if (!profileId) return;
 
-    this.reviewApi.addToReviewQueue(profileId, 'vocab', word).subscribe({
+    this.reviewApi.addWordToReview(profileId, word, this.currentLevel() ?? 'a1').subscribe({
       next: () => this.notification.success(`"${word}" anadido a repaso`),
       error: () => this.notification.error('No se pudo anadir al repaso'),
     });

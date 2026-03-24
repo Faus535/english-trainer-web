@@ -1,6 +1,74 @@
-@if (content(); as c) {
+@if (extendedContent(); as ext) {
   @switch (phase()) {
-    @case ('learn') {
+    @case ('explanation') {
+      <app-pronunciation-explanation [content]="ext" (completed)="startDemonstration()" />
+    }
+    @case ('demonstration') {
+      <app-pronunciation-demonstration [pairs]="ext.minimalPairs" (completed)="startPractice()" />
+    }
+    @case ('practice') {
+      <app-pronunciation-practice [items]="ext.practice" (completed)="startQuiz($event)" />
+    }
+    @case ('quiz') {
+      @if (currentQuiz(); as q) {
+        <div class="exercise-card">
+          <h3 class="exercise-title">Quiz — {{ ext.title }}</h3>
+          <span class="exercise-progress">{{ quizIndex() + 1 }} / {{ quizLength() }}</span>
+          <p class="exercise-instruction">{{ q.prompt }}</p>
+
+          <div class="exercise-options">
+            @for (opt of q.options; track $index) {
+              <button
+                class="option-btn"
+                [class.selected]="selectedOption() === $index"
+                [class.correct]="selectedOption() !== null && $index === q.correct"
+                [class.wrong]="selectedOption() === $index && $index !== q.correct"
+                (click)="selectOption($index)"
+              >
+                {{ opt }}
+              </button>
+            }
+          </div>
+
+          @if (selectedOption() !== null) {
+            @if (currentQuizExplanation(); as expl) {
+              <div
+                class="exercise-feedback"
+                [class.correct]="selectedOption() === q.correct"
+                [class.wrong]="selectedOption() !== q.correct"
+              >
+                <span class="feedback-label">
+                  {{ selectedOption() === q.correct ? 'Correcto!' : 'Incorrecto' }}
+                </span>
+                <p>{{ expl }}</p>
+              </div>
+            }
+            <button class="exercise-btn primary" (click)="nextQuiz()">Siguiente</button>
+          }
+        </div>
+      }
+    }
+    @case ('done') {
+      <div class="exercise-summary">
+        <h3 class="exercise-summary-title">Resultado: {{ combinedScore() }}%</h3>
+        @if (practiceScore() !== null) {
+          <p class="exercise-instruction">
+            Practica: {{ practiceScore() }}% — Quiz: {{ score() }}%
+          </p>
+        }
+        <p class="exercise-instruction">
+          {{
+            combinedScore() >= 70
+              ? 'Buen trabajo! Sigue practicando estos sonidos.'
+              : 'Repasa los ejemplos e intentalo de nuevo.'
+          }}
+        </p>
+      </div>
+    }
+  }
+} @else if (content(); as c) {
+  @switch (phase()) {
+    @case ('explanation') {
       <div class="exercise-card">
         <h3 class="exercise-title">{{ unitTitle() }}</h3>
         <div class="exercise-explanation">
@@ -26,7 +94,7 @@
       @if (currentQuiz(); as q) {
         <div class="exercise-card">
           <h3 class="exercise-title">Quiz — {{ unitTitle() }}</h3>
-          <span class="exercise-progress">{{ quizIndex() + 1 }} / {{ c.quiz.length }}</span>
+          <span class="exercise-progress">{{ quizIndex() + 1 }} / {{ quizLength() }}</span>
           <p class="exercise-instruction">{{ q.prompt }}</p>
 
           <div class="exercise-options">

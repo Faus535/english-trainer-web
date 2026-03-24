@@ -1,0 +1,58 @@
+@if (!finished()) {
+  @if (current(); as item) {
+    <div class="exercise-card">
+      <h3 class="exercise-title">Repaso — Tarjetas</h3>
+      <span class="exercise-progress">{{ currentIndex() + 1 }} / {{ items().length }}</span>
+
+      <div class="vocab-card">
+        <span class="vocab-word">{{ displayLabel(item) }}</span>
+        <span class="vocab-es">{{
+          item.itemType === 'vocabulary-word' ? 'Vocabulario' : item.moduleName
+        }}</span>
+
+        @if (revealed()) {
+          <p class="vocab-example">Nivel: {{ item.level }} — Repasos: {{ item.reviewCount }}</p>
+        }
+      </div>
+
+      @if (!revealed()) {
+        <button class="exercise-btn primary full-width" (click)="reveal()">
+          Mostrar respuesta
+        </button>
+      } @else {
+        <div class="exercise-actions">
+          <button
+            class="exercise-btn full-width"
+            style="border-color: var(--error); color: var(--error)"
+            (click)="rate(false)"
+          >
+            No lo sabia
+          </button>
+          <button
+            class="exercise-btn full-width"
+            style="border-color: var(--success); color: var(--success)"
+            (click)="rate(true)"
+          >
+            Lo sabia
+          </button>
+        </div>
+      }
+    </div>
+  }
+} @else {
+  <div class="exercise-summary">
+    <h3 class="exercise-summary-title">Repaso completado</h3>
+    <p class="exercise-instruction">
+      {{ correctCount() }} de {{ results().length }} recordadas correctamente
+    </p>
+    <div class="exercise-results-list">
+      @for (item of items(); track item.id; let i = $index) {
+        <div class="result-row" [class.correct]="results()[i]" [class.wrong]="!results()[i]">
+          <span class="result-icon">{{ results()[i] ? '&#10003;' : '&#10007;' }}</span>
+          <span class="result-expected">{{ displayLabel(item) }}</span>
+        </div>
+      }
+    </div>
+    <button class="exercise-btn primary full-width" (click)="finish()">Continuar</button>
+  </div>
+}

@@ -1,0 +1,76 @@
+@if (loading()) {
+  <div class="progress-dashboard">
+    <p class="loading-text">Cargando progreso...</p>
+  </div>
+} @else {
+  <div class="progress-dashboard">
+    <!-- XP Level -->
+    @if (xpLevel(); as xp) {
+      <section class="dashboard-section">
+        <div class="xp-header">
+          <span class="xp-level-badge">Nivel {{ xp.level }}</span>
+          <span class="xp-level-name">{{ xp.levelName }}</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" [style.width.%]="xp.progress"></div>
+        </div>
+        <span class="xp-detail">{{ xp.xpForCurrentLevel }} / {{ xp.xpForNextLevel }} XP</span>
+      </section>
+    }
+
+    <!-- Streak -->
+    @if (streak(); as s) {
+      <section class="dashboard-section streak-section">
+        <span class="streak-value">{{ s.currentStreak }}</span>
+        <span class="streak-label">dias de racha</span>
+        <span class="streak-best">Mejor: {{ s.bestStreak }} dias</span>
+      </section>
+    }
+
+    <!-- SRS Stats -->
+    @if (reviewStats(); as stats) {
+      <section class="dashboard-section">
+        <h3 class="section-title">Repaso espaciado</h3>
+        <div class="stats-row">
+          <div class="stat-item">
+            <span class="stat-value">{{ stats.totalItems }}</span>
+            <span class="stat-label">En repaso</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">{{ stats.dueToday }}</span>
+            <span class="stat-label">Pendientes hoy</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">{{ stats.completedToday }}</span>
+            <span class="stat-label">Completadas hoy</span>
+          </div>
+        </div>
+      </section>
+    }
+
+    <!-- Module Progress -->
+    @if (moduleProgress().length > 0) {
+      <section class="dashboard-section">
+        <h3 class="section-title">Progreso por modulo</h3>
+        <div class="modules-list">
+          @for (mod of moduleProgress(); track mod.id) {
+            <div class="module-row">
+              <div class="module-info">
+                <span class="module-name">{{ moduleLabel(mod.moduleName) }}</span>
+                <span class="module-level">{{ mod.level }}</span>
+              </div>
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill" [style.width.%]="progressPercent(mod)"></div>
+              </div>
+              <span class="module-detail">
+                {{ mod.completedUnits.length }} / {{ mod.totalUnits }} unidades ({{
+                  progressPercent(mod)
+                }}%)
+              </span>
+            </div>
+          }
+        </div>
+      </section>
+    }
+  </div>
+}

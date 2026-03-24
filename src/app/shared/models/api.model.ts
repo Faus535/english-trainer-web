@@ -173,6 +173,9 @@ export interface VocabEntryResponse {
   type: string;
   example: string;
   level: Level;
+  category?: string;
+  block?: number;
+  blockTitle?: string;
 }
 
 // Phrases
@@ -186,11 +189,16 @@ export interface PhraseResponse {
 // Spaced Repetition
 export interface SpacedRepetitionItemResponse {
   id: string;
+  userId: string;
   itemType: string;
-  itemId: string;
-  nextReview: string;
-  interval: number;
+  unitReference: string;
+  moduleName: string;
+  level: string;
+  unitIndex: number;
+  nextReviewDate: string;
+  intervalIndex: number;
   reviewCount: number;
+  graduated: boolean;
 }
 
 // Review

@@ -1,0 +1,27 @@
+<div class="exercise-card">
+  <h3 class="exercise-title">Pares minimos — escucha la diferencia</h3>
+  <p class="exercise-instruction">
+    Pulsa en cada palabra para escucharla. Nota como cambia el significado.
+  </p>
+
+  <div class="exercise-examples">
+    @for (pair of pairs(); track $index) {
+      <div class="minimal-pair-row">
+        <button class="example-card" (click)="speak(pair.wordA.word)">
+          <span class="example-word">{{ pair.wordA.word }}</span>
+          <span class="example-ipa">{{ pair.wordA.ipa }}</span>
+        </button>
+
+        <span class="pair-vs">vs</span>
+
+        <button class="example-card" (click)="speak(pair.wordB.word)">
+          <span class="example-word">{{ pair.wordB.word }}</span>
+          <span class="example-ipa">{{ pair.wordB.ipa }}</span>
+        </button>
+      </div>
+      <p class="example-note pair-note">{{ pair.note }}</p>
+    }
+  </div>
+
+  <button class="exercise-btn primary full-width" (click)="completed.emit()">Siguiente →</button>
+</div>

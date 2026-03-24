@@ -8,6 +8,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { TtsService } from '../../../../speak/services/tts.service';
+import { VocabApiService } from '../../../../../core/services/vocab-api.service';
 import { Level } from '../../../../../shared/models/learning.model';
 import { VOCABULARY_WORDS, VocabItem, pickRandom } from './exercise-content.data';
 
@@ -19,6 +20,7 @@ import { VOCABULARY_WORDS, VocabItem, pickRandom } from './exercise-content.data
 })
 export class VocabularyExercise implements OnInit {
   private readonly tts = inject(TtsService);
+  private readonly vocabApi = inject(VocabApiService);
 
   readonly level = input.required<Level>();
   readonly unitTitle = input.required<string>();
@@ -40,8 +42,27 @@ export class VocabularyExercise implements OnInit {
   });
 
   ngOnInit(): void {
+    this.vocabApi.getVocabByLevel(this.level()).subscribe({
+      next: (entries) => {
+        if (entries.length > 0) {
+          const vocabItems: VocabItem[] = entries.map((e) => ({
+            en: e.en,
+            es: e.es,
+            ipa: e.ipa,
+            example: e.example,
+          }));
+          this.items.set(pickRandom(vocabItems, 10));
+        } else {
+          this.loadFallback();
+        }
+      },
+      error: () => this.loadFallback(),
+    });
+  }
+
+  private loadFallback(): void {
     const words = VOCABULARY_WORDS[this.level()] ?? VOCABULARY_WORDS['a1'];
-    this.items.set(pickRandom(words, 6));
+    this.items.set(pickRandom(words, 10));
   }
 
   protected speak(text: string): void {

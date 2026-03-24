@@ -10,9 +10,13 @@ import {
 import { TtsService } from '../../../../speak/services/tts.service';
 import { Level } from '../../../../../shared/models/learning.model';
 import { LISTENING_SENTENCES, DictationItem, pickRandom } from './exercise-content.data';
+import { SoundLesson, getSoundLessonForUnit } from './data/phonetic-content.data';
+import { SoundIntro } from './components/sound-intro';
+import { SoundRecognition } from './components/sound-recognition';
 
 @Component({
   selector: 'app-listening-exercise',
+  imports: [SoundIntro, SoundRecognition],
   templateUrl: './listening-exercise.html',
   styleUrl: './exercises.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,12 +27,14 @@ export class ListeningExercise implements OnInit {
   readonly level = input.required<Level>();
   readonly unitTitle = input.required<string>();
 
+  protected readonly phase = signal<'intro' | 'recognition' | 'dictation' | 'results'>('dictation');
+  protected readonly soundLesson = signal<SoundLesson | null>(null);
+
   protected readonly items = signal<DictationItem[]>([]);
   protected readonly currentIndex = signal(0);
   protected readonly userInput = signal('');
   protected readonly showResult = signal(false);
   protected readonly results = signal<{ correct: boolean; expected: string; given: string }[]>([]);
-  protected readonly finished = signal(false);
 
   protected readonly current = computed(() => this.items()[this.currentIndex()] ?? null);
   protected readonly progress = computed(() => {
@@ -44,6 +50,25 @@ export class ListeningExercise implements OnInit {
   ngOnInit(): void {
     const sentences = LISTENING_SENTENCES[this.level()] ?? LISTENING_SENTENCES['a1'];
     this.items.set(pickRandom(sentences, 5));
+
+    const lesson = getSoundLessonForUnit(this.level(), this.unitTitle());
+    if (lesson) {
+      this.soundLesson.set(lesson);
+      this.phase.set('intro');
+    }
+  }
+
+  protected startRecognition(): void {
+    const lesson = this.soundLesson();
+    if (lesson && lesson.minimalPairs.length > 0) {
+      this.phase.set('recognition');
+    } else {
+      this.phase.set('dictation');
+    }
+  }
+
+  protected startDictation(): void {
+    this.phase.set('dictation');
   }
 
   protected play(): void {
@@ -86,7 +111,7 @@ export class ListeningExercise implements OnInit {
   protected next(): void {
     const nextIdx = this.currentIndex() + 1;
     if (nextIdx >= this.items().length) {
-      this.finished.set(true);
+      this.phase.set('results');
     } else {
       this.currentIndex.set(nextIdx);
       this.userInput.set('');

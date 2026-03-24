@@ -21,6 +21,12 @@ export class VocabApiService {
     return this.http.get<VocabEntryResponse>(`${this.baseUrl}/vocab/random`);
   }
 
+  getVocabByLevelAndBlock(level: string, block: number): Observable<VocabEntryResponse[]> {
+    return this.http.get<VocabEntryResponse[]>(`${this.baseUrl}/vocab/level/${level}`, {
+      params: { block: block.toString() },
+    });
+  }
+
   searchVocab(query: string): Observable<VocabEntryResponse[]> {
     return this.http.get<VocabEntryResponse[]>(`${this.baseUrl}/vocab/search`, {
       params: { q: query },

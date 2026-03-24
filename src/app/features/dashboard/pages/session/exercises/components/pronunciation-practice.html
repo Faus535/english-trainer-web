@@ -1,0 +1,61 @@
+<div class="exercise-card">
+  <h3 class="exercise-title">Practica guiada</h3>
+  <span class="exercise-progress">{{ currentIndex() + 1 }} / {{ items().length }}</span>
+
+  @if (currentItem(); as item) {
+    @switch (item.type) {
+      @case ('classify') {
+        <p class="exercise-instruction">Clasifica esta palabra:</p>
+        <button class="exercise-sentence" (click)="speak(item.word)">{{ item.word }} 🔊</button>
+
+        <div class="exercise-options">
+          @for (opt of item.options; track $index) {
+            <button
+              class="option-btn"
+              [class.selected]="selectedOption() === $index"
+              [class.correct]="selectedOption() !== null && $index === item.answer"
+              [class.wrong]="selectedOption() === $index && $index !== item.answer"
+              (click)="selectOption($index)"
+            >
+              {{ opt }}
+            </button>
+          }
+        </div>
+      }
+      @case ('fill_blank') {
+        <p class="exercise-instruction">Completa la frase:</p>
+        <p class="exercise-sentence">{{ item.sentence }}</p>
+
+        <div class="exercise-options">
+          @for (opt of item.options; track $index) {
+            <button
+              class="option-btn"
+              [class.selected]="selectedOption() === $index"
+              [class.correct]="selectedOption() !== null && $index === item.answer"
+              [class.wrong]="selectedOption() === $index && $index !== item.answer"
+              (click)="selectOption($index)"
+            >
+              {{ opt }}
+            </button>
+          }
+        </div>
+      }
+    }
+
+    @if (selectedOption() !== null) {
+      <div
+        class="exercise-feedback"
+        [class.correct]="selectedOption() === item.answer"
+        [class.wrong]="selectedOption() !== item.answer"
+      >
+        <span class="feedback-label">
+          {{ selectedOption() === item.answer ? 'Correcto!' : 'Incorrecto' }}
+        </span>
+      </div>
+
+      <button class="exercise-btn primary full-width" (click)="next()">
+        {{ isLast() ? 'Ver resultados' : 'Siguiente' }}
+      </button>
+    }
+  }
+</div>

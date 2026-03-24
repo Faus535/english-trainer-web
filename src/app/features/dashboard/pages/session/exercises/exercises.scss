@@ -433,3 +433,48 @@
   font-size: var(--fs-xs);
   color: var(--text-3);
 }
+
+// Pronunciation extended
+.ipa-display {
+  display: flex;
+  gap: var(--sp-3);
+  justify-content: center;
+  padding: var(--sp-3) 0;
+
+  .ipa-symbol {
+    font-size: var(--fs-xl);
+    font-weight: 800;
+    color: var(--primary);
+    font-family: monospace;
+    padding: var(--sp-2) var(--sp-4);
+    background: var(--primary-soft);
+    border-radius: var(--r-md);
+  }
+}
+
+.exercise-tip.warning {
+  background: color-mix(in srgb, var(--error) 8%, var(--surface-0));
+  border-left-color: var(--error);
+  color: var(--error);
+}
+
+// Minimal pairs
+.minimal-pair-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+
+  .example-card.compact {
+    flex: 1;
+    padding: var(--sp-2);
+    text-align: center;
+    align-items: center;
+  }
+}
+
+.pair-vs {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--text-3);
+  flex-shrink: 0;
+}
