@@ -1,8 +1,11 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, EMPTY, throwError } from 'rxjs';
+import { catchError, EMPTY, Observable, switchMap, throwError, finalize, share } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { NotificationService } from '../../shared/services/notification.service';
+import { AuthResponse } from '../../shared/models/api.model';
+
+let refreshing$: Observable<AuthResponse> | null = null;
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
@@ -10,7 +13,33 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      if ((error.status === 401 || error.status === 403) && !req.url.includes('/auth/')) {
+      if (error.status === 401 && !req.url.includes('/auth/')) {
+        if (!refreshing$) {
+          refreshing$ = auth.refresh().pipe(
+            finalize(() => {
+              refreshing$ = null;
+            }),
+            share(),
+          );
+        }
+
+        return refreshing$.pipe(
+          switchMap(() =>
+            next(
+              req.clone({
+                setHeaders: { Authorization: `Bearer ${auth.token()}` },
+              }),
+            ),
+          ),
+          catchError(() => {
+            auth.logout();
+            return EMPTY;
+          }),
+        );
+      }
+
+      if (error.status === 403 && !req.url.includes('/auth/')) {
+        notification.error('No tienes permisos para esta accion.');
         auth.logout();
         return EMPTY;
       }

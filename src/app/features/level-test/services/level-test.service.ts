@@ -246,13 +246,16 @@ export class LevelTestService {
     this.state.setModuleLevel('phrases', phrasesLevel, false);
     this.state.markTestCompleted(false);
 
-    this.submitToBackend({
+    const levels: Record<ModuleName, Level> = {
       vocabulary: vocabLevel,
       grammar: grammarLevel,
       listening: listeningLevel,
       pronunciation: pronunciationLevel,
       phrases: phrasesLevel,
-    });
+    };
+
+    localStorage.setItem('et_pending_levels', JSON.stringify(levels));
+    this.submitToBackend(levels);
   }
 
   private submitToBackend(_levels: Record<ModuleName, Level>): void {
@@ -269,6 +272,7 @@ export class LevelTestService {
 
     this.assessmentApi.submitLevelTest(profileId, { answers: {}, scores }).subscribe({
       next: (res) => {
+        localStorage.removeItem('et_pending_levels');
         if (res.levels) {
           this.state.applyLevelsFromBackend(res.levels);
         }
