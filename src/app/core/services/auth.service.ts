@@ -58,6 +58,7 @@ export class AuthService {
   }
 
   logout(): void {
+    if (!this._token()) return;
     sessionStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(REFRESH_KEY);
     sessionStorage.removeItem(PROFILE_ID_KEY);

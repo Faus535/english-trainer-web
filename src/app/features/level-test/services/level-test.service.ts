@@ -1,4 +1,5 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
+import { Observable } from 'rxjs';
 import {
   Level,
   CEFR_LEVELS,
@@ -206,12 +207,12 @@ export class LevelTestService {
     }
   }
 
-  skipTestWithLevel(level: Level): void {
+  skipTestWithLevel(level: Level): Observable<void> {
     const levels: Record<ModuleName, Level> = {} as Record<ModuleName, Level>;
     for (const mod of MODULE_NAMES) {
       levels[mod] = level;
     }
-    this.state.setAllLevelsAndComplete(levels);
+    return this.state.setAllLevelsAndComplete(levels);
   }
 
   finishTest(): void {
@@ -239,13 +240,6 @@ export class LevelTestService {
     const phraseIdx = Math.min(vocIdx, gramIdx);
     const phrasesLevel = CEFR_LEVELS[phraseIdx];
 
-    this.state.setModuleLevel('vocabulary', vocabLevel, false);
-    this.state.setModuleLevel('grammar', grammarLevel, false);
-    this.state.setModuleLevel('listening', listeningLevel, false);
-    this.state.setModuleLevel('pronunciation', pronunciationLevel, false);
-    this.state.setModuleLevel('phrases', phrasesLevel, false);
-    this.state.markTestCompleted(false);
-
     const levels: Record<ModuleName, Level> = {
       vocabulary: vocabLevel,
       grammar: grammarLevel,
@@ -254,11 +248,11 @@ export class LevelTestService {
       phrases: phrasesLevel,
     };
 
-    localStorage.setItem('et_pending_levels', JSON.stringify(levels));
-    this.submitToBackend(levels);
+    this.state.setAllLevelsAndComplete(levels).subscribe();
+    this.submitScoresHistory();
   }
 
-  private submitToBackend(_levels: Record<ModuleName, Level>): void {
+  private submitScoresHistory(): void {
     const profileId = this.auth.profileId();
     if (!profileId) return;
 
@@ -271,11 +265,8 @@ export class LevelTestService {
     };
 
     this.assessmentApi.submitLevelTest(profileId, { answers: {}, scores }).subscribe({
-      next: (res) => {
-        localStorage.removeItem('et_pending_levels');
-        if (res.levels) {
-          this.state.applyLevelsFromBackend(res.levels);
-        }
+      error: () => {
+        // Scores are best-effort historical data, not critical
       },
     });
   }

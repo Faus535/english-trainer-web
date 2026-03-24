@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { Observable } from 'rxjs';
 import { Level, ModuleName, ModuleProgress, UnitReference } from '../models/learning.model';
 import { ProfileStateService } from './profile-state.service';
 import { ProgressStateService } from './progress-state.service';
@@ -47,8 +48,8 @@ export class StateService {
     this.profileState.markTestCompleted(syncToBackend);
   }
 
-  setAllLevelsAndComplete(levels: Partial<Record<ModuleName, Level>>): void {
-    this.profileState.setAllLevelsAndComplete(levels);
+  setAllLevelsAndComplete(levels: Partial<Record<ModuleName, Level>>): Observable<void> {
+    return this.profileState.setAllLevelsAndComplete(levels);
   }
 
   markTestIncomplete(): void {

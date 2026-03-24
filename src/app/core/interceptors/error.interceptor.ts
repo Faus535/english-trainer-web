@@ -31,17 +31,20 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
               }),
             ),
           ),
-          catchError(() => {
-            auth.logout();
+          catchError((refreshError: HttpErrorResponse) => {
+            if (refreshError.status === 401 || refreshError.status === 403) {
+              auth.logout();
+            } else {
+              notification.warning('Sin conexion. Se reintentara automaticamente.');
+            }
             return EMPTY;
           }),
         );
       }
 
-      if (error.status === 403 && !req.url.includes('/auth/')) {
+      if (error.status === 403) {
         notification.error('No tienes permisos para esta accion.');
-        auth.logout();
-        return EMPTY;
+        return throwError(() => error);
       }
 
       if (error.status === 0) {

@@ -1,4 +1,5 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
+import { Observable, of, tap, catchError } from 'rxjs';
 import {
   CEFR_LEVELS,
   Level,
@@ -22,6 +23,7 @@ export class ProfileStateService {
 
   private readonly _profile = signal<UserProfile>(this.loadProfile());
   private readonly _syncing = signal(false);
+  private _savingLevels = false;
 
   readonly profile = this._profile.asReadonly();
   readonly syncing = this._syncing.asReadonly();
@@ -96,7 +98,7 @@ export class ProfileStateService {
     }
   }
 
-  setAllLevelsAndComplete(levels: Partial<Record<ModuleName, Level>>): void {
+  setAllLevelsAndComplete(levels: Partial<Record<ModuleName, Level>>): Observable<void> {
     this._profile.update((p) => ({
       ...p,
       testCompleted: true,
@@ -105,17 +107,23 @@ export class ProfileStateService {
     this.persistProfile();
 
     const profileId = this.auth.profileId();
-    if (!profileId) return;
+    if (!profileId) return of(undefined);
 
     localStorage.setItem('et_pending_levels', JSON.stringify(levels));
+    this._savingLevels = true;
 
-    this.profileApi.setAllLevels(profileId, levels as Record<string, string>).subscribe({
-      next: () => localStorage.removeItem('et_pending_levels'),
-      error: () => {
+    return this.profileApi.setAllLevels(profileId, levels as Record<string, string>).pipe(
+      tap(() => {
+        localStorage.removeItem('et_pending_levels');
+        this._savingLevels = false;
+      }),
+      catchError(() => {
+        this._savingLevels = false;
         const url = `${environment.apiUrl}/profiles/${profileId}/levels`;
         this.offlineQueue.enqueue('PUT', url, { levels });
-      },
-    });
+        return of(undefined);
+      }),
+    );
   }
 
   markTestIncomplete(): void {
@@ -196,6 +204,8 @@ export class ProfileStateService {
   }
 
   private retryPendingLevels(): void {
+    if (this._savingLevels) return;
+
     try {
       const raw = localStorage.getItem('et_pending_levels');
       if (!raw) return;
@@ -204,14 +214,20 @@ export class ProfileStateService {
       const profileId = this.auth.profileId();
       if (!profileId) return;
 
+      this._savingLevels = true;
       this.profileApi.setAllLevels(profileId, levels).subscribe({
-        next: () => localStorage.removeItem('et_pending_levels'),
+        next: () => {
+          localStorage.removeItem('et_pending_levels');
+          this._savingLevels = false;
+        },
         error: () => {
+          this._savingLevels = false;
           const url = `${environment.apiUrl}/profiles/${profileId}/levels`;
           this.offlineQueue.enqueue('PUT', url, { levels });
         },
       });
     } catch {
+      this._savingLevels = false;
       localStorage.removeItem('et_pending_levels');
     }
   }

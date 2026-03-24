@@ -28,8 +28,10 @@ export class LevelTest {
   }
 
   protected onSkip(level: Level): void {
-    this.testService.skipTestWithLevel(level);
-    this.router.navigate(['/dashboard']);
+    this.testService.skipTestWithLevel(level).subscribe({
+      next: () => this.router.navigate(['/dashboard']),
+      error: () => this.router.navigate(['/dashboard']),
+    });
   }
 
   protected onFinish(): void {
