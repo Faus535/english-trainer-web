@@ -33,6 +33,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           ),
           catchError((refreshError: HttpErrorResponse) => {
             if (refreshError.status === 401 || refreshError.status === 403) {
+              notification.warning('Tu sesion ha expirado. Inicia sesion de nuevo.');
               auth.logout();
             } else {
               notification.warning('Sin conexion. Se reintentara automaticamente.');
