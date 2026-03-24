@@ -38,6 +38,10 @@ export class ProfileApiService {
     );
   }
 
+  setAllLevels(profileId: string, levels: Record<string, string>): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/${profileId}/levels`, { levels });
+  }
+
   recordSession(profileId: string, data: { duration?: number }): Observable<UserProfileResponse> {
     return this.http.post<UserProfileResponse>(`${this.baseUrl}/${profileId}/sessions`, data);
   }

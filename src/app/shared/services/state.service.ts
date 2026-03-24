@@ -47,6 +47,10 @@ export class StateService {
     this.profileState.markTestCompleted(syncToBackend);
   }
 
+  setAllLevelsAndComplete(levels: Partial<Record<ModuleName, Level>>): void {
+    this.profileState.setAllLevelsAndComplete(levels);
+  }
+
   markTestIncomplete(): void {
     this.profileState.markTestIncomplete();
   }

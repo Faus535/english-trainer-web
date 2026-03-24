@@ -91,6 +91,20 @@ export class ProfileStateService {
     }
   }
 
+  setAllLevelsAndComplete(levels: Partial<Record<ModuleName, Level>>): void {
+    this._profile.update((p) => ({
+      ...p,
+      testCompleted: true,
+      levels: { ...p.levels, ...levels },
+    }));
+    this.persistProfile();
+
+    const profileId = this.auth.profileId();
+    if (!profileId) return;
+
+    this.profileApi.setAllLevels(profileId, levels as Record<string, string>).subscribe();
+  }
+
   markTestIncomplete(): void {
     this._profile.update((p) => ({ ...p, testCompleted: false, levels: {} }));
     this.persistProfile();

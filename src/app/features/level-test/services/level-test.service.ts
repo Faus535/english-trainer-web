@@ -207,10 +207,11 @@ export class LevelTestService {
   }
 
   skipTestWithLevel(level: Level): void {
+    const levels: Record<ModuleName, Level> = {} as Record<ModuleName, Level>;
     for (const mod of MODULE_NAMES) {
-      this.state.setModuleLevel(mod, level);
+      levels[mod] = level;
     }
-    this.state.markTestCompleted();
+    this.state.setAllLevelsAndComplete(levels);
   }
 
   finishTest(): void {
