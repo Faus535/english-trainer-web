@@ -4,6 +4,7 @@ import { SessionService } from '../../services/session.service';
 import { GamificationService } from '../../services/gamification.service';
 import { TtsService } from '../../../../features/speak/services/tts.service';
 import { XP_PER_SESSION } from '../../data/gamification.data';
+import { Level } from '../../../../shared/models/learning.model';
 import { ListeningExercise } from './exercises/listening-exercise';
 import { PronunciationExercise } from './exercises/pronunciation-exercise';
 import { VocabularyExercise } from './exercises/vocabulary-exercise';
@@ -38,6 +39,15 @@ export class Session {
   protected readonly completedSession = this.sessionService.completedSession;
 
   protected readonly blocks = computed(() => this.session()?.blocks ?? []);
+
+  protected readonly currentLevel = computed<Level | null>(() => {
+    const block = this.currentBlock();
+    return block?.unit?.level ?? null;
+  });
+
+  protected levelColor(level: Level): string {
+    return `var(--level-${level})`;
+  }
 
   protected readonly sessionDuration = computed(() => {
     const startTime = this.sessionService.sessionStartTime();

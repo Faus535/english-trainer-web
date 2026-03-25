@@ -67,6 +67,40 @@ export const LISTENING_SENTENCES: Record<Level, DictationItem[]> = {
       speed: 1.15,
     },
   ],
+  c2: [
+    {
+      text: "I mean, it's not as though anyone could've foreseen the extent to which things would unravel.",
+      speed: 1.25,
+    },
+    {
+      text: 'The juxtaposition of her pragmatism and his idealism made for a rather volatile working relationship.',
+      speed: 1.25,
+    },
+    {
+      text: "In retrospect, the committee's decision to acquiesce was predicated on a fundamentally flawed premise.",
+      speed: 1.2,
+    },
+    {
+      text: "What's particularly galling is the sheer brazenness with which they've attempted to obfuscate the findings.",
+      speed: 1.25,
+    },
+    {
+      text: 'The epistemological implications of this paradigm shift cannot be overstated, notwithstanding the methodological caveats.',
+      speed: 1.2,
+    },
+    {
+      text: "She's got this uncanny knack for cutting through the waffle and getting straight to the crux of the matter.",
+      speed: 1.25,
+    },
+    {
+      text: 'The conflation of correlation and causation in public discourse has had pernicious consequences for evidence-based policy.',
+      speed: 1.2,
+    },
+    {
+      text: 'One might be forgiven for thinking that the entire enterprise was predicated on little more than wishful thinking.',
+      speed: 1.25,
+    },
+  ],
 };
 
 /* ─── Pronunciation: explanations + examples by unit type ─── */
@@ -366,6 +400,68 @@ export const VOCABULARY_WORDS: Record<Level, VocabItem[]> = {
       example: 'He is meticulous about details.',
     },
   ],
+  c2: [
+    {
+      en: 'obsequious',
+      es: 'servil',
+      ipa: '/əbˈsiːkwiəs/',
+      example: 'His obsequious manner was off-putting.',
+    },
+    {
+      en: 'recalcitrant',
+      es: 'recalcitrante',
+      ipa: '/rɪˈkælsɪtrənt/',
+      example: 'The recalcitrant committee refused to budge.',
+    },
+    {
+      en: 'sanguine',
+      es: 'optimista',
+      ipa: '/ˈsæŋɡwɪn/',
+      example: 'She remained sanguine about the outcome.',
+    },
+    {
+      en: 'pernicious',
+      es: 'pernicioso',
+      ipa: '/pərˈnɪʃəs/',
+      example: 'The pernicious effects of misinformation.',
+    },
+    {
+      en: 'redolent',
+      es: 'evocador',
+      ipa: '/ˈredələnt/',
+      example: 'The garden was redolent of jasmine.',
+    },
+    {
+      en: 'mendacious',
+      es: 'mendaz',
+      ipa: '/menˈdeɪʃəs/',
+      example: 'A mendacious account of the events.',
+    },
+    {
+      en: 'quotidian',
+      es: 'cotidiano',
+      ipa: '/kwoʊˈtɪdiən/',
+      example: 'The quotidian rhythms of daily life.',
+    },
+    {
+      en: 'prescient',
+      es: 'clarividente',
+      ipa: '/ˈpreʃənt/',
+      example: 'Her prescient analysis proved correct.',
+    },
+    {
+      en: 'insouciant',
+      es: 'despreocupado',
+      ipa: '/ɪnˈsuːsiənt/',
+      example: 'His insouciant attitude belied his concern.',
+    },
+    {
+      en: 'perspicacious',
+      es: 'perspicaz',
+      ipa: '/ˌpɜːrspɪˈkeɪʃəs/',
+      example: 'A perspicacious observer would have noticed.',
+    },
+  ],
 };
 
 /* ─── Grammar: explanation + exercises by level ─── */
@@ -541,6 +637,60 @@ export const GRAMMAR_CONTENT: Record<Level, GrammarContent[]> = {
       ],
     },
   ],
+  c2: [
+    {
+      explanation:
+        'Register & Tone: The same idea expressed differently depending on context — formal, neutral, informal, academic.',
+      examples: [
+        'Formal: "I would be grateful if you could..."',
+        'Academic: "It is posited that..."',
+        'Informal: "Could you...?"',
+      ],
+      exercises: [
+        {
+          sentence: 'Which is most appropriate for an academic paper?',
+          options: ['People think that...', 'It is widely held that...', 'Everyone knows...'],
+          correct: 1,
+        },
+        {
+          sentence: '"Terminate the contract" is equivalent informally to...',
+          options: ['End the deal', 'Cease the agreement', 'Nullify the contract'],
+          correct: 0,
+        },
+        {
+          sentence: 'Academic register for "things got worse":',
+          options: ['The situation deteriorated', 'Things went downhill', 'It all fell apart'],
+          correct: 0,
+        },
+      ],
+    },
+    {
+      explanation:
+        'Hedging & Mitigation: Academic and diplomatic language uses hedging to soften claims.',
+      examples: [
+        'The data would seem to suggest...',
+        'It could be argued that...',
+        'There is a tendency for...',
+      ],
+      exercises: [
+        {
+          sentence: 'Which is the most hedged statement?',
+          options: ['This proves...', 'This suggests...', 'This shows...'],
+          correct: 1,
+        },
+        {
+          sentence: 'Academic hedging for "X causes Y":',
+          options: ['X causes Y', 'X appears to contribute to Y', 'X makes Y happen'],
+          correct: 1,
+        },
+        {
+          sentence: '"It might be worth considering..." is an example of:',
+          options: ['Assertion', 'Hedging', 'Imperative'],
+          correct: 1,
+        },
+      ],
+    },
+  ],
 };
 
 /* ─── Phrases: by level ─── */
@@ -697,6 +847,40 @@ export const PHRASE_CONTENT: Record<Level, PhraseItem[]> = {
       context: 'Partial agreement',
     },
   ],
+  c2: [
+    {
+      en: "I'm not at liberty to disclose that.",
+      es: 'No estoy autorizado a revelar eso.',
+      context: 'Diplomatic refusal',
+    },
+    {
+      en: 'One could be forgiven for thinking...',
+      es: 'Seria comprensible pensar que...',
+      context: 'Subtle criticism',
+    },
+    {
+      en: 'It would be remiss of me not to mention...',
+      es: 'Seria negligente por mi parte no mencionar...',
+      context: 'Obligation to mention',
+    },
+    {
+      en: "Let's not mince words.",
+      es: 'No nos andemos con paños calientes.',
+      context: 'Being very direct',
+    },
+    {
+      en: 'The writing is on the wall.',
+      es: 'Las señales son claras.',
+      context: 'Predicting an outcome',
+    },
+    {
+      en: 'I stand to be corrected, but...',
+      es: 'Que me corrijan si me equivoco, pero...',
+      context: 'Humble assertion',
+    },
+    { en: "It's a moot point.", es: 'Es un punto discutible.', context: 'Dismissing an argument' },
+    { en: 'Lest we forget...', es: 'Para que no olvidemos...', context: 'Solemn reminder' },
+  ],
 };
 
 /* ─── Helpers ─── */
@@ -726,3 +910,40 @@ export function getPronunciationKey(unitTitle: string): string {
     return 'vowel-length';
   return 'default';
 }
+
+/* ─── Level metadata for UI indicators ─── */
+export const LEVEL_METADATA: Record<
+  Level,
+  { color: string; vocabBand: string; grammarFocus: string }
+> = {
+  a1: {
+    color: 'var(--level-a1)',
+    vocabBand: 'Top 300',
+    grammarFocus: 'Present Simple, Articles, Possessives',
+  },
+  a2: {
+    color: 'var(--level-a2)',
+    vocabBand: 'Top 300-800',
+    grammarFocus: 'Past Simple, Comparatives, Going to',
+  },
+  b1: {
+    color: 'var(--level-b1)',
+    vocabBand: 'Top 800-1500',
+    grammarFocus: 'Conditionals, Relative Clauses, Modals',
+  },
+  b2: {
+    color: 'var(--level-b2)',
+    vocabBand: 'Top 1500-2500',
+    grammarFocus: 'Passive, Mixed Conditionals, Reported Speech',
+  },
+  c1: {
+    color: 'var(--level-c1)',
+    vocabBand: 'Top 2500-3000+',
+    grammarFocus: 'Inversions, Subjunctive, Nominalization',
+  },
+  c2: {
+    color: 'var(--level-c2)',
+    vocabBand: 'Top 3000+',
+    grammarFocus: 'Register, Hedging, Literary Devices',
+  },
+};

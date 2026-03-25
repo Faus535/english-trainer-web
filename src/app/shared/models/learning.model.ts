@@ -1,10 +1,16 @@
-export type Level = 'a1' | 'a2' | 'b1' | 'b2' | 'c1';
+export type Level = 'a1' | 'a2' | 'b1' | 'b2' | 'c1' | 'c2';
 
-export const CEFR_LEVELS: Level[] = ['a1', 'a2', 'b1', 'b2', 'c1'];
+export const CEFR_LEVELS: Level[] = ['a1', 'a2', 'b1', 'b2', 'c1', 'c2'];
 
 export type ModuleName = 'listening' | 'vocabulary' | 'grammar' | 'phrases' | 'pronunciation';
 
-export const MODULE_NAMES: ModuleName[] = ['listening', 'vocabulary', 'grammar', 'phrases', 'pronunciation'];
+export const MODULE_NAMES: ModuleName[] = [
+  'listening',
+  'vocabulary',
+  'grammar',
+  'phrases',
+  'pronunciation',
+];
 
 export interface ModuleUnit {
   id: string;

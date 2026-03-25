@@ -288,9 +288,16 @@ export class LevelTestService {
     let bestLevel: Level = 'a1';
     for (const level of CEFR_LEVELS) {
       const stats = byLevel[level];
-      if (stats && stats.total > 0 && stats.correct / stats.total >= 0.5) {
+      if (!stats || stats.total === 0) continue;
+      const accuracy = stats.correct / stats.total;
+      // Require >=60% to pass a level (was 50%)
+      if (accuracy >= 0.6) {
         bestLevel = level;
-      } else if (stats && stats.total > 0) {
+      } else if (accuracy < 0.4) {
+        // Stop probing higher levels if accuracy drops below 40%
+        break;
+      } else {
+        // Between 40-60%: don't pass but keep probing
         break;
       }
     }

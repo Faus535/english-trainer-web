@@ -28,6 +28,18 @@
   }
 }
 
+.level-badge {
+  font-size: 0.625rem;
+  font-weight: 800;
+  color: #fff;
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--r-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
 .session-title {
   flex: 1;
   font-weight: 700;
