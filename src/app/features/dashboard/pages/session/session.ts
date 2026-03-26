@@ -49,6 +49,12 @@ export class Session {
   protected readonly sessionCompleted = this.sessionService.sessionCompleted;
   protected readonly completedSession = this.sessionService.completedSession;
   protected readonly isGenerating = this.sessionService.isGenerating;
+  protected readonly canAdvanceBlock = this.sessionService.canAdvanceBlock;
+  protected readonly isAdvancing = this.sessionService.isAdvancing;
+  protected readonly advanceError = this.sessionService.advanceError;
+  protected readonly currentBlockExercises = this.sessionService.currentBlockExercises;
+  protected readonly blockExerciseCount = this.sessionService.currentBlockExerciseCount;
+  protected readonly completedExerciseCount = this.sessionService.currentBlockCompletedCount;
 
   protected readonly sessionId = computed(() => this.session()?.id ?? null);
 
@@ -61,6 +67,20 @@ export class Session {
   protected readonly unitMasteryScore = signal<number | null>(null);
   protected readonly unitStatus = signal<string | null>(null);
   protected readonly accumulatedXp = signal(0);
+
+  protected readonly exerciseProgressText = computed(() => {
+    const done = this.completedExerciseCount();
+    const total = this.blockExerciseCount();
+    return `${done}/${total}`;
+  });
+
+  protected readonly advanceDisabled = computed(() => {
+    return !this.canAdvanceBlock() || this.isAdvancing();
+  });
+
+  protected isExerciseCompleted(exerciseIndex: number): boolean {
+    return this.sessionService.completedExerciseIndices().has(exerciseIndex);
+  }
 
   protected readonly blocks = computed(() => this.session()?.blocks ?? []);
 
@@ -118,6 +138,13 @@ export class Session {
     });
 
     this.reportExerciseResult(result);
+
+    const exercises = this.currentBlockExercises();
+    const exerciseType = result.exerciseType.toLowerCase();
+    const exercise = exercises.find((e) => e.exerciseType.toLowerCase() === exerciseType);
+    if (exercise) {
+      this.sessionService.markExerciseCompleted(exercise.exerciseIndex);
+    }
   }
 
   private reportExerciseResult(result: ExerciseResult): void {

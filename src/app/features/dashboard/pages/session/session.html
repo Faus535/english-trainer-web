@@ -58,6 +58,19 @@
           </div>
         </div>
 
+        @if (blockExerciseCount() > 0) {
+          <div class="exercise-progress-indicator">
+            <span class="progress-text">{{ exerciseProgressText() }}</span>
+            @for (ex of currentBlockExercises(); track ex.exerciseIndex) {
+              <span
+                class="dot"
+                [class.done]="isExerciseCompleted(ex.exerciseIndex)"
+                [title]="ex.exerciseType"
+              ></span>
+            }
+          </div>
+        }
+
         @if (block.unit; as unit) {
           <div class="block-unit">
             <h3 class="unit-title">{{ unit.unit.title }}</h3>
@@ -176,10 +189,22 @@
           @if (blockIndex() > 0) {
             <button class="nav-btn" (click)="goBack()">&larr; Anterior</button>
           }
-          <button class="nav-btn primary" (click)="advanceBlock()">
-            {{ advanceLabel() }}
+          <button
+            class="nav-btn primary"
+            [disabled]="advanceDisabled()"
+            [class.loading]="isAdvancing()"
+            (click)="advanceBlock()"
+          >
+            @if (isAdvancing()) {
+              Avanzando...
+            } @else {
+              {{ advanceLabel() }}
+            }
           </button>
         </div>
+        @if (advanceError(); as error) {
+          <p class="advance-error">{{ error }}</p>
+        }
       </div>
     }
   </div>
