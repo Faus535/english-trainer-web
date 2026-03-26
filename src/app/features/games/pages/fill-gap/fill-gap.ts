@@ -1,7 +1,18 @@
-import { Component, ChangeDetectionStrategy, signal, computed, OnDestroy } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  inject,
+  signal,
+  computed,
+  OnDestroy,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Icon } from '../../../../shared/components/icon/icon';
 import { LucideIconData, ArrowLeft, Trophy, Timer, RotateCcw } from 'lucide-angular';
+import { MinigameApiService } from '../../../../core/services/minigame-api.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { OfflineQueueService } from '../../../../core/services/offline-queue.service';
+import { environment } from '../../../../core/services/environment';
 
 interface GapQuestion {
   sentence: string;
@@ -228,10 +239,18 @@ const GAME_DURATION = 90;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FillGap implements OnDestroy {
+  private readonly minigameApi = inject(MinigameApiService);
+  private readonly auth = inject(AuthService);
+  private readonly offlineQueue = inject(OfflineQueueService);
+
   protected readonly backIcon: LucideIconData = ArrowLeft;
   protected readonly trophyIcon: LucideIconData = Trophy;
   protected readonly timerIcon: LucideIconData = Timer;
   protected readonly retryIcon: LucideIconData = RotateCcw;
+
+  private questionResults: boolean[] = [];
+  protected readonly wordsLearned = signal<string[]>([]);
+  protected readonly xpEarned = signal(0);
 
   protected readonly level = signal('a1');
   protected readonly gameState = signal<'menu' | 'playing' | 'finished'>('menu');
@@ -272,7 +291,29 @@ export class FillGap implements OnDestroy {
   }
 
   protected startGame(): void {
-    const data = FILL_GAP_DATA[this.level()] ?? FILL_GAP_DATA['a1'];
+    this.wordsLearned.set([]);
+    this.xpEarned.set(0);
+    this.questionResults = [];
+    const level = this.level();
+
+    this.minigameApi.getFillGapData(level).subscribe({
+      next: (data) => {
+        if (data.questions.length > 0) {
+          this.initGame(data.questions);
+        } else {
+          this.initGameFromFallback(level);
+        }
+      },
+      error: () => this.initGameFromFallback(level),
+    });
+  }
+
+  private initGameFromFallback(level: string): void {
+    const data = FILL_GAP_DATA[level] ?? FILL_GAP_DATA['a1'];
+    this.initGame([...data]);
+  }
+
+  private initGame(data: GapQuestion[]): void {
     const selected = this.shuffleArray([...data]).slice(0, QUESTIONS_PER_ROUND);
 
     this.questions.set(selected);
@@ -295,6 +336,7 @@ export class FillGap implements OnDestroy {
     this.selectedOption.set(optionIndex);
 
     const isCorrect = optionIndex === q.correct;
+    this.questionResults.push(isCorrect);
     if (isCorrect) {
       this.correctCount.update((c) => c + 1);
     }
@@ -364,6 +406,37 @@ export class FillGap implements OnDestroy {
       localStorage.setItem(STORAGE_KEY, String(finalScore));
       this.bestScore.set(finalScore);
     }
+
+    this.reportResults(finalScore);
+  }
+
+  private reportResults(finalScore: number): void {
+    const userId = this.auth.profileId();
+    if (!userId) return;
+
+    const qs = this.questions();
+    const answeredItems = this.questionResults.map((correct, i) => ({
+      vocabEntryId: null,
+      word: qs[i]?.sentence ?? null,
+      level: this.level(),
+      correct,
+    }));
+
+    const request = { gameType: 'FILL_GAP', score: finalScore, answeredItems };
+
+    this.minigameApi.saveGameResults(userId, request).subscribe({
+      next: (res) => {
+        this.wordsLearned.set(res.wordsLearned);
+        this.xpEarned.set(res.xpEarned);
+      },
+      error: () => {
+        this.offlineQueue.enqueue(
+          'POST',
+          `${environment.apiUrl}/profiles/${userId}/minigames/results`,
+          request,
+        );
+      },
+    });
   }
 
   private loadBestScore(): number {

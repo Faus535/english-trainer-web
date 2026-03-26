@@ -1,60 +1,21 @@
-@if (sessionCompleted()) {
-  <div class="feedback-screen">
-    <div class="feedback-card">
-      <div class="feedback-header">
-        <span class="feedback-icon">&#127881;</span>
-        <h2 class="feedback-title">Sesion completada</h2>
-      </div>
-
-      <div class="feedback-stats">
-        <div class="feedback-stat">
-          <span class="feedback-stat-value">{{ sessionDuration() }}</span>
-          <span class="feedback-stat-label">minutos</span>
-        </div>
-        <div class="feedback-stat">
-          <span class="feedback-stat-value">{{ completedBlockCount() }}</span>
-          <span class="feedback-stat-label">bloques</span>
-        </div>
-        <div class="feedback-stat feedback-stat--xp">
-          <span class="feedback-stat-value">+{{ xpEarned }}</span>
-          <span class="feedback-stat-label">XP</span>
-        </div>
-      </div>
-
-      @if (improvedAreas().length > 0) {
-        <div class="feedback-section">
-          <h3 class="feedback-section-title feedback-section-title--success">
-            Areas que mejoraste
-          </h3>
-          <div class="feedback-list">
-            @for (area of improvedAreas(); track area) {
-              <span class="feedback-chip feedback-chip--success">{{ area }}</span>
-            }
-          </div>
-        </div>
-      }
-
-      @if (practiceAreas().length > 0) {
-        <div class="feedback-section">
-          <h3 class="feedback-section-title feedback-section-title--warning">
-            Areas a seguir practicando
-          </h3>
-          <div class="feedback-list">
-            @for (area of practiceAreas(); track area) {
-              <span class="feedback-chip feedback-chip--warning">{{ area }}</span>
-            }
-          </div>
-        </div>
-      }
-
-      <div class="feedback-actions">
-        <button class="nav-btn primary" (click)="startNextSession()">
-          Siguiente sesion sugerida
-        </button>
-        <button class="nav-btn" (click)="exitSession()">Ir al dashboard</button>
-      </div>
-    </div>
+@if (isGenerating()) {
+  <div class="no-session">
+    <p>Generando sesion...</p>
   </div>
+} @else if (sessionCompleted()) {
+  <app-session-completion
+    [duration]="sessionDuration()"
+    [blockCount]="completedBlockCount()"
+    [xpEarned]="xpEarned"
+    [accumulatedXp]="accumulatedXp()"
+    [improvedAreas]="improvedAreas()"
+    [practiceAreas]="practiceAreas()"
+    [unitMasteryScore]="unitMasteryScore()"
+    [unitStatus]="unitStatus()"
+    [blockResults]="blockResults()"
+    (startNext)="startNextSession()"
+    (exit)="exitSession()"
+  />
 } @else if (session(); as s) {
   <div class="session-page">
     <div class="session-header">
@@ -129,12 +90,21 @@
                 [level]="unit.level"
                 [unitTitle]="unit.unit.title"
                 [reviewMode]="s.mode === 'review'"
+                [contentIds]="getContentIds('listening')"
+                [exerciseCount]="getExerciseCount('listening')"
+                (exerciseCompleted)="onExerciseCompleted($event)"
               />
             }
           }
           @case ('pronunciation') {
             @if (block.unit; as unit) {
-              <app-pronunciation-exercise [level]="unit.level" [unitTitle]="unit.unit.title" />
+              <app-pronunciation-exercise
+                [level]="unit.level"
+                [unitTitle]="unit.unit.title"
+                [contentIds]="getContentIds('pronunciation')"
+                [exerciseCount]="getExerciseCount('pronunciation')"
+                (exerciseCompleted)="onExerciseCompleted($event)"
+              />
             }
           }
           @case ('secondary') {
@@ -145,6 +115,9 @@
                     [level]="unit.level"
                     [unitTitle]="unit.unit.title"
                     [reviewMode]="s.mode === 'review'"
+                    [contentIds]="getContentIds('vocabulary')"
+                    [exerciseCount]="getExerciseCount('vocabulary')"
+                    (exerciseCompleted)="onExerciseCompleted($event)"
                   />
                 }
                 @case ('grammar') {
@@ -152,6 +125,9 @@
                     [level]="unit.level"
                     [unitTitle]="unit.unit.title"
                     [reviewMode]="s.mode === 'review'"
+                    [contentIds]="getContentIds('grammar')"
+                    [exerciseCount]="getExerciseCount('grammar')"
+                    (exerciseCompleted)="onExerciseCompleted($event)"
                   />
                 }
                 @case ('phrases') {
@@ -159,6 +135,9 @@
                     [level]="unit.level"
                     [unitTitle]="unit.unit.title"
                     [reviewMode]="s.mode === 'review'"
+                    [contentIds]="getContentIds('phrases')"
+                    [exerciseCount]="getExerciseCount('phrases')"
+                    (exerciseCompleted)="onExerciseCompleted($event)"
                   />
                 }
               }

@@ -1,7 +1,18 @@
-import { Component, ChangeDetectionStrategy, signal, computed, OnDestroy } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  inject,
+  signal,
+  computed,
+  OnDestroy,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Icon } from '../../../../shared/components/icon/icon';
 import { LucideIconData, ArrowLeft, Trophy, Timer, RotateCcw } from 'lucide-angular';
+import { MinigameApiService } from '../../../../core/services/minigame-api.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { OfflineQueueService } from '../../../../core/services/offline-queue.service';
+import { environment } from '../../../../core/services/environment';
 
 interface ScrambleLetter {
   char: string;
@@ -111,10 +122,19 @@ const GAME_DURATION = 90;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Unscramble implements OnDestroy {
+  private readonly minigameApi = inject(MinigameApiService);
+  private readonly auth = inject(AuthService);
+  private readonly offlineQueue = inject(OfflineQueueService);
+
   protected readonly backIcon: LucideIconData = ArrowLeft;
   protected readonly trophyIcon: LucideIconData = Trophy;
   protected readonly timerIcon: LucideIconData = Timer;
   protected readonly retryIcon: LucideIconData = RotateCcw;
+
+  private wordVocabIds = new Map<string, string>();
+  private wordResults = new Map<string, boolean>();
+  protected readonly wordsLearned = signal<string[]>([]);
+  protected readonly xpEarned = signal(0);
 
   protected readonly level = signal('a1');
   protected readonly gameState = signal<'menu' | 'playing' | 'finished'>('menu');
@@ -164,8 +184,35 @@ export class Unscramble implements OnDestroy {
   }
 
   protected startGame(): void {
-    const data = UNSCRAMBLE_DATA[this.level()] ?? UNSCRAMBLE_DATA['a1'];
-    const selected = this.shuffleArray([...data]).slice(0, WORDS_PER_ROUND);
+    this.wordsLearned.set([]);
+    this.xpEarned.set(0);
+    this.wordVocabIds = new Map();
+    this.wordResults = new Map();
+    const level = this.level();
+
+    this.minigameApi.getUnscrambleData(level).subscribe({
+      next: (data) => {
+        if (data.words.length > 0) {
+          const words = data.words.map((w) => w.word);
+          data.words.forEach((w) => {
+            if (w.vocabEntryId) this.wordVocabIds.set(w.word, w.vocabEntryId);
+          });
+          this.initGame(words);
+        } else {
+          this.initGameFromFallback(level);
+        }
+      },
+      error: () => this.initGameFromFallback(level),
+    });
+  }
+
+  private initGameFromFallback(level: string): void {
+    const data = UNSCRAMBLE_DATA[level] ?? UNSCRAMBLE_DATA['a1'];
+    this.initGame([...data]);
+  }
+
+  private initGame(allWords: string[]): void {
+    const selected = this.shuffleArray([...allWords]).slice(0, WORDS_PER_ROUND);
 
     this.words.set(selected);
     this.currentIndex.set(0);
@@ -228,6 +275,7 @@ export class Unscramble implements OnDestroy {
     const built = this.builtWord();
 
     if (word && built.toLowerCase() === word.toLowerCase()) {
+      this.wordResults.set(word, true);
       this.showCorrect.set(true);
       this.completedCount.update((c) => c + 1);
       this.advanceTimeout = setTimeout(() => {
@@ -305,6 +353,36 @@ export class Unscramble implements OnDestroy {
       localStorage.setItem(STORAGE_KEY, String(finalScore));
       this.bestScore.set(finalScore);
     }
+
+    this.reportResults(finalScore);
+  }
+
+  private reportResults(finalScore: number): void {
+    const userId = this.auth.profileId();
+    if (!userId) return;
+
+    const answeredItems = this.words().map((word) => ({
+      vocabEntryId: this.wordVocabIds.get(word) ?? null,
+      word,
+      level: this.level(),
+      correct: this.wordResults.get(word) ?? false,
+    }));
+
+    const request = { gameType: 'UNSCRAMBLE', score: finalScore, answeredItems };
+
+    this.minigameApi.saveGameResults(userId, request).subscribe({
+      next: (res) => {
+        this.wordsLearned.set(res.wordsLearned);
+        this.xpEarned.set(res.xpEarned);
+      },
+      error: () => {
+        this.offlineQueue.enqueue(
+          'POST',
+          `${environment.apiUrl}/profiles/${userId}/minigames/results`,
+          request,
+        );
+      },
+    });
   }
 
   private loadBestScore(): number {

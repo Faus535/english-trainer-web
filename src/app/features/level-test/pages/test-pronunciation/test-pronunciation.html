@@ -3,11 +3,12 @@
     @if (testService.currentPronunciationQuestion(); as q) {
       <p class="instruction">{{ instruction() }}</p>
       <div class="play-row">
-        <button class="play-btn" (click)="playAudio()">
-          <app-icon [name]="playIcon" [size]="16" /> Reproducir
-        </button>
-        <button class="play-btn" (click)="playAudio()">
-          <app-icon [name]="repeatIcon" [size]="16" /> Repetir
+        <button
+          class="play-btn play-btn--icon-only"
+          (click)="playAudio()"
+          aria-label="Reproducir audio"
+        >
+          <app-icon [name]="playIcon" [size]="20" />
         </button>
       </div>
       <div class="options">

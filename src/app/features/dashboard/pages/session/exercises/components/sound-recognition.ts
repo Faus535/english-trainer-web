@@ -10,6 +10,8 @@ import {
 } from '@angular/core';
 import { TtsService } from '../../../../../speak/services/tts.service';
 import { SoundLesson, MinimalPair } from '../data/phonetic-content.data';
+import { Icon } from '../../../../../../shared/components/icon/icon';
+import { Play } from 'lucide-angular';
 
 interface RecognitionQuestion {
   pair: MinimalPair;
@@ -19,13 +21,15 @@ interface RecognitionQuestion {
 
 @Component({
   selector: 'app-sound-recognition',
-  imports: [],
+  imports: [Icon],
   templateUrl: './sound-recognition.html',
   styleUrl: '../exercises.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SoundRecognition implements OnInit {
   private readonly tts = inject(TtsService);
+
+  protected readonly playIcon = Play;
 
   readonly lesson = input.required<SoundLesson>();
   readonly completed = output<void>();

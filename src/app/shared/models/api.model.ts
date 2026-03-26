@@ -162,6 +162,14 @@ export interface SessionBlockResponse {
   blockType: string;
   moduleName: string;
   durationMinutes: number;
+  exercises?: SessionExerciseResponse[];
+}
+
+export interface SessionExerciseResponse {
+  exerciseIndex: number;
+  exerciseType: string;
+  contentIds: string[];
+  targetCount: number;
 }
 
 // Vocabulary

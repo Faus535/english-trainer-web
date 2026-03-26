@@ -3,13 +3,16 @@ import {
   ChangeDetectionStrategy,
   inject,
   input,
+  output,
   signal,
   computed,
   OnInit,
 } from '@angular/core';
+import { ExerciseResult } from '../../../../../shared/models/exercise-result.model';
 import { TtsService } from '../../../../speak/services/tts.service';
 import { Level } from '../../../../../shared/models/learning.model';
 import { PHRASE_CONTENT, PhraseItem, pickRandom } from './exercise-content.data';
+import { getLowerLevels, mixWithReview } from '../../../../../shared/utils/level.utils';
 
 @Component({
   selector: 'app-phrases-exercise',
@@ -22,6 +25,12 @@ export class PhrasesExercise implements OnInit {
 
   readonly level = input.required<Level>();
   readonly unitTitle = input.required<string>();
+  readonly reviewMode = input(false);
+  readonly contentIds = input<string[]>();
+  readonly exerciseCount = input<number>();
+
+  readonly exerciseCompleted = output<ExerciseResult>();
+  private startTime = 0;
 
   protected readonly items = signal<PhraseItem[]>([]);
   protected readonly phase = signal<'learn' | 'quiz' | 'done'>('learn');
@@ -40,8 +49,26 @@ export class PhrasesExercise implements OnInit {
   });
 
   ngOnInit(): void {
-    const phrases = PHRASE_CONTENT[this.level()] ?? PHRASE_CONTENT['a1'];
-    this.items.set(pickRandom(phrases, 6));
+    this.startTime = Date.now();
+    const level = this.level();
+    const lowerLevels = getLowerLevels(level);
+
+    if (this.reviewMode() && lowerLevels.length > 0) {
+      const reviewLevel = lowerLevels[Math.floor(Math.random() * lowerLevels.length)];
+      const phrases = PHRASE_CONTENT[reviewLevel] ?? PHRASE_CONTENT['a1'];
+      this.items.set(pickRandom(phrases, 6));
+      return;
+    }
+
+    const mainPhrases = PHRASE_CONTENT[level] ?? PHRASE_CONTENT['a1'];
+    if (lowerLevels.length === 0) {
+      this.items.set(pickRandom(mainPhrases, 6));
+      return;
+    }
+
+    const reviewLevel = lowerLevels[Math.floor(Math.random() * lowerLevels.length)];
+    const reviewPhrases = PHRASE_CONTENT[reviewLevel] ?? [];
+    this.items.set(mixWithReview(mainPhrases, reviewPhrases, 6));
   }
 
   protected speak(text: string): void {
@@ -91,10 +118,24 @@ export class PhrasesExercise implements OnInit {
     const nextIdx = this.quizIndex() + 1;
     if (nextIdx >= this.items().length) {
       this.phase.set('done');
+      this.emitResult();
     } else {
       this.quizIndex.set(nextIdx);
       this.userInput.set('');
       this.showAnswer.set(false);
     }
+  }
+
+  private emitResult(): void {
+    const r = this.quizResults();
+    const correctCount = r.filter((x) => x.correct).length;
+    this.exerciseCompleted.emit({
+      exerciseType: 'phrases',
+      correctCount,
+      totalCount: r.length,
+      score: r.length > 0 ? Math.round((correctCount / r.length) * 100) : 0,
+      durationMs: Date.now() - this.startTime,
+      items: r.map((x) => ({ word: x.phrase, correct: x.correct })),
+    });
   }
 }

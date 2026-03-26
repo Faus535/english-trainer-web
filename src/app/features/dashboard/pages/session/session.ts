@@ -1,15 +1,22 @@
-import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { of, catchError } from 'rxjs';
 import { SessionService } from '../../services/session.service';
 import { GamificationService } from '../../services/gamification.service';
 import { TtsService } from '../../../../features/speak/services/tts.service';
+import { ExerciseResultApiService } from '../../../../core/services/exercise-result-api.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { OfflineQueueService } from '../../../../core/services/offline-queue.service';
 import { XP_PER_SESSION } from '../../data/gamification.data';
 import { Level } from '../../../../shared/models/learning.model';
+import { ExerciseResult } from '../../../../shared/models/exercise-result.model';
+import { environment } from '../../../../core/services/environment';
 import { ListeningExercise } from './exercises/listening-exercise';
 import { PronunciationExercise } from './exercises/pronunciation-exercise';
 import { VocabularyExercise } from './exercises/vocabulary-exercise';
 import { GrammarExercise } from './exercises/grammar-exercise';
 import { PhrasesExercise } from './exercises/phrases-exercise';
+import { SessionCompletion } from './components/session-completion';
 
 @Component({
   selector: 'app-session',
@@ -19,6 +26,7 @@ import { PhrasesExercise } from './exercises/phrases-exercise';
     VocabularyExercise,
     GrammarExercise,
     PhrasesExercise,
+    SessionCompletion,
   ],
   templateUrl: './session.html',
   styleUrl: './session.scss',
@@ -29,6 +37,9 @@ export class Session {
   private readonly gamification = inject(GamificationService);
   private readonly tts = inject(TtsService);
   private readonly router = inject(Router);
+  private readonly exerciseResultApi = inject(ExerciseResultApiService);
+  private readonly auth = inject(AuthService);
+  private readonly offlineQueue = inject(OfflineQueueService);
 
   protected readonly session = this.sessionService.currentSession;
   protected readonly currentBlock = this.sessionService.currentBlock;
@@ -37,6 +48,19 @@ export class Session {
   protected readonly isLast = this.sessionService.isLastBlock;
   protected readonly sessionCompleted = this.sessionService.sessionCompleted;
   protected readonly completedSession = this.sessionService.completedSession;
+  protected readonly isGenerating = this.sessionService.isGenerating;
+
+  protected readonly sessionId = computed(() => this.session()?.id ?? null);
+
+  protected readonly currentExercises = computed(() => {
+    const block = this.currentBlock();
+    return block?.exercises ?? [];
+  });
+
+  protected readonly blockResults = signal<Map<number, ExerciseResult>>(new Map());
+  protected readonly unitMasteryScore = signal<number | null>(null);
+  protected readonly unitStatus = signal<string | null>(null);
+  protected readonly accumulatedXp = signal(0);
 
   protected readonly blocks = computed(() => this.session()?.blocks ?? []);
 
@@ -85,6 +109,62 @@ export class Session {
     const session = this.completedSession();
     return session?.blocks.length ?? 0;
   });
+
+  protected onExerciseCompleted(result: ExerciseResult): void {
+    this.blockResults.update((prev) => {
+      const next = new Map(prev);
+      next.set(this.blockIndex(), result);
+      return next;
+    });
+
+    this.reportExerciseResult(result);
+  }
+
+  private reportExerciseResult(result: ExerciseResult): void {
+    const profileId = this.auth.profileId();
+    const sId = this.sessionId();
+    if (!profileId || !sId) return;
+
+    const request = {
+      correctCount: result.correctCount,
+      totalCount: result.totalCount,
+      averageResponseTimeMs:
+        result.totalCount > 0 ? Math.round(result.durationMs / result.totalCount) : 0,
+      exerciseType: result.exerciseType.toUpperCase(),
+    };
+
+    this.exerciseResultApi
+      .recordResult(profileId, sId, this.blockIndex(), request)
+      .pipe(
+        catchError(() => {
+          this.offlineQueue.enqueue(
+            'POST',
+            `${environment.apiUrl}/profiles/${profileId}/sessions/${sId}/exercises/${this.blockIndex()}/result`,
+            request,
+          );
+          return of(null);
+        }),
+      )
+      .subscribe((response) => {
+        if (response) {
+          this.unitMasteryScore.set(response.unitMasteryScore);
+          this.unitStatus.set(response.unitStatus);
+          this.accumulatedXp.update((prev) => prev + response.xpEarned);
+        }
+      });
+  }
+
+  protected getContentIds(exerciseType: string): string[] | undefined {
+    const exercises = this.currentExercises();
+    const ex = exercises.find((e) => e.exerciseType.toLowerCase() === exerciseType);
+    return ex?.contentIds;
+  }
+
+  protected getExerciseCount(exerciseType: string): number | undefined {
+    const exercises = this.currentExercises();
+    const ex = exercises.find((e) => e.exerciseType.toLowerCase() === exerciseType);
+    return ex?.targetCount;
+  }
 
   protected advanceBlock(): void {
     this.sessionService.advanceBlock();

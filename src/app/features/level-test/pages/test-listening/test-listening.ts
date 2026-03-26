@@ -3,7 +3,7 @@ import { LevelTestService } from '../../services/level-test.service';
 import { TtsService } from '../../../../features/speak/services/tts.service';
 import { TestShell } from '../../components/test-shell/test-shell';
 import { Icon } from '../../../../shared/components/icon/icon';
-import { Play, RotateCcw } from 'lucide-angular';
+import { Play } from 'lucide-angular';
 
 @Component({
   selector: 'app-test-listening',
@@ -18,7 +18,6 @@ export class TestListening {
   protected readonly inputValue = signal('');
 
   protected readonly playIcon = Play;
-  protected readonly repeatIcon = RotateCcw;
 
   protected playAudio(): void {
     const q = this.testService.currentListeningQuestion();

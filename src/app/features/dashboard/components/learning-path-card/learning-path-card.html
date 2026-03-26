@@ -1,0 +1,50 @@
+<section class="card">
+  <h3 class="card-title">Learning Path</h3>
+
+  <div class="current-unit">
+    <span class="label">Current Unit</span>
+    <span class="unit-name">{{ currentUnitName() }}</span>
+
+    <div class="mastery">
+      <div class="mastery-header">
+        <span class="label">Mastery</span>
+        <span class="mastery-value">{{ masteryScore() }}%</span>
+      </div>
+      <div
+        class="progress-bar"
+        role="progressbar"
+        [attr.aria-valuenow]="masteryScore()"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        [attr.aria-label]="'Mastery score: ' + masteryScore() + '%'"
+      >
+        <div class="progress-fill" [style.width.%]="masteryScore()"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overall-progress">
+    <div class="overall-header">
+      <span class="label">Overall Progress</span>
+      <span class="overall-value">{{ progressPercent() }}%</span>
+    </div>
+    <span class="units-count">{{ unitsCompleted() }}/{{ totalUnits() }} units completed</span>
+    <div
+      class="progress-bar"
+      role="progressbar"
+      [attr.aria-valuenow]="progressPercent()"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      [attr.aria-label]="'Overall progress: ' + progressPercent() + '%'"
+    >
+      <div class="progress-fill progress-fill--overall" [style.width.%]="progressPercent()"></div>
+    </div>
+  </div>
+
+  @if (nextUnitName()) {
+    <div class="next-unit">
+      <span class="label">Next Up</span>
+      <span class="next-unit-name">{{ nextUnitName() }}</span>
+    </div>
+  }
+</section>

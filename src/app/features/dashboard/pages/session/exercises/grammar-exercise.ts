@@ -1,6 +1,16 @@
-import { Component, ChangeDetectionStrategy, input, signal, computed, OnInit } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  input,
+  output,
+  signal,
+  computed,
+  OnInit,
+} from '@angular/core';
+import { ExerciseResult } from '../../../../../shared/models/exercise-result.model';
 import { Level } from '../../../../../shared/models/learning.model';
 import { GRAMMAR_CONTENT, GrammarContent } from './exercise-content.data';
+import { getLowerLevels } from '../../../../../shared/utils/level.utils';
 
 @Component({
   selector: 'app-grammar-exercise',
@@ -11,6 +21,12 @@ import { GRAMMAR_CONTENT, GrammarContent } from './exercise-content.data';
 export class GrammarExercise implements OnInit {
   readonly level = input.required<Level>();
   readonly unitTitle = input.required<string>();
+  readonly reviewMode = input(false);
+  readonly contentIds = input<string[]>();
+  readonly exerciseCount = input<number>();
+
+  readonly exerciseCompleted = output<ExerciseResult>();
+  private startTime = 0;
 
   protected readonly content = signal<GrammarContent | null>(null);
   protected readonly phase = signal<'learn' | 'exercise' | 'done'>('learn');
@@ -31,10 +47,32 @@ export class GrammarExercise implements OnInit {
   });
 
   ngOnInit(): void {
-    const levelContent = GRAMMAR_CONTENT[this.level()];
+    this.startTime = Date.now();
+    const level = this.level();
+    const lowerLevels = getLowerLevels(level);
+
+    if (this.reviewMode() && lowerLevels.length > 0) {
+      const reviewLevel = lowerLevels[Math.floor(Math.random() * lowerLevels.length)];
+      const content = GRAMMAR_CONTENT[reviewLevel];
+      if (content?.length) {
+        this.content.set(content[Math.floor(Math.random() * content.length)]);
+      }
+      return;
+    }
+
+    // 20% chance to show a lower-level grammar topic as review
+    if (lowerLevels.length > 0 && Math.random() < 0.2) {
+      const reviewLevel = lowerLevels[Math.floor(Math.random() * lowerLevels.length)];
+      const content = GRAMMAR_CONTENT[reviewLevel];
+      if (content?.length) {
+        this.content.set(content[Math.floor(Math.random() * content.length)]);
+        return;
+      }
+    }
+
+    const levelContent = GRAMMAR_CONTENT[level];
     if (levelContent?.length) {
-      const randomIdx = Math.floor(Math.random() * levelContent.length);
-      this.content.set(levelContent[randomIdx]);
+      this.content.set(levelContent[Math.floor(Math.random() * levelContent.length)]);
     }
   }
 
@@ -60,9 +98,23 @@ export class GrammarExercise implements OnInit {
     const nextIdx = this.exerciseIndex() + 1;
     if (nextIdx >= c.exercises.length) {
       this.phase.set('done');
+      this.emitResult();
     } else {
       this.exerciseIndex.set(nextIdx);
       this.selectedOption.set(null);
     }
+  }
+
+  private emitResult(): void {
+    const r = this.results();
+    const correctCount = r.filter((x) => x).length;
+    this.exerciseCompleted.emit({
+      exerciseType: 'grammar',
+      correctCount,
+      totalCount: r.length,
+      score: r.length > 0 ? Math.round((correctCount / r.length) * 100) : 0,
+      durationMs: Date.now() - this.startTime,
+      items: r.map((x) => ({ correct: x })),
+    });
   }
 }

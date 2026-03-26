@@ -9,22 +9,70 @@
     </a>
   }
 
-  <!-- Streak Banner -->
-  <app-streak-banner />
+  @if (hasPath()) {
+    @if (learningStatus(); as status) {
+      <!-- Learning Path Card -->
+      <app-learning-path-card [status]="status" />
 
-  <!-- Hero: Quick Start + Gamification -->
-  <app-quick-start (sessionStarted)="onSessionStarted()" />
+      <!-- Today's Plan + Weak Areas -->
+      <section class="zone-grid-2">
+        <app-todays-plan [plan]="status.todaysPlan" (sessionStarted)="onSessionStarted()" />
+        <app-dashboard-weak-areas [areas]="status.weakAreas" />
+      </section>
 
-  <!-- Review widget -->
-  <app-review-widget />
+      <!-- Streak + Milestones -->
+      <section class="zone-grid-2">
+        <app-streak-banner />
+        <app-milestone-feed [milestones]="status.recentMilestones" />
+      </section>
+    }
 
-  <!-- Primary Modules -->
+    <!-- Quick Start + Review + Games -->
+    <app-quick-start (sessionStarted)="onSessionStarted()" />
+    <app-review-widget />
+
+    <section class="zone">
+      <app-games-widget />
+    </section>
+  } @else if (!isLoadingPath()) {
+    <!-- No learning path: show test CTA and exploratory content -->
+    @if (testCompleted()) {
+      <div class="test-banner" style="cursor: default">
+        <span class="test-banner-text">
+          <strong>Tu ruta de aprendizaje se esta generando</strong>
+          <span>Pronto tendras un plan personalizado basado en tu nivel</span>
+        </span>
+      </div>
+    }
+
+    <!-- Streak Banner -->
+    <app-streak-banner />
+
+    <!-- Hero: Quick Start -->
+    <app-quick-start (sessionStarted)="onSessionStarted()" />
+
+    <!-- Widgets -->
+    <section class="zone-grid-2">
+      <app-sound-of-day />
+      <app-phrase-roulette />
+    </section>
+
+    <!-- Games -->
+    <section class="zone">
+      <app-games-widget />
+    </section>
+  } @else {
+    <!-- Loading state -->
+    <app-streak-banner />
+    <app-quick-start (sessionStarted)="onSessionStarted()" />
+  }
+
+  <!-- Module Cards (always visible) -->
   <section class="zone">
     <app-module-card moduleName="listening" variant="primary" />
     <app-module-card moduleName="pronunciation" variant="primary" />
   </section>
 
-  <!-- Secondary Modules -->
   <section class="zone-grid-3">
     <app-module-card moduleName="vocabulary" variant="compact" />
     <app-module-card moduleName="grammar" variant="compact" />
@@ -37,16 +85,12 @@
   <!-- Stats -->
   <app-stats-summary />
 
-  <!-- Widgets -->
-  <section class="zone-grid-2">
-    <app-sound-of-day />
-    <app-phrase-roulette />
-  </section>
-
-  <!-- Games -->
-  <section class="zone">
-    <app-games-widget />
-  </section>
+  @if (!hasPath()) {
+    <section class="zone-grid-2">
+      <app-sound-of-day />
+      <app-phrase-roulette />
+    </section>
+  }
 
   <!-- Motivation -->
   <app-motivation />

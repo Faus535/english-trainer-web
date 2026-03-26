@@ -15,8 +15,13 @@
     <p class="exercise-instruction">Escucha la palabra y elige cual has oido.</p>
 
     <div class="exercise-play-row">
-      <button class="exercise-play-btn" (click)="playTarget()">Escuchar</button>
-      <button class="exercise-play-btn secondary" (click)="playTarget()">Repetir</button>
+      <button
+        class="exercise-play-btn exercise-play-btn--icon-only"
+        (click)="playTarget()"
+        aria-label="Escuchar palabra"
+      >
+        <app-icon [name]="playIcon" [size]="20" />
+      </button>
     </div>
 
     <div class="exercise-options">

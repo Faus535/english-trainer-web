@@ -34,6 +34,13 @@
       </button>
     </div>
 
+    @if (canReview()) {
+      <button class="btn-review" (click)="startSession('review')">
+        Repasar niveles anteriores
+        <span class="btn-badge">15m</span>
+      </button>
+    }
+
     @if (weaknessHints().length > 0) {
       <div class="weakness-hint">
         <span class="weakness-label">Hoy priorizamos:</span>

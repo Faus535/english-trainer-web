@@ -372,6 +372,7 @@ const SOUND_LESSONS: Record<Level, SoundLesson[]> = {
   b1: [],
   b2: [],
   c1: [],
+  c2: [],
 };
 
 export function getSoundLessonForUnit(level: Level, unitTitle: string): SoundLesson | null {

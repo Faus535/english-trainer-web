@@ -4,6 +4,7 @@ import { SessionService } from '../../services/session.service';
 import { GamificationService } from '../../services/gamification.service';
 import { WeaknessService } from '../../services/weakness.service';
 import { SessionMode } from '../../models/session.model';
+import { MODULE_NAMES, CEFR_LEVELS } from '../../../../shared/models/learning.model';
 
 @Component({
   selector: 'app-quick-start',
@@ -21,6 +22,10 @@ export class QuickStart {
   protected readonly streak = this.state.streak;
   protected readonly level = this.gamification.level;
   protected readonly weaknessHints = computed(() => this.weakness.weaknessExplanation());
+
+  protected readonly canReview = computed(() =>
+    MODULE_NAMES.some((m) => CEFR_LEVELS.indexOf(this.state.getModuleLevel(m)) > 0),
+  );
 
   readonly sessionStarted = output<void>();
 

@@ -3,10 +3,12 @@ import {
   ChangeDetectionStrategy,
   inject,
   input,
+  output,
   signal,
   computed,
   OnInit,
 } from '@angular/core';
+import { ExerciseResult } from '../../../../../shared/models/exercise-result.model';
 import { TtsService } from '../../../../speak/services/tts.service';
 import { Level } from '../../../../../shared/models/learning.model';
 import {
@@ -34,6 +36,11 @@ export class PronunciationExercise implements OnInit {
 
   readonly level = input.required<Level>();
   readonly unitTitle = input.required<string>();
+  readonly contentIds = input<string[]>();
+  readonly exerciseCount = input<number>();
+
+  readonly exerciseCompleted = output<ExerciseResult>();
+  private startTime = 0;
 
   protected readonly content = signal<PronunciationContent | null>(null);
   protected readonly extendedContent = signal<ExtendedPronunciationContent | null>(null);
@@ -85,6 +92,7 @@ export class PronunciationExercise implements OnInit {
   });
 
   ngOnInit(): void {
+    this.startTime = Date.now();
     const title = this.unitTitle();
 
     // Try extended content first (4-phase flow)
@@ -137,9 +145,23 @@ export class PronunciationExercise implements OnInit {
     const nextIdx = this.quizIndex() + 1;
     if (nextIdx >= this.quizLength()) {
       this.phase.set('done');
+      this.emitResult();
     } else {
       this.quizIndex.set(nextIdx);
       this.selectedOption.set(null);
     }
+  }
+
+  private emitResult(): void {
+    const r = this.quizResults();
+    const correctCount = r.filter((x) => x).length;
+    this.exerciseCompleted.emit({
+      exerciseType: 'pronunciation',
+      correctCount,
+      totalCount: r.length,
+      score: this.combinedScore(),
+      durationMs: Date.now() - this.startTime,
+      items: r.map((x) => ({ correct: x })),
+    });
   }
 }

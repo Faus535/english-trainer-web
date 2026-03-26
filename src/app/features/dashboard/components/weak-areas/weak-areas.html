@@ -1,0 +1,26 @@
+<section class="weak-areas">
+  <h3 class="title">Areas a reforzar</h3>
+
+  @if (sortedAreas().length === 0) {
+    <p class="empty">No hay areas debiles detectadas.</p>
+  } @else {
+    <ul class="list">
+      @for (area of sortedAreas(); track area.unitName) {
+        <li class="item">
+          <div class="item-header">
+            <span class="unit-name">{{ area.unitName }}</span>
+            <span class="mastery-value">{{ area.masteryScore }}%</span>
+          </div>
+          <div class="bar-track">
+            <div
+              class="bar-fill"
+              [style.width.%]="area.masteryScore"
+              [class.bar-low]="area.masteryScore < 40"
+              [class.bar-mid]="area.masteryScore >= 40 && area.masteryScore < 70"
+            ></div>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</section>

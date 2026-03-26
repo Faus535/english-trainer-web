@@ -146,6 +146,17 @@
   }
 }
 
+.exercise-play-btn--icon-only {
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border-radius: var(--r-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .exercise-input {
   width: 100%;
   padding: var(--sp-3);

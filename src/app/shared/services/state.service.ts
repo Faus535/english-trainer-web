@@ -5,6 +5,7 @@ import { ProfileStateService } from './profile-state.service';
 import { ProgressStateService } from './progress-state.service';
 import { ActivityStateService } from './activity-state.service';
 import { ReviewStateService } from './review-state.service';
+import { LearningPathStateService } from './learning-path-state.service';
 
 /**
  * Facade service — delegates to focused sub-services.
@@ -16,6 +17,9 @@ export class StateService {
   private readonly progressState = inject(ProgressStateService);
   private readonly activityState = inject(ActivityStateService);
   private readonly reviewState = inject(ReviewStateService);
+
+  // Learning Path sub-service
+  readonly learningPath = inject(LearningPathStateService);
 
   // Profile delegates
   readonly profile = this.profileState.profile;

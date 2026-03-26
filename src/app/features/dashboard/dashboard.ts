@@ -9,8 +9,13 @@ import { Motivation } from './components/motivation/motivation';
 import { CurrentLevels } from './components/current-levels/current-levels';
 import { StreakBanner } from './components/streak-banner/streak-banner';
 import { LevelUpPopup } from './components/level-up-popup/level-up-popup';
+import { LearningPathCard } from './components/learning-path-card/learning-path-card';
+import { TodaysPlanComponent } from './components/todays-plan/todays-plan';
+import { DashboardWeakAreas } from './components/weak-areas/weak-areas';
+import { MilestoneFeed } from './components/milestone-feed/milestone-feed';
 import { StateService } from '../../shared/services/state.service';
 import { GamificationService } from './services/gamification.service';
+import { AuthService } from '../../core/services/auth.service';
 
 import { ReviewWidget } from './components/review-widget/review-widget';
 import { GamesWidget } from './components/games-widget/games-widget';
@@ -27,6 +32,10 @@ import { GamesWidget } from './components/games-widget/games-widget';
     CurrentLevels,
     StreakBanner,
     LevelUpPopup,
+    LearningPathCard,
+    TodaysPlanComponent,
+    DashboardWeakAreas,
+    MilestoneFeed,
     RouterLink,
     ReviewWidget,
     GamesWidget,
@@ -39,9 +48,14 @@ export class Dashboard implements OnInit {
   private readonly router = inject(Router);
   private readonly state = inject(StateService);
   private readonly gamification = inject(GamificationService);
+  private readonly auth = inject(AuthService);
 
   protected readonly testCompleted = this.state.testCompleted;
   protected readonly pendingLevelUp = this.gamification.pendingLevelUp;
+
+  protected readonly learningStatus = this.state.learningPath.learningStatus;
+  protected readonly hasPath = this.state.learningPath.hasPath;
+  protected readonly isLoadingPath = this.state.learningPath.isLoading;
 
   constructor() {
     effect(() => {
@@ -52,6 +66,11 @@ export class Dashboard implements OnInit {
 
   ngOnInit(): void {
     this.state.loadFromBackend();
+
+    const profileId = this.auth.profileId();
+    if (profileId) {
+      this.state.learningPath.loadStatus(profileId);
+    }
   }
 
   protected onSessionStarted(): void {

@@ -1,0 +1,19 @@
+<section class="feed">
+  <h3 class="feed-title">Logros recientes</h3>
+
+  @if (recentMilestones().length === 0) {
+    <p class="feed-empty">Aún no hay logros. ¡Empieza a practicar!</p>
+  } @else {
+    <ul class="feed-list">
+      @for (milestone of recentMilestones(); track milestone.date) {
+        <li class="feed-item">
+          <span class="feed-icon">{{ iconFor(milestone.type) }}</span>
+          <div class="feed-content">
+            <span class="feed-description">{{ milestone.description }}</span>
+            <time class="feed-date">{{ milestone.date | date: 'mediumDate' }}</time>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</section>

@@ -35,8 +35,13 @@
         <span class="exercise-progress">{{ progress() }}</span>
 
         <div class="exercise-play-row">
-          <button class="exercise-play-btn" (click)="play()">Reproducir</button>
-          <button class="exercise-play-btn secondary" (click)="play()">Repetir</button>
+          <button
+            class="exercise-play-btn exercise-play-btn--icon-only"
+            (click)="play()"
+            aria-label="Reproducir audio"
+          >
+            <app-icon [name]="playIcon" [size]="20" />
+          </button>
         </div>
 
         <input

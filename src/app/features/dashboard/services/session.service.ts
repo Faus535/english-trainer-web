@@ -1,11 +1,18 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
-import { ModuleName } from '../../../shared/models/learning.model';
+import { ModuleName, CEFR_LEVELS, UnitReference } from '../../../shared/models/learning.model';
 import { StateService } from '../../../shared/services/state.service';
 import { GamificationService } from './gamification.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { SessionApiService } from '../../../core/services/session-api.service';
-import { SessionMode, StudySession, SessionBlock, WarmupItem } from '../models/session.model';
-import { MODULES, getModuleLabel } from '../data/modules.data';
+import {
+  SessionMode,
+  StudySession,
+  SessionBlock,
+  SessionExercise,
+  WarmupItem,
+} from '../models/session.model';
+import { MODULES, getModuleLabel, getModuleConfig } from '../data/modules.data';
+import { SessionResponse, SessionBlockResponse } from '../../../shared/models/api.model';
 
 const SECONDARY_ROTATION: ModuleName[] = ['vocabulary', 'grammar', 'phrases'];
 const STORAGE_KEY = 'english_modular_currentSession';
@@ -23,12 +30,14 @@ export class SessionService {
   private readonly _sessionCompleted = signal(false);
   private readonly _completedSession = signal<StudySession | null>(null);
   private readonly _sessionStartTime = signal<number>(Date.now());
+  private readonly _isGenerating = signal(false);
 
   readonly currentSession = this._currentSession.asReadonly();
   readonly currentBlockIndex = this._currentBlockIndex.asReadonly();
   readonly sessionCompleted = this._sessionCompleted.asReadonly();
   readonly completedSession = this._completedSession.asReadonly();
   readonly sessionStartTime = this._sessionStartTime.asReadonly();
+  readonly isGenerating = this._isGenerating.asReadonly();
 
   readonly currentBlock = computed<SessionBlock | null>(() => {
     const session = this._currentSession();
@@ -50,7 +59,29 @@ export class SessionService {
   });
 
   startSession(mode: SessionMode): void {
-    const session = this.generateSession(mode);
+    const profileId = this.auth.profileId();
+
+    if (profileId && mode !== 'review') {
+      this._isGenerating.set(true);
+      this.sessionApi.generateSession(profileId, { mode }).subscribe({
+        next: (response) => {
+          const session = this.mapBackendSession(response, mode);
+          this.initSession(session);
+          this._isGenerating.set(false);
+        },
+        error: () => {
+          const session = this.generateSession(mode);
+          this.initSession(session);
+          this._isGenerating.set(false);
+        },
+      });
+    } else {
+      const session = this.generateSession(mode);
+      this.initSession(session);
+    }
+  }
+
+  private initSession(session: StudySession): void {
     this._currentSession.set(session);
     this._currentBlockIndex.set(0);
     this._completedBlocks.set(new Set());
@@ -58,6 +89,93 @@ export class SessionService {
     this._completedSession.set(null);
     this._sessionStartTime.set(Date.now());
     this.persistSession(session);
+  }
+
+  private mapBackendSession(response: SessionResponse, mode: SessionMode): StudySession {
+    const sessionNum = this.state.totalSessions() + 1;
+    const secondaryModule = this.resolveSecondaryModule();
+    const warmup = this.buildWarmup();
+
+    const blocks: SessionBlock[] = response.blocks.map((b) => this.mapBlock(b, secondaryModule));
+
+    return {
+      id: response.id,
+      number: sessionNum,
+      mode,
+      isIntegrator: sessionNum > 1 && sessionNum % 5 === 0,
+      listening: this.findUnitForType(blocks, 'listening'),
+      pronunciation: this.findUnitForType(blocks, 'pronunciation'),
+      secondary: this.findUnitForType(blocks, 'secondary'),
+      secondaryModule,
+      warmup,
+      duration: response.durationMinutes,
+      blocks,
+    };
+  }
+
+  private mapBlock(b: SessionBlockResponse, secondaryModule: ModuleName): SessionBlock {
+    const blockType = b.blockType.toLowerCase() as SessionBlock['type'];
+    const exercises: SessionExercise[] = (b.exercises ?? []).map((e) => ({
+      exerciseIndex: e.exerciseIndex,
+      exerciseType: e.exerciseType,
+      contentIds: e.contentIds,
+      targetCount: e.targetCount,
+    }));
+
+    const unit = this.resolveBlockUnit(blockType, b.moduleName, secondaryModule);
+
+    return {
+      type: blockType,
+      duration: b.durationMinutes,
+      label: this.blockLabel(blockType, secondaryModule),
+      unit,
+      exercises: exercises.length > 0 ? exercises : undefined,
+    };
+  }
+
+  private resolveBlockUnit(
+    blockType: string,
+    moduleName: string,
+    secondaryModule: ModuleName,
+  ): UnitReference | null {
+    switch (blockType) {
+      case 'listening':
+        return this.state.getNextUnit('listening');
+      case 'pronunciation':
+        return this.state.getNextUnit('pronunciation');
+      case 'secondary':
+        return this.state.getNextUnit(secondaryModule);
+      default:
+        return null;
+    }
+  }
+
+  private findUnitForType(blocks: SessionBlock[], type: string): UnitReference | null {
+    return blocks.find((b) => b.type === type)?.unit ?? null;
+  }
+
+  private blockLabel(type: string, secondaryModule: ModuleName): string {
+    switch (type) {
+      case 'warmup':
+        return 'Repaso espaciado';
+      case 'listening':
+        return 'Listening';
+      case 'pronunciation':
+        return 'Pronunciacion';
+      case 'secondary':
+        return getModuleLabel(secondaryModule);
+      case 'practice':
+        return 'Practica activa';
+      case 'bonus':
+        return 'Bonus: contenido real';
+      default:
+        return type;
+    }
+  }
+
+  private resolveSecondaryModule(): ModuleName {
+    const weekSession = this.state.sessionsThisWeek();
+    return SECONDARY_ROTATION[weekSession % SECONDARY_ROTATION.length];
   }
 
   resumeSession(): boolean {
@@ -158,6 +276,10 @@ export class SessionService {
     const sessionNum = this.state.totalSessions() + 1;
     const weekSession = this.state.sessionsThisWeek();
 
+    if (mode === 'review') {
+      return this.generateReviewSession(sessionNum, weekSession);
+    }
+
     const listeningUnit = this.state.getNextUnit('listening');
     const pronunciationUnit = this.state.getNextUnit('pronunciation');
 
@@ -188,6 +310,60 @@ export class SessionService {
     };
 
     return session;
+  }
+
+  private generateReviewSession(sessionNum: number, weekSession: number): StudySession {
+    const lowerListening = this.getReviewUnit('listening');
+    const secondaryIdx = weekSession % SECONDARY_ROTATION.length;
+    const secondaryModule = SECONDARY_ROTATION[secondaryIdx];
+    const lowerSecondary = this.getReviewUnit(secondaryModule);
+
+    const blocks: SessionBlock[] = [
+      { type: 'warmup', duration: 2, label: 'Preparacion' },
+      { type: 'listening', duration: 6, label: 'Listening (repaso)', unit: lowerListening },
+      {
+        type: 'secondary',
+        duration: 5,
+        label: `${getModuleLabel(secondaryModule)} (repaso)`,
+        unit: lowerSecondary,
+      },
+      { type: 'practice', duration: 2, label: 'Practica' },
+    ];
+
+    return {
+      id: `session-${Date.now()}`,
+      number: sessionNum,
+      mode: 'review',
+      isIntegrator: false,
+      listening: lowerListening,
+      pronunciation: null,
+      secondary: lowerSecondary,
+      secondaryModule,
+      warmup: [
+        { type: 'intro', desc: 'Repaso de niveles anteriores', icon: '\u{1F504}', count: 0 },
+      ],
+      duration: 15,
+      blocks,
+    };
+  }
+
+  private getReviewUnit(moduleName: ModuleName): UnitReference | null {
+    const currentLevel = this.state.getModuleLevel(moduleName);
+    const idx = CEFR_LEVELS.indexOf(currentLevel);
+    if (idx <= 0) return null;
+
+    const lowerLevels = CEFR_LEVELS.slice(0, idx);
+    const reviewLevel = lowerLevels[Math.floor(Math.random() * lowerLevels.length)];
+    const config = getModuleConfig(moduleName, reviewLevel);
+    if (!config || config.units.length === 0) return null;
+
+    const unitIdx = Math.floor(Math.random() * config.units.length);
+    return {
+      module: moduleName,
+      level: reviewLevel,
+      unitIndex: unitIdx,
+      unit: config.units[unitIdx],
+    };
   }
 
   private buildBlocks(

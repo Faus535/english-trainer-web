@@ -1,11 +1,23 @@
-import { Component, ChangeDetectionStrategy, signal, computed, OnDestroy } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  inject,
+  signal,
+  computed,
+  OnDestroy,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Icon } from '../../../../shared/components/icon/icon';
 import { LucideIconData, ArrowLeft, Trophy, Timer, RotateCcw } from 'lucide-angular';
+import { MinigameApiService } from '../../../../core/services/minigame-api.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { OfflineQueueService } from '../../../../core/services/offline-queue.service';
+import { environment } from '../../../../core/services/environment';
 
 interface WordPair {
   en: string;
   es: string;
+  vocabEntryId?: string;
 }
 
 interface MatchItem {
@@ -116,10 +128,18 @@ const PAIRS_PER_ROUND = 8;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WordMatch implements OnDestroy {
+  private readonly minigameApi = inject(MinigameApiService);
+  private readonly auth = inject(AuthService);
+  private readonly offlineQueue = inject(OfflineQueueService);
+
   protected readonly backIcon: LucideIconData = ArrowLeft;
   protected readonly trophyIcon: LucideIconData = Trophy;
   protected readonly timerIcon: LucideIconData = Timer;
   protected readonly retryIcon: LucideIconData = RotateCcw;
+
+  private gamePairs: WordPair[] = [];
+  protected readonly wordsLearned = signal<string[]>([]);
+  protected readonly xpEarned = signal(0);
 
   protected readonly level = signal('a1');
   protected readonly gameState = signal<'menu' | 'playing' | 'finished'>('menu');
@@ -148,8 +168,32 @@ export class WordMatch implements OnDestroy {
   }
 
   protected startGame(): void {
-    const pairs = WORD_PAIRS[this.level()] ?? WORD_PAIRS['a1'];
+    this.wordsLearned.set([]);
+    this.xpEarned.set(0);
+    const level = this.level();
+
+    this.minigameApi.getWordMatchData(level).subscribe({
+      next: (data) => {
+        if (data.pairs.length > 0) {
+          this.initGame(
+            data.pairs.map((p) => ({ en: p.en, es: p.es, vocabEntryId: p.vocabEntryId })),
+          );
+        } else {
+          this.initGameFromFallback(level);
+        }
+      },
+      error: () => this.initGameFromFallback(level),
+    });
+  }
+
+  private initGameFromFallback(level: string): void {
+    const pairs = WORD_PAIRS[level] ?? WORD_PAIRS['a1'];
+    this.initGame([...pairs]);
+  }
+
+  private initGame(pairs: WordPair[]): void {
     const selected = this.shuffleArray([...pairs]).slice(0, PAIRS_PER_ROUND);
+    this.gamePairs = selected;
 
     const enItems: MatchItem[] = this.shuffleArray(
       selected.map((p, i) => ({
@@ -307,6 +351,37 @@ export class WordMatch implements OnDestroy {
       localStorage.setItem(STORAGE_KEY, String(finalScore));
       this.bestScore.set(finalScore);
     }
+
+    this.reportResults(finalScore);
+  }
+
+  private reportResults(finalScore: number): void {
+    const userId = this.auth.profileId();
+    if (!userId) return;
+
+    const enItemsList = this.enItems();
+    const answeredItems = this.gamePairs.map((pair, i) => ({
+      vocabEntryId: pair.vocabEntryId ?? null,
+      word: pair.en,
+      level: this.level(),
+      correct: enItemsList.find((item) => item.pairIndex === i)?.matched ?? false,
+    }));
+
+    const request = { gameType: 'WORD_MATCH', score: finalScore, answeredItems };
+
+    this.minigameApi.saveGameResults(userId, request).subscribe({
+      next: (res) => {
+        this.wordsLearned.set(res.wordsLearned);
+        this.xpEarned.set(res.xpEarned);
+      },
+      error: () => {
+        this.offlineQueue.enqueue(
+          'POST',
+          `${environment.apiUrl}/profiles/${userId}/minigames/results`,
+          request,
+        );
+      },
+    });
   }
 
   private loadBestScore(): number {

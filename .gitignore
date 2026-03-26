@@ -39,6 +39,11 @@ testem.log
 /typings
 __screenshots__/
 
+# Plans
+plans/
+PLAN_BACKEND.md
+PLAN_FRONTEND.md
+
 # System files
 .DS_Store
 Thumbs.db
