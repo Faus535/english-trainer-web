@@ -31,6 +31,9 @@ export class SessionService {
   private readonly _completedSession = signal<StudySession | null>(null);
   private readonly _sessionStartTime = signal<number>(Date.now());
   private readonly _isGenerating = signal(false);
+  private readonly _completedExerciseIndices = signal<Set<number>>(new Set());
+  private readonly _isAdvancing = signal(false);
+  private readonly _advanceError = signal<string | null>(null);
 
   readonly currentSession = this._currentSession.asReadonly();
   readonly currentBlockIndex = this._currentBlockIndex.asReadonly();
@@ -38,6 +41,9 @@ export class SessionService {
   readonly completedSession = this._completedSession.asReadonly();
   readonly sessionStartTime = this._sessionStartTime.asReadonly();
   readonly isGenerating = this._isGenerating.asReadonly();
+  readonly completedExerciseIndices = this._completedExerciseIndices.asReadonly();
+  readonly isAdvancing = this._isAdvancing.asReadonly();
+  readonly advanceError = this._advanceError.asReadonly();
 
   readonly currentBlock = computed<SessionBlock | null>(() => {
     const session = this._currentSession();
@@ -56,6 +62,28 @@ export class SessionService {
     const session = this._currentSession();
     if (!session) return false;
     return this._currentBlockIndex() >= session.blocks.length - 1;
+  });
+
+  readonly currentBlockExercises = computed(() => {
+    const block = this.currentBlock();
+    return block?.exercises ?? [];
+  });
+
+  readonly currentBlockExerciseCount = computed(() => {
+    return this.currentBlockExercises().length;
+  });
+
+  readonly currentBlockCompletedCount = computed(() => {
+    const exercises = this.currentBlockExercises();
+    const completed = this._completedExerciseIndices();
+    return exercises.filter((e) => completed.has(e.exerciseIndex)).length;
+  });
+
+  readonly canAdvanceBlock = computed(() => {
+    const exercises = this.currentBlockExercises();
+    if (exercises.length === 0) return true;
+    const completed = this._completedExerciseIndices();
+    return exercises.every((e) => completed.has(e.exerciseIndex));
   });
 
   startSession(mode: SessionMode): void {
@@ -88,6 +116,9 @@ export class SessionService {
     this._sessionCompleted.set(false);
     this._completedSession.set(null);
     this._sessionStartTime.set(Date.now());
+    this._completedExerciseIndices.set(new Set());
+    this._isAdvancing.set(false);
+    this._advanceError.set(null);
     this.persistSession(session);
   }
 
@@ -120,6 +151,7 @@ export class SessionService {
       exerciseType: e.exerciseType,
       contentIds: e.contentIds,
       targetCount: e.targetCount,
+      completed: e.completed ?? false,
     }));
 
     const unit = this.resolveBlockUnit(blockType, b.moduleName, secondaryModule);
@@ -187,23 +219,51 @@ export class SessionService {
     return false;
   }
 
-  advanceBlock(): void {
-    const session = this._currentSession();
-    if (!session) return;
-
-    this._completedBlocks.update((s) => {
+  markExerciseCompleted(exerciseIndex: number): void {
+    this._completedExerciseIndices.update((s) => {
       const next = new Set(s);
-      next.add(this._currentBlockIndex());
+      next.add(exerciseIndex);
       return next;
     });
+  }
 
-    const nextIdx = this._currentBlockIndex() + 1;
-    if (nextIdx >= session.blocks.length) {
-      this.completeSession();
-      return;
-    }
+  advanceBlock(): void {
+    if (!this.canAdvanceBlock() || this._isAdvancing()) return;
 
-    this._currentBlockIndex.set(nextIdx);
+    const session = this._currentSession();
+    const profileId = this.auth.profileId();
+    if (!session || !profileId) return;
+
+    this._isAdvancing.set(true);
+    this._advanceError.set(null);
+
+    this.sessionApi.advanceBlock(profileId, session.id, this._currentBlockIndex()).subscribe({
+      next: (response) => {
+        this._isAdvancing.set(false);
+
+        if (response.sessionCompleted) {
+          this.completeSession();
+          return;
+        }
+
+        this._completedBlocks.update((s) => {
+          const next = new Set(s);
+          next.add(this._currentBlockIndex());
+          return next;
+        });
+        this._currentBlockIndex.set(response.nextBlockIndex);
+        this._completedExerciseIndices.set(new Set());
+      },
+      error: (err) => {
+        this._isAdvancing.set(false);
+        const code = err?.error?.code;
+        if (code === 'block_not_completed') {
+          this._advanceError.set('Completa todos los ejercicios antes de avanzar.');
+        } else {
+          this._advanceError.set('Error al avanzar. Intenta de nuevo.');
+        }
+      },
+    });
   }
 
   goBackBlock(): void {

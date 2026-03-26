@@ -15,6 +15,7 @@ export interface SessionExercise {
   exerciseType: string;
   contentIds: string[];
   targetCount: number;
+  completed?: boolean;
 }
 
 export interface SessionBlock {
