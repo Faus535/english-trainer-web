@@ -14,6 +14,10 @@ export interface ExerciseResultResponse {
   unitMasteryScore: number;
   unitStatus: string;
   xpEarned: number;
+  blockIndex: number;
+  blockCompleted: boolean;
+  completedExercisesInBlock: number;
+  totalExercisesInBlock: number;
 }
 
 @Injectable({ providedIn: 'root' })

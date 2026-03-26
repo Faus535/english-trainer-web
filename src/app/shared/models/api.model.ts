@@ -163,6 +163,9 @@ export interface SessionBlockResponse {
   moduleName: string;
   durationMinutes: number;
   exercises?: SessionExerciseResponse[];
+  exerciseCount?: number;
+  completedExercises?: number;
+  blockCompleted?: boolean;
 }
 
 export interface SessionExerciseResponse {
@@ -170,6 +173,23 @@ export interface SessionExerciseResponse {
   exerciseType: string;
   contentIds: string[];
   targetCount: number;
+  blockIndex?: number;
+  completed?: boolean;
+  correctCount?: number;
+  totalCount?: number;
+}
+
+export interface AdvanceBlockResponse {
+  blockIndex: number;
+  blockCompleted: boolean;
+  nextBlockIndex: number;
+  sessionCompleted: boolean;
+  completedExercises: number;
+  totalExercises: number;
+}
+
+export interface BlockExercisesResponse {
+  exercises: SessionExerciseResponse[];
 }
 
 // Vocabulary
