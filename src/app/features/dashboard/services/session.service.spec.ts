@@ -86,6 +86,7 @@ describe('SessionService - Exercise completion tracking', () => {
     sessionStorage.setItem('et_profile_id', profileId);
     sessionStorage.setItem('et_token', 'test-token');
 
+    TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(),
@@ -98,7 +99,10 @@ describe('SessionService - Exercise completion tracking', () => {
     httpMock = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => httpMock.verify());
+  afterEach(() => {
+    // Discard outstanding requests from side effects (gamification sync, state recording, etc.)
+    httpMock.match(() => true);
+  });
 
   function startBackendSession(): string {
     service.startSession('full');
@@ -256,5 +260,133 @@ describe('SessionService - Exercise completion tracking', () => {
 
     expect(service.advanceError()).toBe('Completa todos los ejercicios antes de avanzar.');
     expect(service.isAdvancing()).toBe(false);
+  });
+
+  describe('Full advancement flow', () => {
+    it('should complete: exercise done -> mark completed -> canAdvance true -> advanceBlock -> next block', () => {
+      const sessionId = startBackendSession();
+
+      // Advance from warmup (no exercises, canAdvance = true)
+      expect(service.canAdvanceBlock()).toBe(true);
+      service.advanceBlock();
+      httpMock.expectOne(`${baseUrl}/${profileId}/sessions/${sessionId}/blocks/0/advance`).flush({
+        blockIndex: 0,
+        blockCompleted: true,
+        nextBlockIndex: 1,
+        sessionCompleted: false,
+        completedExercises: 0,
+        totalExercises: 0,
+      });
+
+      // Now on block 1 (listening, 2 exercises)
+      expect(service.currentBlockIndex()).toBe(1);
+      expect(service.canAdvanceBlock()).toBe(false);
+
+      // Mark exercises complete
+      service.markExerciseCompleted(0);
+      expect(service.canAdvanceBlock()).toBe(false);
+      service.markExerciseCompleted(1);
+      expect(service.canAdvanceBlock()).toBe(true);
+
+      // Advance to block 2
+      service.advanceBlock();
+      httpMock.expectOne(`${baseUrl}/${profileId}/sessions/${sessionId}/blocks/1/advance`).flush({
+        blockIndex: 1,
+        blockCompleted: true,
+        nextBlockIndex: 2,
+        sessionCompleted: false,
+        completedExercises: 2,
+        totalExercises: 2,
+      });
+
+      expect(service.currentBlockIndex()).toBe(2);
+      expect(service.completedExerciseIndices().size).toBe(0);
+    });
+
+    it('should handle session resumption with partially completed blocks', () => {
+      service.startSession('full');
+
+      const req = httpMock.expectOne(`${baseUrl}/${profileId}/sessions/generate`);
+      req.flush({
+        id: 'session-resume',
+        mode: 'full',
+        blocks: [
+          { blockType: 'warmup', moduleName: 'listening', durationMinutes: 3 },
+          {
+            blockType: 'listening',
+            moduleName: 'listening',
+            durationMinutes: 7,
+            exercises: [
+              {
+                exerciseIndex: 0,
+                exerciseType: 'MULTIPLE_CHOICE',
+                contentIds: ['c1'],
+                targetCount: 5,
+                completed: true,
+              },
+              {
+                exerciseIndex: 1,
+                exerciseType: 'FILL_BLANK',
+                contentIds: ['c2'],
+                targetCount: 3,
+                completed: false,
+              },
+            ],
+          },
+        ],
+        completed: false,
+        startedAt: new Date().toISOString(),
+        completedAt: null,
+        durationMinutes: 21,
+      });
+
+      // Exercise 0 should be hydrated as completed
+      expect(service.completedExerciseIndices().has(0)).toBe(true);
+      expect(service.completedExerciseIndices().has(1)).toBe(false);
+    });
+
+    it('should complete session when backend says sessionCompleted', () => {
+      const sessionId = startBackendSession();
+
+      service.advanceBlock();
+      httpMock.expectOne(`${baseUrl}/${profileId}/sessions/${sessionId}/blocks/0/advance`).flush({
+        blockIndex: 0,
+        blockCompleted: true,
+        nextBlockIndex: 1,
+        sessionCompleted: true,
+        completedExercises: 0,
+        totalExercises: 0,
+      });
+
+      // completeSession calls sessionApi.completeSession
+      const completeReq = httpMock.expectOne(
+        `${baseUrl}/${profileId}/sessions/${sessionId}/complete`,
+      );
+      completeReq.flush({});
+
+      expect(service.sessionCompleted()).toBe(true);
+    });
+
+    it('should prevent double-tap during advance', () => {
+      const sessionId = startBackendSession();
+
+      service.advanceBlock();
+      expect(service.isAdvancing()).toBe(true);
+
+      service.advanceBlock(); // no-op
+
+      const reqs = httpMock.match(`${baseUrl}/${profileId}/sessions/${sessionId}/blocks/0/advance`);
+      expect(reqs.length).toBe(1);
+      reqs[0].flush({
+        blockIndex: 0,
+        blockCompleted: true,
+        nextBlockIndex: 1,
+        sessionCompleted: false,
+        completedExercises: 0,
+        totalExercises: 0,
+      });
+
+      expect(service.isAdvancing()).toBe(false);
+    });
   });
 });

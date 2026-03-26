@@ -1,4 +1,5 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
+import { catchError, of } from 'rxjs';
 import { ModuleName, CEFR_LEVELS, UnitReference } from '../../../shared/models/learning.model';
 import { StateService } from '../../../shared/services/state.service';
 import { GamificationService } from './gamification.service';
@@ -95,6 +96,7 @@ export class SessionService {
         next: (response) => {
           const session = this.mapBackendSession(response, mode);
           this.initSession(session);
+          this.hydrateCompletedExercises(response);
           this._isGenerating.set(false);
         },
         error: () => {
@@ -106,6 +108,20 @@ export class SessionService {
     } else {
       const session = this.generateSession(mode);
       this.initSession(session);
+    }
+  }
+
+  private hydrateCompletedExercises(response: SessionResponse): void {
+    const completedIndices = new Set<number>();
+    for (const block of response.blocks) {
+      for (const ex of block.exercises ?? []) {
+        if (ex.completed) {
+          completedIndices.add(ex.exerciseIndex);
+        }
+      }
+    }
+    if (completedIndices.size > 0) {
+      this._completedExerciseIndices.set(completedIndices);
     }
   }
 
@@ -314,7 +330,17 @@ export class SessionService {
 
     const profileId = this.auth.profileId();
     if (profileId) {
-      this.sessionApi.completeSession(profileId, session.id).subscribe();
+      this.sessionApi
+        .completeSession(profileId, session.id)
+        .pipe(
+          catchError((err) => {
+            if (err?.error?.code === 'incomplete_session') {
+              this._advanceError.set('Hay bloques sin completar.');
+            }
+            return of(null);
+          }),
+        )
+        .subscribe();
     }
 
     this.gamification.syncToBackend();
