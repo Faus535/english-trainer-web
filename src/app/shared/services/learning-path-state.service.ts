@@ -1,7 +1,7 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { EMPTY, finalize, catchError } from 'rxjs';
 import { LearningPathApiService } from '../../core/services/learning-path-api.service';
-import { LearningStatus, LearningPath } from '../models/learning-path.model';
+import { LearningPath, LearningStatus } from '../models/learning-path.model';
 
 @Injectable({ providedIn: 'root' })
 export class LearningPathStateService {
@@ -20,16 +20,7 @@ export class LearningPathStateService {
     this._isLoading.set(true);
     this.api
       .getLearningStatus(profileId)
-      .pipe(
-        catchError((err) => {
-          if (err.status === 404) {
-            this._learningStatus.set(null);
-            return EMPTY;
-          }
-          throw err;
-        }),
-        finalize(() => this._isLoading.set(false)),
-      )
+      .pipe(finalize(() => this._isLoading.set(false)))
       .subscribe((status) => this._learningStatus.set(status));
   }
 
