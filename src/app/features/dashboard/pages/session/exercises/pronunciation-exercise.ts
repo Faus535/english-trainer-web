@@ -38,6 +38,7 @@ export class PronunciationExercise implements OnInit {
   readonly unitTitle = input.required<string>();
   readonly contentIds = input<string[]>();
   readonly exerciseCount = input<number>();
+  readonly exerciseIndex = input<number>();
 
   readonly exerciseCompleted = output<ExerciseResult>();
   private startTime = 0;
@@ -157,6 +158,7 @@ export class PronunciationExercise implements OnInit {
     const correctCount = r.filter((x) => x).length;
     this.exerciseCompleted.emit({
       exerciseType: 'pronunciation',
+      exerciseIndex: this.exerciseIndex(),
       correctCount,
       totalCount: r.length,
       score: this.combinedScore(),

@@ -31,6 +31,7 @@ export class VocabularyExercise implements OnInit {
   readonly reviewMode = input(false);
   readonly contentIds = input<string[]>();
   readonly exerciseCount = input<number>();
+  readonly exerciseIndex = input<number>();
 
   readonly exerciseCompleted = output<ExerciseResult>();
   private startTime = 0;
@@ -181,6 +182,7 @@ export class VocabularyExercise implements OnInit {
     const correctCount = r.filter((x) => x.correct).length;
     this.exerciseCompleted.emit({
       exerciseType: 'vocabulary',
+      exerciseIndex: this.exerciseIndex(),
       correctCount,
       totalCount: r.length,
       score: r.length > 0 ? Math.round((correctCount / r.length) * 100) : 0,

@@ -24,20 +24,21 @@ export class GrammarExercise implements OnInit {
   readonly reviewMode = input(false);
   readonly contentIds = input<string[]>();
   readonly exerciseCount = input<number>();
+  readonly exerciseIndex = input<number>();
 
   readonly exerciseCompleted = output<ExerciseResult>();
   private startTime = 0;
 
   protected readonly content = signal<GrammarContent | null>(null);
   protected readonly phase = signal<'learn' | 'exercise' | 'done'>('learn');
-  protected readonly exerciseIndex = signal(0);
+  protected readonly currentQuestionIndex = signal(0);
   protected readonly selectedOption = signal<number | null>(null);
   protected readonly results = signal<boolean[]>([]);
 
   protected readonly currentExercise = computed(() => {
     const c = this.content();
     if (!c) return null;
-    return c.exercises[this.exerciseIndex()] ?? null;
+    return c.exercises[this.currentQuestionIndex()] ?? null;
   });
 
   protected readonly score = computed(() => {
@@ -78,7 +79,7 @@ export class GrammarExercise implements OnInit {
 
   protected startExercises(): void {
     this.phase.set('exercise');
-    this.exerciseIndex.set(0);
+    this.currentQuestionIndex.set(0);
     this.selectedOption.set(null);
     this.results.set([]);
   }
@@ -95,12 +96,12 @@ export class GrammarExercise implements OnInit {
   protected nextExercise(): void {
     const c = this.content();
     if (!c) return;
-    const nextIdx = this.exerciseIndex() + 1;
+    const nextIdx = this.currentQuestionIndex() + 1;
     if (nextIdx >= c.exercises.length) {
       this.phase.set('done');
       this.emitResult();
     } else {
-      this.exerciseIndex.set(nextIdx);
+      this.currentQuestionIndex.set(nextIdx);
       this.selectedOption.set(null);
     }
   }
@@ -110,6 +111,7 @@ export class GrammarExercise implements OnInit {
     const correctCount = r.filter((x) => x).length;
     this.exerciseCompleted.emit({
       exerciseType: 'grammar',
+      exerciseIndex: this.exerciseIndex(),
       correctCount,
       totalCount: r.length,
       score: r.length > 0 ? Math.round((correctCount / r.length) * 100) : 0,
