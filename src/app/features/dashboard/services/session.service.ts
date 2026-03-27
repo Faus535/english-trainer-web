@@ -14,6 +14,7 @@ import {
 } from '../models/session.model';
 import { MODULES, getModuleLabel, getModuleConfig } from '../data/modules.data';
 import { SessionResponse, SessionBlockResponse } from '../../../shared/models/api.model';
+import { isBackendSession } from '../utils/session-id.util';
 
 const SECONDARY_ROTATION: ModuleName[] = ['vocabulary', 'grammar', 'phrases'];
 const STORAGE_KEY = 'english_modular_currentSession';
@@ -249,6 +250,22 @@ export class SessionService {
     const session = this._currentSession();
     const profileId = this.auth.profileId();
     if (!session || !profileId) return;
+
+    if (!isBackendSession(session.id)) {
+      this._completedBlocks.update((s) => {
+        const next = new Set(s);
+        next.add(this._currentBlockIndex());
+        return next;
+      });
+      const nextIdx = this._currentBlockIndex() + 1;
+      if (nextIdx >= session.blocks.length) {
+        this.completeSession();
+      } else {
+        this._currentBlockIndex.set(nextIdx);
+        this._completedExerciseIndices.set(new Set());
+      }
+      return;
+    }
 
     this._isAdvancing.set(true);
     this._advanceError.set(null);
