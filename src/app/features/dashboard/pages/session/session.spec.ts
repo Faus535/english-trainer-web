@@ -175,6 +175,44 @@ describe('Session Component', () => {
     expect(errorEl.textContent).toContain('Completa todos los ejercicios');
   });
 
+  it('should use result.exerciseIndex for markExerciseCompleted when available', () => {
+    setupSessionWithExercises();
+    const fixture = createComponent();
+    const component = fixture.componentInstance as any;
+
+    const result = {
+      exerciseType: 'listening',
+      exerciseIndex: 1,
+      correctCount: 3,
+      totalCount: 5,
+      score: 60,
+      durationMs: 5000,
+      items: [],
+    };
+    component.onExerciseCompleted(result);
+
+    expect(mockService._completedExerciseIndices().has(1)).toBe(true);
+    expect(mockService._completedExerciseIndices().has(0)).toBe(false);
+  });
+
+  it('should fallback to first non-completed exercise of matching type when exerciseIndex is missing', () => {
+    setupSessionWithExercises();
+    mockService._completedExerciseIndices.set(new Set([0]));
+    const fixture = createComponent();
+    const component = fixture.componentInstance as any;
+
+    const result = {
+      exerciseType: 'MULTIPLE_CHOICE',
+      correctCount: 3,
+      totalCount: 5,
+      score: 60,
+      durationMs: 5000,
+      items: [],
+    };
+    component.onExerciseCompleted(result);
+    expect(mockService._completedExerciseIndices().size).toBe(1);
+  });
+
   it('should not show progress indicator for blocks with 0 exercises', () => {
     const block: SessionBlock = { type: 'warmup', duration: 3, label: 'Warmup' };
     (mockService.currentBlock as ReturnType<typeof signal<SessionBlock | null>>).set(block);

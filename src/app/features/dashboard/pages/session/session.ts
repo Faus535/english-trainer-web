@@ -139,18 +139,26 @@ export class Session {
 
     this.reportExerciseResult(result);
 
-    const exercises = this.currentBlockExercises();
-    const exerciseType = result.exerciseType.toLowerCase();
-    const exercise = exercises.find((e) => e.exerciseType.toLowerCase() === exerciseType);
-    if (exercise) {
-      this.sessionService.markExerciseCompleted(exercise.exerciseIndex);
+    if (result.exerciseIndex != null) {
+      this.sessionService.markExerciseCompleted(result.exerciseIndex);
+    } else {
+      const exercises = this.currentBlockExercises();
+      const completed = this.sessionService.completedExerciseIndices();
+      const exerciseType = result.exerciseType.toLowerCase();
+      const exercise = exercises.find(
+        (e) => e.exerciseType.toLowerCase() === exerciseType && !completed.has(e.exerciseIndex),
+      );
+      if (exercise) {
+        this.sessionService.markExerciseCompleted(exercise.exerciseIndex);
+      }
     }
   }
 
   private reportExerciseResult(result: ExerciseResult): void {
     const profileId = this.auth.profileId();
     const sId = this.sessionId();
-    if (!profileId || !sId) return;
+    const exerciseIndex = result.exerciseIndex;
+    if (!profileId || !sId || exerciseIndex == null) return;
 
     const request = {
       correctCount: result.correctCount,
@@ -161,12 +169,12 @@ export class Session {
     };
 
     this.exerciseResultApi
-      .recordResult(profileId, sId, this.blockIndex(), request)
+      .recordResult(profileId, sId, exerciseIndex, request)
       .pipe(
         catchError(() => {
           this.offlineQueue.enqueue(
             'POST',
-            `${environment.apiUrl}/profiles/${profileId}/sessions/${sId}/exercises/${this.blockIndex()}/result`,
+            `${environment.apiUrl}/profiles/${profileId}/sessions/${sId}/exercises/${exerciseIndex}/result`,
             request,
           );
           return of(null);
@@ -191,6 +199,12 @@ export class Session {
     const exercises = this.currentExercises();
     const ex = exercises.find((e) => e.exerciseType.toLowerCase() === exerciseType);
     return ex?.targetCount;
+  }
+
+  protected getExerciseIndexForType(exerciseType: string): number | undefined {
+    const exercises = this.currentExercises();
+    const ex = exercises.find((e) => e.exerciseType.toLowerCase() === exerciseType);
+    return ex?.exerciseIndex;
   }
 
   protected advanceBlock(): void {
