@@ -346,7 +346,7 @@ export class SessionService {
     }
 
     const profileId = this.auth.profileId();
-    if (profileId) {
+    if (profileId && isBackendSession(session.id)) {
       this.sessionApi
         .completeSession(profileId, session.id)
         .pipe(

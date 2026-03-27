@@ -11,6 +11,7 @@ import { XP_PER_SESSION } from '../../data/gamification.data';
 import { Level } from '../../../../shared/models/learning.model';
 import { ExerciseResult } from '../../../../shared/models/exercise-result.model';
 import { environment } from '../../../../core/services/environment';
+import { isBackendSession } from '../../utils/session-id.util';
 import { ListeningExercise } from './exercises/listening-exercise';
 import { PronunciationExercise } from './exercises/pronunciation-exercise';
 import { VocabularyExercise } from './exercises/vocabulary-exercise';
@@ -158,7 +159,7 @@ export class Session {
     const profileId = this.auth.profileId();
     const sId = this.sessionId();
     const exerciseIndex = result.exerciseIndex;
-    if (!profileId || !sId || exerciseIndex == null) return;
+    if (!profileId || !sId || exerciseIndex == null || !isBackendSession(sId)) return;
 
     const request = {
       correctCount: result.correctCount,

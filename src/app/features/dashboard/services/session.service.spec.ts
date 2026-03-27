@@ -109,7 +109,7 @@ describe('SessionService - Exercise completion tracking', () => {
 
     const req = httpMock.expectOne(`${baseUrl}/${profileId}/sessions/generate`);
     req.flush({
-      id: 'session-1',
+      id: '550e8400-e29b-41d4-a716-446655440000',
       mode: 'full',
       blocks: [
         { blockType: 'warmup', moduleName: 'listening', durationMinutes: 3 },
@@ -155,7 +155,7 @@ describe('SessionService - Exercise completion tracking', () => {
       durationMinutes: 21,
     });
 
-    return 'session-1';
+    return '550e8400-e29b-41d4-a716-446655440000';
   }
 
   it('canAdvanceBlock should be true for blocks with 0 exercises', () => {
@@ -308,7 +308,7 @@ describe('SessionService - Exercise completion tracking', () => {
 
       const req = httpMock.expectOne(`${baseUrl}/${profileId}/sessions/generate`);
       req.flush({
-        id: 'session-resume',
+        id: '660e8400-e29b-41d4-a716-446655440000',
         mode: 'full',
         blocks: [
           { blockType: 'warmup', moduleName: 'listening', durationMinutes: 3 },
@@ -387,6 +387,79 @@ describe('SessionService - Exercise completion tracking', () => {
       });
 
       expect(service.isAdvancing()).toBe(false);
+    });
+  });
+
+  describe('Local session guards', () => {
+    function startLocalSession(): void {
+      // Start a session without auth so it generates a local fallback (session-{timestamp})
+      service.startSession('full');
+
+      // The generate endpoint is called, simulate a failure so it falls back to local
+      httpMock
+        .expectOne(`${baseUrl}/${profileId}/sessions/generate`)
+        .error(new ProgressEvent('error'));
+    }
+
+    it('advanceBlock with local session ID should not make HTTP calls', () => {
+      startLocalSession();
+      const session = service.currentSession();
+      expect(session).not.toBeNull();
+      expect(session!.id).toMatch(/^session-/);
+
+      service.advanceBlock();
+
+      httpMock.expectNone(() => true);
+    });
+
+    it('advanceBlock with local session ID should increment block index locally', () => {
+      startLocalSession();
+      expect(service.currentBlockIndex()).toBe(0);
+
+      service.advanceBlock();
+
+      expect(service.currentBlockIndex()).toBe(1);
+      expect(service.isAdvancing()).toBe(false);
+      expect(service.advanceError()).toBeNull();
+    });
+
+    it('advanceBlock with local session should clear completedExerciseIndices', () => {
+      startLocalSession();
+      service.markExerciseCompleted(0);
+      expect(service.completedExerciseIndices().size).toBe(1);
+
+      service.advanceBlock();
+
+      expect(service.completedExerciseIndices().size).toBe(0);
+    });
+
+    it('completeSession with local session ID should not call backend', () => {
+      startLocalSession();
+      const session = service.currentSession()!;
+      const totalBlocks = session.blocks.length;
+
+      // Advance through all blocks to trigger completeSession
+      for (let i = 0; i < totalBlocks; i++) {
+        service.advanceBlock();
+      }
+
+      // No advance or complete HTTP calls should be made for this session
+      const sessionRequests = httpMock
+        .match(() => true)
+        .filter((r) => r.request.url.includes('/sessions/') && r.request.url.includes(session.id));
+      expect(sessionRequests.length).toBe(0);
+    });
+
+    it('completeSession with local session ID should still clear session state', () => {
+      startLocalSession();
+      const totalBlocks = service.currentSession()!.blocks.length;
+
+      for (let i = 0; i < totalBlocks; i++) {
+        service.advanceBlock();
+      }
+
+      expect(service.sessionCompleted()).toBe(true);
+      expect(service.currentSession()).toBeNull();
     });
   });
 });
