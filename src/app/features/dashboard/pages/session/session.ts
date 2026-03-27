@@ -237,6 +237,13 @@ export class Session {
     this.tts.speak(text);
   }
 
+  protected completeWarmupExercises(): void {
+    const exercises = this.currentBlockExercises();
+    for (const exercise of exercises) {
+      this.sessionService.markExerciseCompleted(exercise.exerciseIndex);
+    }
+  }
+
   protected readonly advanceLabel = computed(() =>
     this.isLast() ? 'Completar sesion \u2713' : 'Siguiente \u2192',
   );

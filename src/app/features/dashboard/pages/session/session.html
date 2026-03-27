@@ -95,6 +95,14 @@
                   <span class="warmup-desc">{{ item.desc }}</span>
                 </div>
               }
+              @if (blockExerciseCount() > 0 && !canAdvanceBlock()) {
+                <button
+                  class="nav-btn secondary warmup-continue"
+                  (click)="completeWarmupExercises()"
+                >
+                  Listo, continuar
+                </button>
+              }
             </div>
           }
           @case ('listening') {
@@ -105,6 +113,7 @@
                 [reviewMode]="s.mode === 'review'"
                 [contentIds]="getContentIds('listening')"
                 [exerciseCount]="getExerciseCount('listening')"
+                [exerciseIndex]="getExerciseIndexForType('listening')"
                 (exerciseCompleted)="onExerciseCompleted($event)"
               />
             }
@@ -116,6 +125,7 @@
                 [unitTitle]="unit.unit.title"
                 [contentIds]="getContentIds('pronunciation')"
                 [exerciseCount]="getExerciseCount('pronunciation')"
+                [exerciseIndex]="getExerciseIndexForType('pronunciation')"
                 (exerciseCompleted)="onExerciseCompleted($event)"
               />
             }
@@ -130,6 +140,7 @@
                     [reviewMode]="s.mode === 'review'"
                     [contentIds]="getContentIds('vocabulary')"
                     [exerciseCount]="getExerciseCount('vocabulary')"
+                    [exerciseIndex]="getExerciseIndexForType('vocabulary')"
                     (exerciseCompleted)="onExerciseCompleted($event)"
                   />
                 }
@@ -140,6 +151,7 @@
                     [reviewMode]="s.mode === 'review'"
                     [contentIds]="getContentIds('grammar')"
                     [exerciseCount]="getExerciseCount('grammar')"
+                    [exerciseIndex]="getExerciseIndexForType('grammar')"
                     (exerciseCompleted)="onExerciseCompleted($event)"
                   />
                 }
@@ -150,6 +162,7 @@
                     [reviewMode]="s.mode === 'review'"
                     [contentIds]="getContentIds('phrases')"
                     [exerciseCount]="getExerciseCount('phrases')"
+                    [exerciseIndex]="getExerciseIndexForType('phrases')"
                     (exerciseCompleted)="onExerciseCompleted($event)"
                   />
                 }

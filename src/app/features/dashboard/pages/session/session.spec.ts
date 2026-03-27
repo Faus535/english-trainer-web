@@ -213,6 +213,53 @@ describe('Session Component', () => {
     expect(mockService._completedExerciseIndices().size).toBe(1);
   });
 
+  it('should return exerciseIndex for matching exercise type via getExerciseIndexForType', () => {
+    setupSessionWithExercises();
+    const fixture = createComponent();
+    const component = fixture.componentInstance as any;
+
+    expect(component.getExerciseIndexForType('multiple_choice')).toBe(0);
+    expect(component.getExerciseIndexForType('fill_blank')).toBe(1);
+    expect(component.getExerciseIndexForType('speak')).toBe(2);
+    expect(component.getExerciseIndexForType('nonexistent')).toBeUndefined();
+  });
+
+  it('should complete all warmup exercises when completeWarmupExercises is called', () => {
+    const warmupExercises: SessionExercise[] = [
+      { exerciseIndex: 0, exerciseType: 'WARMUP_REVIEW', contentIds: [], targetCount: 1 },
+      { exerciseIndex: 1, exerciseType: 'WARMUP_INTRO', contentIds: [], targetCount: 1 },
+    ];
+    mockService._exercises.set(warmupExercises);
+
+    const block: SessionBlock = {
+      type: 'warmup',
+      duration: 3,
+      label: 'Repaso espaciado',
+      exercises: warmupExercises,
+    };
+    (mockService.currentBlock as ReturnType<typeof signal<SessionBlock | null>>).set(block);
+    (mockService.currentSession as ReturnType<typeof signal<StudySession | null>>).set({
+      id: 'session-1',
+      number: 1,
+      mode: 'full',
+      isIntegrator: false,
+      listening: null,
+      pronunciation: null,
+      secondary: null,
+      secondaryModule: 'vocabulary',
+      warmup: [{ type: 'intro', desc: 'Welcome', icon: '\u{1F44B}', count: 0 }],
+      duration: 21,
+      blocks: [block],
+    });
+
+    const fixture = createComponent();
+    const component = fixture.componentInstance as any;
+    component.completeWarmupExercises();
+
+    expect(mockService._completedExerciseIndices().has(0)).toBe(true);
+    expect(mockService._completedExerciseIndices().has(1)).toBe(true);
+  });
+
   it('should not show progress indicator for blocks with 0 exercises', () => {
     const block: SessionBlock = { type: 'warmup', duration: 3, label: 'Warmup' };
     (mockService.currentBlock as ReturnType<typeof signal<SessionBlock | null>>).set(block);
