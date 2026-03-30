@@ -75,7 +75,19 @@ describe('PhoneticsApiService', () => {
 
   describe('getTodayPhoneme', () => {
     it('should call GET /api/profiles/:profileId/phonetics/today', () => {
-      const mockToday = { phoneme: { id: '1' }, assignedDate: '2026-03-30', progress: 40 };
+      const mockToday = {
+        phoneme: { id: '1' },
+        assignedDate: '2026-03-30',
+        progress: {
+          attemptsCount: 4,
+          correctAttemptsCount: 2,
+          completed: false,
+          phrasesCompleted: 2,
+          phrasesTotal: 5,
+        },
+        completedCount: 2,
+        totalCount: 5,
+      };
 
       service.getTodayPhoneme(profileId).subscribe((result) => {
         expect(result).toEqual(mockToday);
@@ -84,6 +96,30 @@ describe('PhoneticsApiService', () => {
       const req = httpMock.expectOne(`${baseUrl}/profiles/${profileId}/phonetics/today`);
       expect(req.request.method).toBe('GET');
       req.flush(mockToday);
+    });
+  });
+
+  describe('getProgress', () => {
+    it('should call GET /api/profiles/:profileId/phonetics/progress', () => {
+      const mockProgress = [
+        {
+          phonemeId: '1',
+          symbol: '/iː/',
+          name: 'Long E',
+          category: 'vowel',
+          difficultyOrder: 1,
+          completed: true,
+          completedAt: '2026-03-28T10:00:00Z',
+        },
+      ];
+
+      service.getProgress(profileId).subscribe((result) => {
+        expect(result).toEqual(mockProgress);
+      });
+
+      const req = httpMock.expectOne(`${baseUrl}/profiles/${profileId}/phonetics/progress`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockProgress);
     });
   });
 

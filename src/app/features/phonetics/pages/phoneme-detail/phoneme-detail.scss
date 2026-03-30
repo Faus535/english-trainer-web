@@ -150,10 +150,13 @@
 }
 
 .practice-phrase {
+  width: 100%;
   font-size: var(--fs-xl);
   font-weight: 700;
   text-align: center;
   line-height: 1.4;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .target-highlight {

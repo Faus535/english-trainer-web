@@ -11,8 +11,14 @@
     </div>
     <div class="today-right">
       <div class="today-progress-bar">
-        <div class="today-progress-fill" [style.width.%]="today.progress"></div>
+        <div
+          class="today-progress-fill"
+          [style.width.%]="
+            today.totalCount > 0 ? (today.completedCount / today.totalCount) * 100 : 0
+          "
+        ></div>
       </div>
+      <span class="today-progress-text"> {{ today.completedCount }}/{{ today.totalCount }} </span>
       <span class="today-cta">Practicar</span>
     </div>
   </a>

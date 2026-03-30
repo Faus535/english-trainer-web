@@ -42,6 +42,7 @@ const samplePhonemes: PhonemeResponse[] = [
 const mockPhoneticsApi = {
   getPhonemes: () => of(samplePhonemes),
   getTodayPhoneme: () => of(null),
+  getProgress: () => of([]),
 };
 
 const mockAuth = {

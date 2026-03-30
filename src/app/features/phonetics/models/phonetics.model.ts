@@ -29,10 +29,30 @@ export interface PhraseResponse {
   phonemeId: string;
 }
 
+export interface TodayPhonemeProgressDto {
+  attemptsCount: number;
+  correctAttemptsCount: number;
+  completed: boolean;
+  phrasesCompleted: number;
+  phrasesTotal: number;
+}
+
 export interface TodayPhonemeResponse {
   phoneme: PhonemeResponse;
   assignedDate: string;
-  progress: number;
+  progress: TodayPhonemeProgressDto;
+  completedCount: number;
+  totalCount: number;
+}
+
+export interface PhonemeProgressItem {
+  phonemeId: string;
+  symbol: string;
+  name: string;
+  category: string;
+  difficultyOrder: number;
+  completed: boolean;
+  completedAt: string | null;
 }
 
 export interface AttemptRequest {

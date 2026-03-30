@@ -68,6 +68,11 @@
   transition: width 300ms var(--ease);
 }
 
+.today-progress-text {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}
+
 .today-cta {
   font-size: var(--fs-sm);
   font-weight: 700;

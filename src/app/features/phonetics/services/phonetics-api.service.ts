@@ -7,6 +7,7 @@ import {
   AttemptResponse,
   CompletionResponse,
   PhonemeDetailResponse,
+  PhonemeProgressItem,
   PhonemeResponse,
   PhraseResponse,
   TodayPhonemeResponse,
@@ -34,6 +35,12 @@ export class PhoneticsApiService {
   getTodayPhoneme(profileId: string): Observable<TodayPhonemeResponse> {
     return this.http.get<TodayPhonemeResponse>(
       `${this.baseUrl}/profiles/${profileId}/phonetics/today`,
+    );
+  }
+
+  getProgress(profileId: string): Observable<PhonemeProgressItem[]> {
+    return this.http.get<PhonemeProgressItem[]>(
+      `${this.baseUrl}/profiles/${profileId}/phonetics/progress`,
     );
   }
 
