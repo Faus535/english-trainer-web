@@ -1,0 +1,25 @@
+<div class="page">
+  <div class="header">
+    <a class="back-btn" routerLink="/speak" aria-label="Volver">
+      <app-icon [name]="backIcon" [size]="20" aria-hidden="true" />
+    </a>
+    <h2 class="page-title">Fonetica</h2>
+  </div>
+
+  <div class="completion-card">
+    <div class="completion-badge">
+      <span class="completion-emoji">&#127942;</span>
+    </div>
+    <h3 class="completion-title">Todos los fonemas completados!</h3>
+    <p class="completion-subtitle">
+      Has completado todos los fonemas del sistema IPA. Puedes repetir cualquier fonema para seguir
+      mejorando tu pronunciacion.
+    </p>
+    <div class="completion-actions">
+      <a class="btn-primary" routerLink="/phonetics" aria-label="Repasar fonemas">
+        Repasar fonemas
+      </a>
+      <a class="btn-secondary" routerLink="/speak" aria-label="Volver a hablar"> Volver al menu </a>
+    </div>
+  </div>
+</div>

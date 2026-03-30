@@ -1,8 +1,8 @@
-@for (group of filteredGroups(); track group.category) {
+@for (group of groups(); track group.category) {
   <h3 class="grid-heading">{{ group.label }}</h3>
   <div class="phoneme-grid">
     @for (phoneme of group.phonemes; track phoneme.id) {
-      <app-phoneme-card [phoneme]="phoneme" />
+      <app-phoneme-card [phoneme]="phoneme" [completed]="completedIds().has(phoneme.id)" />
     }
   </div>
 }

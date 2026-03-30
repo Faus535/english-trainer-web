@@ -6,36 +6,27 @@
     <h2 class="page-title">Fonetica</h2>
   </div>
 
-  <p class="page-subtitle">{{ completedCount() }}/{{ phonemes().length }} fonemas completados</p>
-
-  <app-today-phoneme-banner />
-
-  <div class="filters" role="group" aria-label="Filtrar por categoria">
-    <button class="chip" [class.chip--active]="filter() === 'ALL'" (click)="setFilter('ALL')">
-      Todos
-    </button>
-    <button class="chip" [class.chip--active]="filter() === 'VOWELS'" (click)="setFilter('VOWELS')">
-      Vocales
-    </button>
-    <button
-      class="chip"
-      [class.chip--active]="filter() === 'DIPHTHONGS'"
-      (click)="setFilter('DIPHTHONGS')"
-    >
-      Diptongos
-    </button>
-    <button
-      class="chip"
-      [class.chip--active]="filter() === 'CONSONANTS'"
-      (click)="setFilter('CONSONANTS')"
-    >
-      Consonantes
-    </button>
-  </div>
-
   @if (loading()) {
     <div class="loading">Cargando fonemas...</div>
   } @else {
-    <app-phoneme-grid [phonemes]="phonemes()" [filter]="filter()" />
+    <app-phonetics-progress-bar
+      [completed]="completedCount()"
+      [total]="progress().length || phonemes().length"
+    />
+
+    @if (allCompleted()) {
+      <div class="all-completed-banner">
+        <span class="all-completed-text">Has completado todos los fonemas!</span>
+        <a class="all-completed-link" routerLink="/phonetics/complete">Ver logro</a>
+      </div>
+    } @else if (nextPhoneme(); as next) {
+      <app-next-phoneme-banner
+        [phoneme]="next"
+        [position]="nextPhonemePosition()"
+        [total]="progress().length"
+      />
+    }
+
+    <app-phoneme-grid [phonemes]="phonemes()" [completedIds]="completedIds()" />
   }
 </div>

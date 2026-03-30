@@ -7,7 +7,7 @@ import { of } from 'rxjs';
 import { PhoneticsHub } from './phonetics-hub';
 import { PhoneticsApiService } from '../../services/phonetics-api.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { PhonemeResponse } from '../../models/phonetics.model';
+import { PhonemeResponse, PhonemeProgressItem } from '../../models/phonetics.model';
 
 const samplePhonemes: PhonemeResponse[] = [
   {
@@ -39,10 +39,40 @@ const samplePhonemes: PhonemeResponse[] = [
   },
 ];
 
+const sampleProgress: PhonemeProgressItem[] = [
+  {
+    phonemeId: '1',
+    symbol: '/iː/',
+    name: 'Long E',
+    category: 'vowel',
+    difficultyOrder: 1,
+    completed: true,
+    completedAt: '2026-03-28T10:00:00Z',
+  },
+  {
+    phonemeId: '2',
+    symbol: '/æ/',
+    name: 'Short A',
+    category: 'vowel',
+    difficultyOrder: 2,
+    completed: false,
+    completedAt: null,
+  },
+  {
+    phonemeId: '3',
+    symbol: '/θ/',
+    name: 'Voiceless TH',
+    category: 'consonant',
+    difficultyOrder: 3,
+    completed: false,
+    completedAt: null,
+  },
+];
+
 const mockPhoneticsApi = {
   getPhonemes: () => of(samplePhonemes),
+  getProgress: () => of(sampleProgress),
   getTodayPhoneme: () => of(null),
-  getProgress: () => of([]),
 };
 
 const mockAuth = {
@@ -80,21 +110,30 @@ describe('PhoneticsHub', () => {
     expect(cards.length).toBe(3);
   });
 
-  it('should show completed count', () => {
+  it('should show progress bar with correct counts', () => {
     const fixture = TestBed.createComponent(PhoneticsHub);
     fixture.detectChanges();
 
     const el: HTMLElement = fixture.nativeElement;
-    expect(el.querySelector('.page-subtitle')?.textContent).toContain('0/3');
+    const progressBar = el.querySelector('app-phonetics-progress-bar');
+    expect(progressBar).toBeTruthy();
   });
 
-  it('should render filter chips', () => {
+  it('should show next phoneme banner for first incomplete phoneme', () => {
+    const fixture = TestBed.createComponent(PhoneticsHub);
+    fixture.detectChanges();
+
+    const el: HTMLElement = fixture.nativeElement;
+    const banner = el.querySelector('app-next-phoneme-banner');
+    expect(banner).toBeTruthy();
+  });
+
+  it('should not show filter chips (removed)', () => {
     const fixture = TestBed.createComponent(PhoneticsHub);
     fixture.detectChanges();
 
     const el: HTMLElement = fixture.nativeElement;
     const chips = el.querySelectorAll('.chip');
-    expect(chips.length).toBe(4);
-    expect(chips[0].textContent).toContain('Todos');
+    expect(chips.length).toBe(0);
   });
 });

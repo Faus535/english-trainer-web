@@ -1,0 +1,15 @@
+<a
+  class="next-banner"
+  [routerLink]="['/phonetics', phoneme().phonemeId]"
+  [attr.aria-label]="'Siguiente fonema: ' + phoneme().name"
+>
+  <div class="next-left">
+    <span class="next-label">Siguiente fonema</span>
+    <span class="next-symbol">{{ phoneme().symbol }}</span>
+    <span class="next-name">{{ phoneme().name }}</span>
+  </div>
+  <div class="next-right">
+    <span class="next-position">{{ position() }} de {{ total() }}</span>
+    <span class="next-cta">Practicar</span>
+  </div>
+</a>

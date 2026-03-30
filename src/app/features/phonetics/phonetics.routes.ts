@@ -7,6 +7,14 @@ const routes: Routes = [
     title: 'Fonetica',
   },
   {
+    path: 'complete',
+    loadComponent: () =>
+      import('./pages/phonetics-completion/phonetics-completion').then(
+        (m) => m.PhoneticsCompletion,
+      ),
+    title: 'Fonetica completada',
+  },
+  {
     path: ':id',
     loadComponent: () =>
       import('./pages/phoneme-detail/phoneme-detail').then((m) => m.PhonemeDetail),

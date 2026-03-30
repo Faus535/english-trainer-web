@@ -30,16 +30,14 @@ const CATEGORY_ORDER: PhonemeDisplayCategory[] = ['VOWELS', 'DIPHTHONGS', 'CONSO
 })
 export class PhonemeGrid {
   readonly phonemes = input.required<PhonemeResponse[]>();
-  readonly filter = input<PhonemeDisplayCategory | 'ALL'>('ALL');
+  readonly completedIds = input<Set<string>>(new Set());
 
-  protected readonly filteredGroups = computed<PhonemeGroup[]>(() => {
+  protected readonly groups = computed<PhonemeGroup[]>(() => {
     const all = this.phonemes();
-    const f = this.filter();
-
     const grouped = new Map<PhonemeDisplayCategory, PhonemeResponse[]>();
+
     for (const p of all) {
       const cat = getDisplayCategory(p);
-      if (f !== 'ALL' && cat !== f) continue;
       const list = grouped.get(cat) ?? [];
       list.push(p);
       grouped.set(cat, list);
