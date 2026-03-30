@@ -58,6 +58,12 @@ export const routes: Routes = [
     title: 'Juegos',
   },
   {
+    path: 'phonetics',
+    canActivate: [authGuard],
+    loadChildren: () => import('./features/phonetics/phonetics.routes'),
+    title: 'Fonetica',
+  },
+  {
     path: 'practice',
     canActivate: [authGuard],
     loadComponent: () => import('./features/practice/practice-hub').then((m) => m.PracticeHub),

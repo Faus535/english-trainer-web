@@ -1,0 +1,23 @@
+:host {
+  display: block;
+}
+
+.grid-heading {
+  font-size: var(--fs-sm);
+  color: var(--text-3);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: var(--sp-4);
+  margin-bottom: var(--sp-2);
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.phoneme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(4.5rem, 1fr));
+  gap: var(--sp-3);
+}

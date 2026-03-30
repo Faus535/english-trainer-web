@@ -1,0 +1,41 @@
+<div class="page">
+  <div class="header">
+    <a class="back-btn" routerLink="/speak" aria-label="Volver">
+      <app-icon [name]="backIcon" [size]="20" aria-hidden="true" />
+    </a>
+    <h2 class="page-title">Fonetica</h2>
+  </div>
+
+  <p class="page-subtitle">{{ completedCount() }}/{{ phonemes().length }} fonemas completados</p>
+
+  <app-today-phoneme-banner />
+
+  <div class="filters" role="group" aria-label="Filtrar por categoria">
+    <button class="chip" [class.chip--active]="filter() === 'ALL'" (click)="setFilter('ALL')">
+      Todos
+    </button>
+    <button class="chip" [class.chip--active]="filter() === 'VOWELS'" (click)="setFilter('VOWELS')">
+      Vocales
+    </button>
+    <button
+      class="chip"
+      [class.chip--active]="filter() === 'DIPHTHONGS'"
+      (click)="setFilter('DIPHTHONGS')"
+    >
+      Diptongos
+    </button>
+    <button
+      class="chip"
+      [class.chip--active]="filter() === 'CONSONANTS'"
+      (click)="setFilter('CONSONANTS')"
+    >
+      Consonantes
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">Cargando fonemas...</div>
+  } @else {
+    <app-phoneme-grid [phonemes]="phonemes()" [filter]="filter()" />
+  }
+</div>

@@ -1,0 +1,19 @@
+@if (todayPhoneme(); as today) {
+  <a
+    class="today-banner"
+    [routerLink]="['/phonetics', today.phoneme.id]"
+    aria-label="Fonema del dia: {{ today.phoneme.name }}"
+  >
+    <div class="today-left">
+      <span class="today-label">Fonema del dia</span>
+      <span class="today-symbol">{{ today.phoneme.symbol }}</span>
+      <span class="today-name">{{ today.phoneme.name }}</span>
+    </div>
+    <div class="today-right">
+      <div class="today-progress-bar">
+        <div class="today-progress-fill" [style.width.%]="today.progress"></div>
+      </div>
+      <span class="today-cta">Practicar</span>
+    </div>
+  </a>
+}
