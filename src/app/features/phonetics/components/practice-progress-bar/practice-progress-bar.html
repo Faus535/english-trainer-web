@@ -1,0 +1,12 @@
+<div class="progress-track" [attr.aria-label]="'Progreso: ' + (current() + 1) + ' de ' + total()">
+  @for (i of segments(); track i) {
+    <div
+      class="progress-dot"
+      [class.progress-dot--pass]="results().get(i) === true"
+      [class.progress-dot--fail]="results().get(i) === false"
+      [class.progress-dot--current]="i === current()"
+      [class.progress-dot--future]="i > current() && !results().has(i)"
+    ></div>
+  }
+</div>
+<span class="progress-label">{{ current() + 1 }} / {{ total() }}</span>

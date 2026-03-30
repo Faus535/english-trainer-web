@@ -1,0 +1,38 @@
+<div class="completion-card">
+  <div class="completion-badge">
+    <span class="completion-symbol">{{ phonemeSymbol() }}</span>
+    <span class="completion-check">&#10003;</span>
+  </div>
+  <h3 class="completion-title">Fonema completado!</h3>
+  <p class="completion-subtitle">{{ phonemeName() }}</p>
+
+  <div class="completion-stats">
+    <div class="stat">
+      <span class="stat-value">{{ passedCount() }}</span>
+      <span class="stat-label">aprobadas</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">{{ totalPhrases() }}</span>
+      <span class="stat-label">total</span>
+    </div>
+  </div>
+
+  <div class="completion-results">
+    @for (r of results(); track $index) {
+      <div
+        class="result-row"
+        [class.result-row--pass]="r.passed"
+        [class.result-row--fail]="!r.passed"
+      >
+        <span class="result-phrase">{{ r.phrase }}</span>
+        <span class="result-score">{{ r.score }}%</span>
+        <span class="result-icon">{{ r.passed ? '&#10003;' : '&#10007;' }}</span>
+      </div>
+    }
+  </div>
+
+  <div class="completion-actions">
+    <button class="btn-secondary" (click)="retry.emit()">Repetir</button>
+    <button class="btn-primary" (click)="goBack.emit()">Volver</button>
+  </div>
+</div>

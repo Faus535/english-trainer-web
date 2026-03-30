@@ -1,0 +1,53 @@
+:host {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.progress-track {
+  display: flex;
+  flex: 1;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.progress-dot {
+  flex: 1;
+  height: 0.25rem;
+  border-radius: var(--r-full);
+  background: var(--surface-1);
+  transition: all 300ms var(--ease);
+
+  &--pass {
+    background: var(--success);
+  }
+
+  &--fail {
+    background: var(--error);
+  }
+
+  &--current {
+    background: var(--primary);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  &--future {
+    background: var(--surface-1);
+  }
+}
+
+.progress-label {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
