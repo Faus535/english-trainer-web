@@ -135,7 +135,13 @@
   }
 }
 
-.minimal-pairs-link {
+.practice-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.practice-link {
   display: block;
   text-align: center;
   padding: var(--sp-3);
@@ -151,6 +157,15 @@
   &:hover {
     border-color: var(--primary);
     background: var(--primary-soft);
+  }
+
+  &--phonetics {
+    color: var(--color-phonetics);
+
+    &:hover {
+      border-color: var(--color-phonetics);
+      background: var(--color-phonetics-soft);
+    }
   }
 }
 
