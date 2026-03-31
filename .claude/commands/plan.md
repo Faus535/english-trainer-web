@@ -1,160 +1,250 @@
 ---
 description: Analyze both projects with multiple parallel agents and generate detailed implementation plans
 argument-hint: <feature description>
-allowed-tools: Read, Glob, Grep, Write, Agent, Bash
+allowed-tools: Read, Glob, Grep, Write, Agent, Bash, AskUserQuestion
 ---
 
 <!--
 PURPOSE: Multi-agent analysis and phased implementation plan generation
 USAGE: /plan <feature description in natural language>
-EXAMPLES:
-  /plan Add a button to export vocabulary as PDF
-  /plan Create user settings page with notification preferences
-OUTPUT: plans/<slug>-backend.md and/or plans/<slug>-frontend.md
+OUTPUT: .ai/plans/YYYY_MM_DD-semantic-name-backend.md and/or .ai/plans/YYYY_MM_DD-semantic-name-frontend.md
+ARCHITECTURE: 7-step pipeline
+  Step 0: Load Project Snapshots (read-only, requires .ai/project-snapshot.md to exist)
+  Step 1: Context Gathering & Slug
+  Step 1.5: Scope Detector (haiku)
+  Step 2: Public Contracts & Phases Proposal (interactive, user approval required)
+  Step 3: Specialists (sonnet, parallel)
+  Step 4: Writers (opus, parallel) — absorbs synthesis, coordination, and validation
+  Step 5: Git Branch Preparation
 -->
-
-Analyze the requested feature using **multiple parallel agents**, consolidate findings, resolve conflicts, and generate detailed phased plans.
 
 **Request**: $ARGUMENTS
 
-## Step 0 — Derive plan file name
+Before each layer, read the corresponding reference file for agent prompts.
 
-Generate a short kebab-case slug from the feature description (3-5 words max). Examples:
+---
 
-- "Add a button to export vocabulary as PDF" → `export-vocabulary-pdf`
-- "Fix optimistic locking errors" → `fix-optimistic-locking`
-- "Create user settings page" → `user-settings-page`
+## Step 0 — Load Project Snapshots (read-only)
 
-Plan files:
+Read the project snapshots (index + references). This step ONLY reads — it never generates or updates snapshots.
 
-- **Backend**: `plans/<slug>-backend.md` (in backend root)
-- **Frontend**: `plans/<slug>-frontend.md` (in frontend root)
+**0a. Backend snapshot**: Read `.ai/project-snapshot.md` (index) in the backend project.
 
-Ensure the `plans/` directory exists in each project root before writing.
+- If it exists → store as `BACKEND_SNAPSHOT`
+- If it does NOT exist → **STOP**. Tell the user:
+  ```
+  No project snapshot found. Run /analyze first to generate it.
+  ```
+  Do NOT proceed.
+- Also read the relevant `.ai/snapshot-references/*.md` files (modules.md, endpoints.md, database.md, cross-cutting.md) for detailed context.
 
-## Step 1 — Multi-agent parallel analysis
+**0b. Frontend snapshot**: Read `.ai/project-snapshot.md` (index) in the frontend project (if the project exists).
 
-Launch the following agents **in parallel** using the Agent tool. Each agent must read the relevant skills and code before producing its analysis.
+- If it exists → store as `FRONTEND_SNAPSHOT`
+- If it does NOT exist → continue without it (frontend snapshot is optional)
+- Also read relevant `.ai/snapshot-references/*.md` files if they exist.
 
-### Agent 1: Backend Analysis
-
-```
-Analyze the backend project at /home/faustinoolivas/dev/proyectos/carmen/english-trainer-api for implementing: "$ARGUMENTS"
-
-Steps:
-1. Read CLAUDE.md for architecture conventions
-2. Read relevant skills from .claude/plugins/s2-backend/skills/ (domain-design, persistence, api-design, modulith-usecases, etc.)
-3. Explore existing modules, entities, controllers, services related to this feature
-4. Identify what already exists and what needs to be created/modified
-
-Return a structured analysis with:
-- EXISTING: files, classes, endpoints already relevant
-- PROPOSED: new classes, endpoints, migrations needed (with exact paths and signatures)
-- DEPENDENCIES: what the frontend will need from the backend (API contract)
-- RISKS: potential issues, breaking changes, performance concerns
-- PHASES: suggested implementation order with acceptance criteria
-```
-
-### Agent 2: Frontend Analysis
+**0c. Staleness check**: Read the `Last updated` timestamp from each snapshot. If older than 7 days, warn the user:
 
 ```
-Analyze the frontend project at /home/faustinoolivas/dev/proyectos/carmen/english-trainer-web for implementing: "$ARGUMENTS"
-
-Steps:
-1. Read CLAUDE.md for architecture conventions
-2. Read relevant skills from .claude/skills/angular/ (components, services, state management, etc.)
-3. Explore existing features, components, services, routes related to this feature
-4. Identify what already exists and what needs to be created/modified
-
-Return a structured analysis with:
-- EXISTING: files, components, services already relevant
-- PROPOSED: new components, services, routes needed (with exact paths and selectors)
-- DEPENDENCIES: what it needs from the backend (endpoints, DTOs)
-- RISKS: potential issues, UX edge cases, responsive concerns
-- PHASES: suggested implementation order with acceptance criteria
+Project snapshot is X days old. Consider running /analyze to refresh it before planning.
+Continue anyway? (y/n)
 ```
 
-### Agent 3: Data & Schema Analysis
+Store `BACKEND_SNAPSHOT` + `FRONTEND_SNAPSHOT` + relevant references as `PROJECT_ANALYSIS`.
 
-```
-Analyze the database and data model for implementing: "$ARGUMENTS"
+Show a brief summary (5 lines) of the project state and proceed to Step 1.
 
-Project: /home/faustinoolivas/dev/proyectos/carmen/english-trainer-api
+---
 
-Steps:
-1. Read existing Flyway migrations in src/main/resources/db/migration/
-2. Read existing domain entities and Value Objects related to the feature
-3. Read the persistence skill at .claude/plugins/s2-backend/skills/persistence/
-4. Analyze current table structures, relationships, and constraints
+## Step 1 — Context Gathering & Slug
 
-Return a structured analysis with:
-- EXISTING_SCHEMA: current tables, columns, relationships relevant to this feature
-- PROPOSED_MIGRATIONS: new tables, columns, indexes, constraints needed
-- DATA_FLOW: how data moves from API → Domain → Persistence and back
-- RISKS: migration risks, data integrity concerns, backwards compatibility
-- MIGRATION_ORDER: suggested order for Flyway migrations
-```
+**1a. Slug**: Generate a date-prefixed semantic name from the feature description.
 
-### Agent 4: UX & Integration Analysis
+- Format: `YYYY_MM_DD-semantic_name` (e.g., `2026_03_26-user-vocabulary-export`)
+- `.ai/plans/<slug>-backend.md` (backend plan)
+- `.ai/plans/<slug>-frontend.md` (frontend plan)
+- Ensure `.ai/plans/` directories exist. Never overwrite — append numeric suffix if file exists.
 
-```
-Analyze the user experience and cross-cutting concerns for implementing: "$ARGUMENTS"
+**1b. Existing plans**: Read ALL `.ai/plans/*.md` in both projects. Extract: feature name, date, decisions log, phase status, API contracts. Store as `EXISTING_PLANS_CONTEXT`. If none: `"No existing plans found."`.
 
-Projects:
-- Backend: /home/faustinoolivas/dev/proyectos/carmen/english-trainer-api
-- Frontend: /home/faustinoolivas/dev/proyectos/carmen/english-trainer-web
+**1c. Git context**: Run and store as `GIT_CONTEXT`:
 
-Steps:
-1. Review existing user flows in the frontend that relate to this feature
-2. Check authentication/authorization patterns (read security skill at backend .claude/plugins/s2-backend/skills/security/)
-3. Check error handling patterns (read error-handling skill)
-4. Analyze how similar features are already implemented end-to-end
-
-Return a structured analysis with:
-- USER_FLOWS: step-by-step user interactions for this feature
-- AUTH_REQUIREMENTS: what auth/permissions are needed
-- ERROR_SCENARIOS: what can go wrong and how to handle each case
-- INTEGRATION_POINTS: where frontend and backend connect, edge cases
-- CONSISTENCY: patterns from existing features that should be followed
+```bash
+git -C /home/faustinoolivas/dev/proyectos/carmen/english-trainer-api log --oneline -20
+git -C /home/faustinoolivas/dev/proyectos/carmen/english-trainer-web log --oneline -20
+git -C /home/faustinoolivas/dev/proyectos/carmen/english-trainer-api status --short
+git -C /home/faustinoolivas/dev/proyectos/carmen/english-trainer-web status --short
 ```
 
-## Step 2 — Consolidate and debate
+**1d. Skills consultation**: Read CLAUDE.md and consult relevant s2-backend skills to understand architecture and conventions:
 
-After all agents complete, review their outputs together:
+- **s2-backend:architecture** — Package structure
+- **s2-backend:domain-design** — Domain patterns (Aggregates, VOs, Events)
+- **s2-backend:persistence** — Persistence (Entities, Repositories, Flyway)
+- **s2-backend:api-design** — Controllers, validation
+- **s2-backend:error-handling** — Exceptions and ControllerAdvice
+- **s2-backend:testing** — Testing strategy
+- **s2-backend:modulith-usecases** — Use Cases with @Service
+- **s2-backend:security** — Authentication and authorization
+- **s2-backend:logging** — Logging and health checks
 
-1. **Identify conflicts**: Where agents disagree on approach, naming, or structure
-2. **Resolve conflicts**: Choose the best approach based on existing codebase patterns and skill conventions
-3. **Cross-validate dependencies**: Ensure backend API contract matches what frontend expects
-4. **Merge phases**: Create a unified timeline where backend phases come before frontend phases that depend on them
-5. **Document decisions**: Note any significant trade-offs or alternative approaches considered
+Read the `SKILL.md` and key `references/*.md` files of the skills most relevant to the feature.
 
-Write a brief summary of key decisions and conflicts resolved before generating the final plans.
+---
 
-## Step 3 — Generate plans
+## Step 1.5 — Scope Detector (haiku)
 
-Read the templates in [plan-references/templates.md](plan-references/templates.md), then generate **only the plans that have actual development work**:
+Launch 1 **haiku** agent. Read prompt from: `.claude/commands/plan-references/layer0-scope.md`
 
-- `plans/<slug>-backend.md` — in backend project root `/home/faustinoolivas/dev/proyectos/carmen/english-trainer-api/`.
-- `plans/<slug>-frontend.md` — in frontend project root `/home/faustinoolivas/dev/proyectos/carmen/english-trainer-web/`.
+Replace `$ARGUMENTS` with the feature request. Store result as `SCOPE` (`BACKEND_ONLY` | `FRONTEND_ONLY` | `FULL_STACK`).
 
-Each plan must include a **Decisions Log** section at the top summarizing the multi-agent analysis:
+---
 
-```markdown
-## Decisions Log
+## Step 2 — Public Contracts & Phases Proposal (interactive)
 
-| Topic | Decision | Alternatives Considered | Why |
-| ----- | -------- | ----------------------- | --- |
-| ...   | ...      | ...                     | ... |
+**IMPORTANT**: This step requires user approval before proceeding to the analysis pipeline. Do NOT continue to Step 3 until the user explicitly approves.
+
+Based on the feature request, SCOPE, `PROJECT_ANALYSIS`, and context gathered, propose to the user:
+
+**2a. Public Contracts** — The external-facing contracts this feature will introduce or modify:
+
+- **Application services (Use Cases)**: to add, modify, or remove, with method signatures
+- **Domain events**: to add, modify, or remove, with their attributes
+- **Test suites**: to add, modify, or remove, with test cases within each
+- **Database schemas**: to add, modify, or remove, with tables and columns
+- **REST endpoints**: to add, modify, or remove, with HTTP methods and paths
+
+If the user doesn't provide contracts, suggest them based on the task description. Use `PROJECT_ANALYSIS` to ensure proposals are consistent with existing modules, naming conventions, and patterns.
+
+**2b. Implementation Phases** — Proposed vertical slices:
+
+- Each phase must be a **vertical slice** delivering end-to-end functionality
+- Avoid creating the controller in one phase and the use case in another
+- **MANDATORY**: Each phase MUST include its corresponding tests (unit and/or integration). NEVER propose a phase without tests.
+- Each phase must be independently committable without breaking the build
+- Don't mix responsibilities in the same phase
+
+Present the contracts and phases to the user and ask for approval. Adjust based on feedback. Only proceed to Step 3 once approved.
+
+---
+
+## Step 3 — Specialists (parallel, conditional)
+
+Read agent prompts from: `.claude/commands/plan-references/layer1-specialists.md`
+
+Launch in parallel based on SCOPE:
+
+- **BACKEND_ONLY**: Agents 1, 2, 5, 6 (4 agents, model: sonnet)
+- **FRONTEND_ONLY**: Agents 3, 4, 5, 6 (4 agents, model: sonnet)
+- **FULL_STACK**: All 6 agents (model: sonnet)
+
+Replace `{EXISTING_PLANS_CONTEXT}`, `{GIT_CONTEXT}`, and `$ARGUMENTS` in each prompt.
+Also inject `{PROJECT_ANALYSIS}` and the approved public contracts and phases from Step 2 as `{APPROVED_CONTRACTS}` and `{APPROVED_PHASES}` so specialists can focus their analysis.
+
+---
+
+## Step 4 — Writers (parallel, conditional)
+
+Read agent prompts from: `.claude/commands/plan-references/layer4-writers.md`
+
+Launch Writers in parallel based on SCOPE:
+
+- **BACKEND_ONLY** or **FULL_STACK** with backend work → Launch Backend Writer
+- **FRONTEND_ONLY** or **FULL_STACK** with frontend work → Launch Frontend Writer
+
+**Output injection**: Insert each specialist's full text output verbatim into the `[Insert ... here]` placeholders. Use `SCOPE` from Step 1.5 to determine which writers to launch.
+
+If a specialist was not launched: `"N/A — agent not launched (scope: {SCOPE})"`. If a specialist failed: `"AGENT FAILED — no output available"`.
+
+Model: **opus** for all writers.
+
+---
+
+## Step 5 — Git Branch Preparation & Next Steps
+
+**5a. Git status check**: Verify there are no uncommitted changes (`git status`). If there are, warn the user and ask them to resolve before continuing.
+
+**5b. Update base branch**:
+
+```bash
+git checkout develop && git pull origin develop
 ```
+
+If `develop` doesn't exist, use `master`/`main`.
+
+**5c. Branch creation**: Suggest a branch name following the convention `feature/#TICKET_brief-description` (e.g., `feature/#PROJ-123_create-user-module`). Ask the user for the final name. Create the branch:
+
+```bash
+git checkout -b <branch-name>
+```
+
+**5d. Final output**: **CRITICAL: Do NOT execute the plan and do NOT ask the user if they want to execute it.** The conversation MUST end here. The user needs to run `/clear` first to free context window space before execution. Show:
+
+```
+Plan saved:
+  - .ai/plans/<slug>-backend.md (if applicable)
+  - .ai/plans/<slug>-frontend.md (if applicable)
+Branch: <branch-name> created from <base-branch>
+
+To start execution, run:
+  /clear
+  /execute-plan .ai/plans/<slug>-backend.md
+```
+
+---
 
 ## Rules
 
+### Pipeline execution
+
 - Write ALL content in **English**
-- Launch ALL 4 agents in parallel (single message with multiple Agent tool calls)
-- Be extremely detailed: file paths, class names, method signatures, component selectors
+- Execute steps sequentially: 0 → 1 → 1.5 → 2 (wait for approval) → 3 → 4 → 5
+- **Step 0 presents a summary** of the project analysis to the user before continuing
+- **Step 2 is a gate**: do NOT proceed to Step 3 until the user approves contracts and phases
+- Within each layer, launch all agents in a **single message** (parallel)
+- Read the reference file for each layer BEFORE constructing agent prompts
+
+### Model assignment
+
+| Step | Model  | Agents                                       |
+| ---- | ------ | -------------------------------------------- |
+| 0    | —      | Read snapshots (read-only, stops if missing) |
+| 1    | —      | Context gathering (no agent)                 |
+| 1.5  | haiku  | Scope Detector                               |
+| 2    | —      | Interactive (no agent)                       |
+| 3    | sonnet | 6 specialists                                |
+| 4    | opus   | 1-2 writers                                  |
+| 5    | —      | Git operations (no agent)                    |
+
+### Token limits
+
+| Layer       | Max words |
+| ----------- | --------- |
+| Specialists | 3000      |
+| Writers     | unlimited |
+
+### Fallback on agent failure
+
+- Specialist fails → Writer works with remaining specialist outputs, flags gap in plan RISKS section
+
+### Phase quality rules (enforced by Writers)
+
+- Each phase must be a **vertical slice** delivering end-to-end functionality
+- **MANDATORY**: Each phase MUST include its corresponding tests (unit and/or integration). NEVER create a phase without tests.
+- **MANDATORY**: Each phase must end with a verification cycle: compile, run tests, human review, commit. This is non-negotiable.
+- Each phase must be independently committable without breaking the build
+- Don't mix responsibilities in the same phase
+- **The last phase MUST include running `/revisar`** to validate architecture, naming conventions, and code quality across the entire plan.
+
+### Content rules
+
+- Be extremely detailed: file paths, class names, method signatures
 - Each phase must be independently executable
-- **Never mix** frontend and backend concerns in the same plan file
-- Include the API contract in both backend and frontend plans
+- Never mix frontend and backend in the same plan file
+- Include API contract in both plans
 - Order phases by dependency: backend first when frontend depends on it
-- **Skip** generating a plan file when there are zero phases for that project
-- **Never overwrite** an existing plan — if file exists, append a numeric suffix
+- Skip plan file when zero phases for that project
+- Never overwrite existing plans — append numeric suffix
+- Cross-cutting concerns must be integrated into phases, not separate appendices
+- Plan files go in `.ai/plans/` with date-prefixed naming: `YYYY_MM_DD-semantic_name-backend.md`
