@@ -61,14 +61,14 @@
       >
         <div class="flashcard-inner">
           <div class="flashcard-front">
-            <span class="flashcard-type">{{ item.itemType }}</span>
-            <span class="flashcard-word">{{ item.unitReference }}</span>
+            <span class="flashcard-type">{{ item.sourceType }}</span>
+            <span class="flashcard-word">{{ item.frontContent }}</span>
             <span class="flashcard-hint">Toca para revelar</span>
           </div>
           <div class="flashcard-back">
-            <span class="flashcard-type">{{ item.itemType }}</span>
-            <span class="flashcard-word">{{ item.unitReference }}</span>
-            <span class="flashcard-review-info">Repaso #{{ item.reviewCount + 1 }}</span>
+            <span class="flashcard-type">{{ item.sourceType }}</span>
+            <span class="flashcard-word">{{ item.backContent }}</span>
+            <span class="flashcard-review-info">Racha: {{ item.consecutiveCorrect }}</span>
           </div>
         </div>
       </div>

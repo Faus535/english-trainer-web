@@ -8,9 +8,8 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Icon } from '../../../../shared/components/icon/icon';
-import { ReviewApiService } from '../../../../core/services/review-api.service';
+import { ReviewApiService, ReviewItemResponse } from '../../../../core/services/review-api.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { SpacedRepetitionItemResponse } from '../../../../shared/models/api.model';
 import { LucideIconData, ArrowLeft, RotateCcw } from 'lucide-angular';
 
 @Component({
@@ -28,7 +27,7 @@ export class ReviewPage implements OnInit {
   protected readonly arrowLeftIcon: LucideIconData = ArrowLeft;
   protected readonly repeatIcon: LucideIconData = RotateCcw;
 
-  protected readonly items = signal<SpacedRepetitionItemResponse[]>([]);
+  protected readonly items = signal<ReviewItemResponse[]>([]);
   protected readonly currentIndex = signal(0);
   protected readonly flipped = signal(false);
   protected readonly loading = signal(true);

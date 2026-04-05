@@ -3,8 +3,6 @@ import { Router } from '@angular/router';
 import { TalkStateService } from '../../services/talk-state.service';
 import { EvaluationCard } from '../../components/evaluation-card/evaluation-card';
 import { GoalsTracker } from '../../components/goals-tracker/goals-tracker';
-import { AuthService } from '../../../../core/services/auth.service';
-import { ReviewApiService } from '../../../../core/services/review-api.service';
 
 @Component({
   selector: 'app-talk-summary',
@@ -16,9 +14,6 @@ import { ReviewApiService } from '../../../../core/services/review-api.service';
 export class TalkSummary {
   private readonly router = inject(Router);
   private readonly talkState = inject(TalkStateService);
-  private readonly auth = inject(AuthService);
-  private readonly reviewApi = inject(ReviewApiService);
-
   protected readonly endResult = this.talkState.endResult;
   protected readonly status = this.talkState.status;
 
@@ -32,14 +27,7 @@ export class TalkSummary {
   );
 
   protected sendToReview(): void {
-    const profileId = this.auth.profileId();
-    const eval_ = this.evaluation();
-    if (!profileId || !eval_) return;
-
-    const areasToImprove = eval_.areasToImprove ?? [];
-    for (const area of areasToImprove) {
-      this.reviewApi.addWordToReview(profileId, area, 'a2').subscribe();
-    }
+    // TODO: Backend endpoint for adding review items not yet available
   }
 
   protected newConversation(): void {
