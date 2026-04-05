@@ -4,11 +4,9 @@ import {
   inject,
   DestroyRef,
   signal,
-  computed,
   effect,
 } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 import { TtsService } from '../../features/speak/services/tts.service';
@@ -18,23 +16,12 @@ import { Toast } from '../../shared/components/toast/toast';
 import { IdleWarningModal } from '../../shared/components/idle-warning-modal/idle-warning-modal';
 import { IdleService } from '../../core/services/idle.service';
 import { AuthService } from '../../core/services/auth.service';
-import { environment } from '../../core/services/environment';
-import { CurrentUserResponse } from '../../shared/models/api.model';
-import {
-  LucideIconData,
-  LayoutDashboard,
-  Mic,
-  Square,
-  BotMessageSquare,
-  GraduationCap,
-  UserCircle,
-} from 'lucide-angular';
+import { LucideIconData, House, Mic, Square, BookOpen, RotateCcw } from 'lucide-angular';
 
 interface NavTab {
   path: string;
   label: string;
   icon: LucideIconData;
-  adminOnly?: boolean;
 }
 
 @Component({
@@ -55,7 +42,6 @@ interface NavTab {
 export class Shell {
   private readonly tts = inject(TtsService);
   private readonly router = inject(Router);
-  private readonly http = inject(HttpClient);
   private readonly destroyRef = inject(DestroyRef);
   private readonly idle = inject(IdleService);
   private readonly auth = inject(AuthService);
@@ -63,17 +49,15 @@ export class Shell {
   protected readonly speaking = this.tts.speaking;
   protected readonly stopIcon = Square;
   protected readonly showChrome = signal(this.shouldShowChrome(this.router.url));
-  private readonly _isAdmin = signal(false);
 
-  protected readonly visibleTabs = computed(() =>
-    this._allTabs.filter((t) => !t.adminOnly || this._isAdmin()),
-  );
+  protected readonly visibleTabs: NavTab[] = [
+    { path: '/home', label: 'Home', icon: House },
+    { path: '/talk', label: 'Talk', icon: Mic },
+    { path: '/immerse', label: 'Immerse', icon: BookOpen },
+    { path: '/review', label: 'Review', icon: RotateCcw },
+  ];
 
   constructor() {
-    this.http.get<CurrentUserResponse>(`${environment.apiUrl}/auth/me`).subscribe({
-      next: (user) => this._isAdmin.set(user.role === 'ADMIN'),
-    });
-
     this.router.events
       .pipe(
         filter((e): e is NavigationEnd => e instanceof NavigationEnd),
@@ -102,31 +86,11 @@ export class Shell {
     this.tts.stop();
   }
 
-  private readonly profilePaths = [
-    '/profile',
-    '/achievements',
-    '/analytics',
-    '/notifications',
-    '/settings',
-  ];
-  private readonly practicePaths = ['/practice', '/reading', '/writing'];
-
   protected isActive(path: string): boolean {
-    const url = this.router.url;
-    if (path === '/profile') return this.profilePaths.some((p) => url.startsWith(p));
-    if (path === '/practice') return this.practicePaths.some((p) => url.startsWith(p));
-    return url.startsWith(path);
+    return this.router.url.startsWith(path);
   }
 
   private shouldShowChrome(url: string): boolean {
     return !url.startsWith('/auth');
   }
-
-  private readonly _allTabs: NavTab[] = [
-    { path: '/dashboard', label: 'Sesiones', icon: LayoutDashboard },
-    { path: '/speak', label: 'Hablar', icon: Mic },
-    { path: '/tutor', label: 'Tutor', icon: BotMessageSquare, adminOnly: true },
-    { path: '/practice', label: 'Mejorar', icon: GraduationCap },
-    { path: '/profile', label: 'Perfil', icon: UserCircle },
-  ];
 }

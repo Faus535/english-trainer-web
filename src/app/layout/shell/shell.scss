@@ -173,6 +173,8 @@ $breakpoint-desktop: 768px;
 
   &.active {
     color: var(--primary);
+    background: var(--primary-soft);
+    border-radius: var(--r-full);
 
     app-icon {
       transform: translateY(-2px);

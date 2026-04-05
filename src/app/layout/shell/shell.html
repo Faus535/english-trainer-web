@@ -1,6 +1,6 @@
 @if (showChrome()) {
   <header class="header" role="banner">
-    <a class="logo" routerLink="/dashboard" aria-label="English Trainer - Ir al dashboard">ET</a>
+    <a class="logo" routerLink="/home" aria-label="English Trainer - Go to home">ET</a>
     @if (speaking()) {
       <button class="header-btn" (click)="stopAudio()" aria-label="Detener audio">
         <app-icon [name]="stopIcon" [size]="16" aria-hidden="true" />
@@ -9,7 +9,7 @@
   </header>
 
   <aside class="sidebar" aria-label="Navegacion principal">
-    @for (tab of visibleTabs(); track tab.path) {
+    @for (tab of visibleTabs; track tab.path) {
       <a
         class="sidebar-item"
         [routerLink]="tab.path"
@@ -29,7 +29,7 @@
 
 @if (showChrome()) {
   <nav class="nav" aria-label="Navegacion principal">
-    @for (tab of visibleTabs(); track tab.path) {
+    @for (tab of visibleTabs; track tab.path) {
       <a
         class="nav-item"
         [routerLink]="tab.path"

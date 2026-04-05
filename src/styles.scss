@@ -95,6 +95,12 @@
   --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--border);
   --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
 
+  // --- Feature gradients ---
+  --surface-glass: rgba(255, 255, 255, 0.04);
+  --gradient-talk: linear-gradient(135deg, #6366f1, #8b5cf6);
+  --gradient-immerse: linear-gradient(135deg, #06b6d4, #0ea5e9);
+  --gradient-review: linear-gradient(135deg, #f59e0b, #ef4444);
+
   // --- Transition ---
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
 }
