@@ -257,11 +257,11 @@ export interface DeleteAccountRequest {
 }
 
 export interface UserAccountResponse {
-  id: string;
+  userId: string;
   email: string;
-  name: string | null;
-  avatarUrl: string | null;
-  provider: 'local' | 'google';
+  profileId: string;
+  role: string;
+  provider: string;
   createdAt: string;
 }
 
