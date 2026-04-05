@@ -1,7 +1,0 @@
-<div class="weekly-target" [class.done]="done()">
-  @if (done()) {
-    <p>&check; Objetivo semanal cumplido ({{ sessionsWeek() }}/3-4 sesiones)</p>
-  } @else {
-    <p>Te faltan <strong>{{ remaining() }}</strong> sesion{{ remaining() > 1 ? 'es' : '' }} esta semana para cumplir tu objetivo.</p>
-  }
-</div>

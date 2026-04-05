@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { CEFR_LEVELS, ModuleName, ModuleProgress, UnitReference } from '../models/learning.model';
-import { getModuleConfig } from '../../features/dashboard/data/modules.data';
+import { getModuleConfig } from '../data/modules.data';
 import { ProgressApiService } from '../../core/services/progress-api.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ProfileStateService } from './profile-state.service';

@@ -7,7 +7,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { TtsService } from '../speak/services/tts.service';
+import { TtsService } from '../../shared/services/tts.service';
 import { StateService } from '../../shared/services/state.service';
 import { I18nService, Locale } from '../../shared/services/i18n.service';
 import { FocusModeService } from '../../shared/services/focus-mode.service';

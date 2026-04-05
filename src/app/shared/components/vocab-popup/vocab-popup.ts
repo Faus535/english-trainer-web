@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, output } f
 
 import { Icon } from '../icon/icon';
 import { LucideIconData, Volume2, X, BookPlus } from 'lucide-angular';
-import { TtsService } from '../../../features/speak/services/tts.service';
+import { TtsService } from '../../services/tts.service';
 
 function generateExamples(word: string): string[] {
   const clean = word.toLowerCase().replace(/[^a-z'-]/g, '');

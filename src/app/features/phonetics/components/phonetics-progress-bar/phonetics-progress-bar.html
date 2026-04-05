@@ -1,9 +1,0 @@
-<div class="progress-container" [attr.aria-label]="'Progreso: ' + completed() + ' de ' + total()">
-  <div class="progress-header">
-    <span class="progress-text">{{ completed() }}/{{ total() }} fonemas</span>
-    <span class="progress-percentage">{{ percentage() }}%</span>
-  </div>
-  <div class="progress-track">
-    <div class="progress-fill" [style.width.%]="percentage()"></div>
-  </div>
-</div>
