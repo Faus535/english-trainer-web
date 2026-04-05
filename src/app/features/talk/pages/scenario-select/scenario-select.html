@@ -1,0 +1,32 @@
+<section class="scenario-page">
+  <h1 class="page-title">Choose a Scenario</h1>
+  <p class="page-subtitle">Pick a conversation topic to practice</p>
+
+  @if (loading()) {
+    <div class="grid" aria-busy="true">
+      @for (s of skeletons; track $index) {
+        <div class="skeleton-card"></div>
+      }
+    </div>
+  } @else if (error()) {
+    <div class="error-banner" role="alert">
+      <p>{{ error() }}</p>
+      <button class="retry-btn" (click)="retry()">Retry</button>
+    </div>
+  } @else if (categories().length === 0) {
+    <div class="empty-state">
+      <p>No scenarios available</p>
+    </div>
+  } @else {
+    @for (category of categories(); track category.id) {
+      <section class="category">
+        <h2 class="category-name">{{ category.name }}</h2>
+        <div class="grid">
+          @for (scenario of category.scenarios; track scenario.id) {
+            <app-scenario-card [scenario]="scenario" (selected)="onScenarioSelected($event)" />
+          }
+        </div>
+      </section>
+    }
+  }
+</section>

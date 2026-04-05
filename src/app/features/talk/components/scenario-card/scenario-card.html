@@ -1,0 +1,8 @@
+<button class="card" (click)="onSelect()" type="button">
+  <span class="card-icon" aria-hidden="true">{{ scenario().icon }}</span>
+  <span class="card-name">{{ scenario().name }}</span>
+  <span class="card-desc">{{ scenario().description }}</span>
+  <span class="card-badge" [attr.data-level]="scenario().difficulty">
+    {{ scenario().difficulty | uppercase }}
+  </span>
+</button>
