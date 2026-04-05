@@ -19,5 +19,5 @@ export const testNotCompletedGuard: CanActivateFn = () => {
   if (!state.testCompleted()) {
     return true;
   }
-  return router.createUrlTree(['/dashboard']);
+  return router.createUrlTree(['/home']);
 };

@@ -29,13 +29,13 @@ export class LevelTest {
 
   protected onSkip(level: Level): void {
     this.testService.skipTestWithLevel(level).subscribe({
-      next: () => this.router.navigate(['/dashboard']),
-      error: () => this.router.navigate(['/dashboard']),
+      next: () => this.router.navigate(['/home']),
+      error: () => this.router.navigate(['/home']),
     });
   }
 
   protected onFinish(): void {
     this.testService.finishTest();
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/home']);
   }
 }
