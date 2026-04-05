@@ -5,7 +5,6 @@ import { environment } from '../../../core/services/environment';
 import {
   ImmerseContentRequest,
   ImmerseContentResponse,
-  ImmerseContentSuggestion,
   ImmerseExercise,
   ImmerseExerciseResult,
   VocabEntry,
@@ -28,10 +27,6 @@ export class ImmerseApiService {
 
   getContent(contentId: string): Observable<ImmerseContentResponse> {
     return this.http.get<ImmerseContentResponse>(`${this.baseUrl}/content/${contentId}`);
-  }
-
-  getSuggested(): Observable<ImmerseContentSuggestion[]> {
-    return this.http.get<ImmerseContentSuggestion[]>(`${this.baseUrl}/content/suggested`);
   }
 
   getExercises(contentId: string): Observable<ImmerseExercise[]> {

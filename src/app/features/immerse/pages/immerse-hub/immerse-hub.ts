@@ -1,10 +1,10 @@
-import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UpperCasePipe } from '@angular/common';
 import { ImmerseApiService } from '../../services/immerse-api.service';
 import { ImmerseStateService } from '../../services/immerse-state.service';
-import { ImmerseContentSuggestion, ContentType } from '../../models/immerse.model';
+import { ContentType } from '../../models/immerse.model';
 import { Level, CEFR_LEVELS } from '../../../../shared/models/learning.model';
 
 @Component({
@@ -14,14 +14,13 @@ import { Level, CEFR_LEVELS } from '../../../../shared/models/learning.model';
   styleUrl: './immerse-hub.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ImmerseHub implements OnInit {
+export class ImmerseHub {
   private readonly immerseApi = inject(ImmerseApiService);
   private readonly immerseState = inject(ImmerseStateService);
   private readonly router = inject(Router);
 
   protected readonly urlInput = signal('');
   protected readonly textInput = signal('');
-  protected readonly suggestions = signal<ImmerseContentSuggestion[]>([]);
   protected readonly urlError = signal<string | null>(null);
   protected readonly loading = this.immerseState.loading;
   protected readonly error = this.immerseState.error;
@@ -32,12 +31,6 @@ export class ImmerseHub implements OnInit {
   protected readonly topicInput = signal('');
   protected readonly contentTypes: ContentType[] = ['TEXT', 'AUDIO', 'VIDEO'];
   protected readonly levels = CEFR_LEVELS;
-
-  ngOnInit(): void {
-    this.immerseApi.getSuggested().subscribe({
-      next: (data) => this.suggestions.set(data),
-    });
-  }
 
   protected onGenerate(): void {
     this.immerseState.generateContent({
@@ -64,10 +57,6 @@ export class ImmerseHub implements OnInit {
     const text = this.textInput().trim();
     if (!text) return;
     this.immerseState.submitContent({ text });
-  }
-
-  protected onSuggestionClick(suggestion: ImmerseContentSuggestion): void {
-    this.router.navigate(['/immerse', suggestion.id]);
   }
 
   private isValidHttpsUrl(value: string): boolean {

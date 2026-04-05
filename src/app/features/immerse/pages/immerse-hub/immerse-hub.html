@@ -130,27 +130,7 @@
     <p class="inline-error" role="alert">{{ error() }}</p>
   }
 
-  @if (suggestions().length > 0) {
-    <section class="suggestions">
-      <h2 class="section-title">Suggested for you</h2>
-      <div class="suggestion-grid">
-        @for (suggestion of suggestions(); track suggestion.id) {
-          <button class="suggestion-card" (click)="onSuggestionClick(suggestion)" type="button">
-            <span class="suggestion-title">{{ suggestion.title }}</span>
-            <span class="suggestion-desc">{{ suggestion.description }}</span>
-            <div class="suggestion-meta">
-              <span class="badge" [attr.data-level]="suggestion.difficulty">
-                {{ suggestion.difficulty | uppercase }}
-              </span>
-              <span class="duration">{{ suggestion.estimatedMinutes }} min</span>
-            </div>
-          </button>
-        }
-      </div>
-    </section>
-  }
-
-  @if (!suggestions().length && !urlInput() && !textInput()) {
+  @if (!urlInput() && !textInput()) {
     <div class="empty-state">
       <p class="empty-title">Start learning from real content</p>
       <p class="empty-desc">Paste a URL or text above to begin</p>
