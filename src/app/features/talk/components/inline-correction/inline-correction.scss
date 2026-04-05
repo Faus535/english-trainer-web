@@ -1,0 +1,39 @@
+:host {
+  display: block;
+
+  @media (min-width: 768px) {
+    display: inline-block;
+  }
+}
+
+.correction {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--error-soft);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-sm);
+  flex-wrap: wrap;
+}
+
+.original {
+  text-decoration: line-through;
+  color: var(--error);
+}
+
+.arrow {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+}
+
+.corrected {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.rule {
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  font-style: italic;
+}

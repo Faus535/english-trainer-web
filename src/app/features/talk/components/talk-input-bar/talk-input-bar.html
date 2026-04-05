@@ -1,0 +1,22 @@
+<div class="input-bar">
+  <textarea
+    class="input-field"
+    [ngModel]="text()"
+    (ngModelChange)="text.set($event)"
+    (keydown)="onKeydown($event)"
+    [maxlength]="maxLength"
+    [disabled]="disabled()"
+    placeholder="Type your message..."
+    rows="1"
+    aria-label="Message input"
+  ></textarea>
+  <button
+    class="send-btn"
+    (click)="onSend()"
+    [disabled]="disabled() || !text().trim()"
+    aria-label="Send message"
+    type="button"
+  >
+    Send
+  </button>
+</div>

@@ -1,0 +1,45 @@
+<div class="conversation-layout">
+  <app-conversation-header
+    [level]="'a2'"
+    [messageCount]="messageCount()"
+    (endConversation)="onEndConversation()"
+  />
+
+  <div class="message-list" aria-live="polite">
+    @if (status() === 'sending' && messages().length === 0) {
+      <div class="loading-messages" aria-busy="true">
+        <div class="skeleton-msg"></div>
+        <div class="skeleton-msg short"></div>
+        <div class="skeleton-msg"></div>
+      </div>
+    }
+
+    @for (message of messages(); track message.id) {
+      <app-chat-bubble [message]="message" />
+      @if (message.feedback?.grammarCorrections?.length) {
+        <div class="corrections">
+          @for (correction of message.feedback!.grammarCorrections; track correction.original) {
+            <app-inline-correction [correction]="correction" />
+          }
+        </div>
+      }
+    }
+
+    @if (streaming()) {
+      <div class="typing-indicator" aria-label="AI is typing">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    }
+  </div>
+
+  @if (error()) {
+    <div class="error-banner" role="alert">
+      <p>{{ error() }}</p>
+      <button class="retry-btn" (click)="onMessageSent({ content: '' })">Retry</button>
+    </div>
+  }
+
+  <app-talk-input-bar [disabled]="inputDisabled()" (messageSent)="onMessageSent($event)" />
+</div>

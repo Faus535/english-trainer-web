@@ -1,0 +1,44 @@
+<section class="summary-page">
+  <h1 class="page-title">Conversation Summary</h1>
+
+  @if (status() === 'sending') {
+    <div class="loading" aria-busy="true">
+      <div class="skeleton-block"></div>
+      <div class="skeleton-block short"></div>
+    </div>
+  } @else if (endResult()) {
+    <div class="stats-row">
+      <div class="stat-card">
+        <span class="stat-value">{{ messagesCount() }}</span>
+        <span class="stat-label">Messages</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">{{ xpEarned() }}</span>
+        <span class="stat-label">XP Earned</span>
+      </div>
+    </div>
+
+    @if (summary()) {
+      <p class="summary-text">{{ summary() }}</p>
+    }
+
+    @if (evaluation()) {
+      <app-evaluation-card [evaluation]="evaluation()!" />
+    }
+
+    @if (goalDescriptions().length > 0) {
+      <app-goals-tracker [goals]="goalDescriptions()" />
+    }
+
+    <div class="actions">
+      <button class="action-btn primary" (click)="sendToReview()">Send errors to Review</button>
+      <button class="action-btn" (click)="newConversation()">New conversation</button>
+      <button class="action-btn" (click)="goHome()">Go home</button>
+    </div>
+  } @else {
+    <div class="empty-state">
+      <p>No summary available</p>
+      <button class="action-btn" (click)="goHome()">Go home</button>
+    </div>
+  }
+</section>
