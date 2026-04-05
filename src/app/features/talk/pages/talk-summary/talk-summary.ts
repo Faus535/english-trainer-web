@@ -1,8 +1,8 @@
 import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
 import { Router } from '@angular/router';
 import { TalkStateService } from '../../services/talk-state.service';
-import { EvaluationCard } from '../../../tutor/components/evaluation-card/evaluation-card';
-import { GoalsTracker } from '../../../tutor/components/goals-tracker/goals-tracker';
+import { EvaluationCard } from '../../components/evaluation-card/evaluation-card';
+import { GoalsTracker } from '../../components/goals-tracker/goals-tracker';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ReviewApiService } from '../../../../core/services/review-api.service';
 

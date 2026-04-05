@@ -1,8 +1,8 @@
 import { Component, ChangeDetectionStrategy, inject, OnInit, computed } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TalkStateService } from '../../services/talk-state.service';
-import { ChatBubble } from '../../../tutor/components/chat-bubble/chat-bubble';
-import { ConversationHeader } from '../../../tutor/components/conversation-header/conversation-header';
+import { ChatBubble } from '../../components/chat-bubble/chat-bubble';
+import { ConversationHeader } from '../../components/conversation-header/conversation-header';
 import { InlineCorrection } from '../../components/inline-correction/inline-correction';
 import { TalkInputBar } from '../../components/talk-input-bar/talk-input-bar';
 

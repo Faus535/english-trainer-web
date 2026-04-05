@@ -25,17 +25,7 @@
 
         @if (fb.grammarCorrections.length > 0) {
           <div class="feedback-section">
-            <div class="feedback-section-header">
-              <h4 class="feedback-section-title">Gramatica</h4>
-              <button
-                class="feedback-history-link"
-                (click)="goToErrorHistory()"
-                aria-label="Ver historial de errores"
-              >
-                <app-icon [name]="historyIcon" [size]="12" aria-hidden="true" />
-                Historial
-              </button>
-            </div>
+            <h4 class="feedback-section-title">Gramatica</h4>
             @for (correction of fb.grammarCorrections; track correction.original) {
               <div class="grammar-item">
                 @if (correction.category) {

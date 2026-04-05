@@ -1,24 +1,8 @@
-import {
-  Component,
-  ChangeDetectionStrategy,
-  input,
-  output,
-  signal,
-  computed,
-  inject,
-} from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, ChangeDetectionStrategy, input, output, signal, computed } from '@angular/core';
 import { Icon } from '../../../../shared/components/icon/icon';
 import { VocabPopup } from '../../../../shared/components/vocab-popup/vocab-popup';
-import {
-  LucideIconData,
-  ChevronDown,
-  ChevronUp,
-  Volume2,
-  BookPlus,
-  BarChart3,
-} from 'lucide-angular';
-import { TutorFeedback } from '../../models/tutor.model';
+import { LucideIconData, ChevronDown, ChevronUp, Volume2, BookPlus } from 'lucide-angular';
+import { TutorFeedback } from '../../models/talk.model';
 
 @Component({
   selector: 'app-feedback-card',
@@ -28,8 +12,6 @@ import { TutorFeedback } from '../../models/tutor.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeedbackCard {
-  private readonly router = inject(Router);
-
   readonly feedback = input.required<TutorFeedback>();
   readonly speakWord = output<string>();
   readonly addToReview = output<string>();
@@ -39,7 +21,6 @@ export class FeedbackCard {
   protected readonly collapseIcon: LucideIconData = ChevronUp;
   protected readonly speakIcon: LucideIconData = Volume2;
   protected readonly addIcon: LucideIconData = BookPlus;
-  protected readonly historyIcon: LucideIconData = BarChart3;
 
   protected readonly selectedVocabWord = signal('');
   protected readonly showVocabPopup = signal(false);
@@ -55,10 +36,6 @@ export class FeedbackCard {
 
   protected toggle(): void {
     this.expanded.update((v) => !v);
-  }
-
-  protected goToErrorHistory(): void {
-    this.router.navigate(['/analytics']);
   }
 
   protected openVocabPopup(word: string): void {

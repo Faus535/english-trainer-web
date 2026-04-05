@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { ConversationMessage } from '../../models/tutor.model';
+import { ConversationMessage } from '../../models/talk.model';
 import { FeedbackCard } from '../feedback-card/feedback-card';
 
 @Component({

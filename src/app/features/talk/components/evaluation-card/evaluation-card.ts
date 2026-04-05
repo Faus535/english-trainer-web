@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, input, computed } from '@angular/core';
 import { Icon } from '../../../../shared/components/icon/icon';
 import { LucideIconData, Check, ArrowUp, Award } from 'lucide-angular';
-import { ConversationEvaluation } from '../../models/tutor.model';
+import { ConversationEvaluation } from '../../models/talk.model';
 
 interface ScoreBar {
   label: string;
