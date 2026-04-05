@@ -1,0 +1,88 @@
+:host {
+  display: block;
+  position: relative;
+}
+
+.popup {
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-5);
+  box-shadow: var(--shadow-elevated);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  max-width: 20rem;
+
+  // Mobile: bottom sheet
+  @media (max-width: 767px) {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: 100%;
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    padding-bottom: calc(var(--sp-6) + env(safe-area-inset-bottom, 0px));
+    z-index: 200;
+  }
+}
+
+.popup-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.popup-word {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+
+.popup-pos {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  font-style: italic;
+}
+
+.close-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--text-3);
+  font-size: var(--fs-xl);
+  cursor: pointer;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-definition {
+  font-size: var(--fs-base);
+  color: var(--text);
+}
+
+.popup-context {
+  font-size: var(--fs-sm);
+  color: var(--text-3);
+  font-style: italic;
+}
+
+.add-btn {
+  padding: var(--sp-3);
+  background: var(--gradient-immerse);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-md);
+  font-weight: 600;
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  min-height: 2.75rem;
+  transition: opacity 200ms var(--ease);
+
+  &:hover {
+    opacity: 0.9;
+  }
+}

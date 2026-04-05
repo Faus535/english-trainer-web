@@ -1,0 +1,89 @@
+<section class="exercises-page">
+  <h1 class="page-title">Exercises</h1>
+
+  @if (loading()) {
+    <div class="loading" aria-busy="true">
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card short"></div>
+    </div>
+  } @else if (showResults()) {
+    <div class="results-panel">
+      <h2 class="results-title">
+        @if (accuracy() >= 80) {
+          Great job!
+        } @else {
+          Keep practicing!
+        }
+      </h2>
+
+      <div class="stats-row">
+        <div class="stat">
+          <span class="stat-value">{{ accuracy() }}%</span>
+          <span class="stat-label">Accuracy</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">{{ progress().length }}</span>
+          <span class="stat-label">Completed</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">{{ capturedVocab().length }}</span>
+          <span class="stat-label">Vocab Saved</span>
+        </div>
+      </div>
+
+      @if (capturedVocab().length > 0) {
+        <div class="vocab-list">
+          <h3 class="vocab-title">Saved vocabulary</h3>
+          <div class="vocab-chips">
+            @for (entry of capturedVocab(); track entry.word) {
+              <app-vocab-chip [entry]="entry" />
+            }
+          </div>
+        </div>
+      }
+
+      <div class="actions">
+        <button class="action-btn" (click)="backToArticle()" type="button">Back to article</button>
+        <button class="action-btn primary" (click)="newContent()" type="button">New content</button>
+      </div>
+    </div>
+  } @else if (currentExercise()) {
+    <div class="exercise-card">
+      <span class="exercise-counter"> {{ currentIndex() + 1 }} / {{ exercises().length }} </span>
+      <p class="exercise-prompt">{{ currentExercise()!.prompt }}</p>
+
+      @if (currentExercise()!.type === 'definition-match' && currentExercise()!.options) {
+        <div class="options">
+          @for (option of currentExercise()!.options!; track option) {
+            <button
+              class="option-btn"
+              [class.selected]="selectedOption() === option"
+              (click)="selectOption(option)"
+              type="button"
+            >
+              {{ option }}
+            </button>
+          }
+        </div>
+      } @else {
+        <input
+          class="answer-input"
+          [ngModel]="currentAnswer()"
+          (ngModelChange)="currentAnswer.set($event)"
+          (keydown.enter)="submitAnswer()"
+          placeholder="Type your answer..."
+          aria-label="Your answer"
+        />
+      }
+
+      <button
+        class="submit-btn"
+        (click)="submitAnswer()"
+        [disabled]="!currentAnswer().trim() && !selectedOption()"
+        type="button"
+      >
+        Submit
+      </button>
+    </div>
+  }
+</section>

@@ -1,0 +1,22 @@
+:host {
+  display: inline-block;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-3);
+  background: var(--primary-soft);
+  border-radius: var(--r-full);
+  font-size: var(--fs-sm);
+}
+
+.chip-word {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.chip-def {
+  color: var(--text-3);
+}

@@ -1,0 +1,43 @@
+@if (loading()) {
+  <div class="reader-skeleton" aria-busy="true">
+    <div class="skeleton-title"></div>
+    <div class="skeleton-para"></div>
+    <div class="skeleton-para short"></div>
+    <div class="skeleton-para"></div>
+  </div>
+} @else if (error()) {
+  <div class="error-state" role="alert">
+    <p>{{ error() }}</p>
+  </div>
+} @else if (content()) {
+  <div class="progress-bar" role="progressbar" [attr.aria-valuenow]="readingProgress()">
+    <div class="progress-fill" [style.width.%]="readingProgress()"></div>
+  </div>
+
+  <article class="reader" (scroll)="onScroll($event)">
+    <h1 class="article-title">{{ content()!.title }}</h1>
+    <div class="article-meta">
+      <span class="difficulty">{{ content()!.difficulty | uppercase }}</span>
+      <span class="word-count">{{ content()!.wordCount }} words</span>
+      @if (capturedVocabCount() > 0) {
+        <span class="saved-count">{{ capturedVocabCount() }} saved</span>
+      }
+    </div>
+
+    @for (paragraph of content()!.paragraphs; track $index) {
+      <p class="paragraph">{{ paragraph.text }}</p>
+    }
+
+    <div class="end-cta">
+      <button class="cta-btn" (click)="goToExercises()" type="button">Continue to exercises</button>
+    </div>
+  </article>
+
+  @if (activeVocabEntry()) {
+    <app-word-popup
+      [entry]="activeVocabEntry()!"
+      (dismissed)="onPopupDismissed()"
+      (addToReview)="onAddToReview($event)"
+    />
+  }
+}

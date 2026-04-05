@@ -1,0 +1,10 @@
+<span
+  class="word"
+  [attr.data-level]="annotation().level"
+  tabindex="0"
+  role="button"
+  [attr.aria-label]="annotation().word + ' — tap for definition'"
+  (click)="onClick()"
+  (keydown)="onKeydown($event)"
+  >{{ annotation().word }}</span
+>

@@ -1,0 +1,12 @@
+<div class="popup" role="dialog" aria-label="Word definition">
+  <div class="popup-header">
+    <span class="popup-word">{{ entry().word }}</span>
+    <span class="popup-pos">{{ entry().partOfSpeech }}</span>
+    <button class="close-btn" (click)="onDismiss()" aria-label="Close" type="button">
+      &times;
+    </button>
+  </div>
+  <p class="popup-definition">{{ entry().definition }}</p>
+  <p class="popup-context">{{ entry().contextSentence }}</p>
+  <button class="add-btn" (click)="onAddToReview()" type="button">Add to Review</button>
+</div>

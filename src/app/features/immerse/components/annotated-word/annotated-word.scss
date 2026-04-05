@@ -1,0 +1,41 @@
+:host {
+  display: inline;
+}
+
+.word {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+  border-radius: 0.125rem;
+  transition: background 200ms var(--ease);
+
+  &:hover,
+  &:focus-visible {
+    background: var(--primary-soft);
+  }
+
+  &[data-level='a1'] {
+    text-decoration-color: var(--level-a1);
+  }
+
+  &[data-level='a2'] {
+    text-decoration-color: var(--level-a2);
+  }
+
+  &[data-level='b1'] {
+    text-decoration-color: var(--level-b1);
+  }
+
+  &[data-level='b2'] {
+    text-decoration-color: var(--level-b2);
+  }
+
+  &[data-level='c1'] {
+    text-decoration-color: var(--level-c1);
+  }
+
+  &[data-level='c2'] {
+    text-decoration-color: var(--level-c2);
+  }
+}
