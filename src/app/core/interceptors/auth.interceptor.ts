@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { switchMap, catchError, finalize, share, Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { AuthResponse } from '../../shared/models/api.model';
+import { isPublicAuthUrl } from './public-auth-urls';
 
 const REFRESH_MARGIN_MS = 5 * 60 * 1000;
 
@@ -28,7 +29,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
   const token = auth.token();
 
-  if (!token || req.url.includes('/auth/')) {
+  if (!token || isPublicAuthUrl(req.url)) {
     return next(req);
   }
 

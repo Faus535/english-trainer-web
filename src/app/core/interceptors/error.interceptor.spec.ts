@@ -77,6 +77,21 @@ describe('errorInterceptor', () => {
     expect(logoutSpy).not.toHaveBeenCalled();
   });
 
+  it('should attempt refresh on 401 for /auth/me (authenticated endpoint)', () => {
+    const refreshSpy = vi.spyOn(auth, 'refresh');
+
+    http.get('/api/auth/me').subscribe({
+      error: () => {
+        // expected
+      },
+    });
+
+    const req = httpMock.expectOne('/api/auth/me');
+    req.flush(null, { status: 401, statusText: 'Unauthorized' });
+
+    expect(refreshSpy).toHaveBeenCalled();
+  });
+
   it('should propagate error to subscriber', () => {
     let caughtError: HttpErrorResponse | null = null;
 
