@@ -7,6 +7,7 @@ export interface ImmerseContent {
   paragraphs: AnnotatedParagraph[];
   difficulty: Level;
   wordCount: number;
+  contentType?: ContentType;
 }
 
 export interface AnnotatedParagraph {
@@ -51,6 +52,14 @@ export interface ImmerseContentSuggestion {
   description: string;
   difficulty: Level;
   estimatedMinutes: number;
+}
+
+export type ContentType = 'TEXT' | 'AUDIO' | 'VIDEO';
+
+export interface GenerateContentRequest {
+  contentType: ContentType;
+  level?: Level;
+  topic?: string;
 }
 
 export interface ImmerseContentRequest {

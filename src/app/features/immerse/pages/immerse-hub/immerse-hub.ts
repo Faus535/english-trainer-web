@@ -4,7 +4,8 @@ import { Router } from '@angular/router';
 import { UpperCasePipe } from '@angular/common';
 import { ImmerseApiService } from '../../services/immerse-api.service';
 import { ImmerseStateService } from '../../services/immerse-state.service';
-import { ImmerseContentSuggestion } from '../../models/immerse.model';
+import { ImmerseContentSuggestion, ContentType } from '../../models/immerse.model';
+import { Level, CEFR_LEVELS } from '../../../../shared/models/learning.model';
 
 @Component({
   selector: 'app-immerse-hub',
@@ -26,9 +27,23 @@ export class ImmerseHub implements OnInit {
   protected readonly error = this.immerseState.error;
   protected readonly maxTextLength = 50000;
 
+  protected readonly selectedContentType = signal<ContentType>('TEXT');
+  protected readonly selectedLevel = signal<Level>('b1');
+  protected readonly topicInput = signal('');
+  protected readonly contentTypes: ContentType[] = ['TEXT', 'AUDIO', 'VIDEO'];
+  protected readonly levels = CEFR_LEVELS;
+
   ngOnInit(): void {
     this.immerseApi.getSuggested().subscribe({
       next: (data) => this.suggestions.set(data),
+    });
+  }
+
+  protected onGenerate(): void {
+    this.immerseState.generateContent({
+      contentType: this.selectedContentType(),
+      level: this.selectedLevel(),
+      topic: this.topicInput().trim() || undefined,
     });
   }
 

@@ -2,6 +2,78 @@
   <h1 class="page-title">Immerse</h1>
   <p class="page-subtitle">Learn from real content</p>
 
+  <!-- Generate content section -->
+  <section class="generate-section">
+    <h2 class="section-title">Generate for me</h2>
+    <p class="section-desc">Pick a format and let AI create something for you</p>
+
+    <div class="content-type-selector">
+      @for (type of contentTypes; track type) {
+        <button
+          class="type-card"
+          [class.active]="selectedContentType() === type"
+          (click)="selectedContentType.set(type)"
+          type="button"
+        >
+          <span class="type-icon" aria-hidden="true">
+            @switch (type) {
+              @case ('TEXT') {
+                📝
+              }
+              @case ('AUDIO') {
+                🎧
+              }
+              @case ('VIDEO') {
+                🎬
+              }
+            }
+          </span>
+          <span class="type-label">{{ type }}</span>
+        </button>
+      }
+    </div>
+
+    <div class="generate-options">
+      <select
+        class="level-select"
+        [ngModel]="selectedLevel()"
+        (ngModelChange)="selectedLevel.set($event)"
+        aria-label="CEFR Level"
+      >
+        @for (level of levels; track level) {
+          <option [value]="level">{{ level | uppercase }}</option>
+        }
+      </select>
+
+      <input
+        class="topic-input"
+        type="text"
+        [ngModel]="topicInput()"
+        (ngModelChange)="topicInput.set($event)"
+        placeholder="Topic (optional)... e.g. space travel, cooking, music"
+        aria-label="Topic"
+      />
+    </div>
+
+    <button
+      class="submit-btn full-width"
+      (click)="onGenerate()"
+      [disabled]="loading()"
+      type="button"
+    >
+      @if (loading()) {
+        <span class="spinner" aria-hidden="true"></span>
+      }
+      Generate Content
+    </button>
+  </section>
+
+  <!-- Divider between generate and manual -->
+  <div class="divider">
+    <span class="divider-text">or bring your own</span>
+  </div>
+
+  <!-- Manual input section -->
   <div class="input-section">
     <div class="url-input-group">
       <input

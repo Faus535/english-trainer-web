@@ -8,6 +8,7 @@ import {
   ImmerseExerciseResult,
   VocabEntry,
   WordAnnotation,
+  GenerateContentRequest,
 } from '../models/immerse.model';
 
 @Injectable({ providedIn: 'root' })
@@ -40,6 +41,23 @@ export class ImmerseStateService {
     if (exercises.length === 0) return 0;
     return Math.round((results.length / exercises.length) * 100);
   });
+
+  generateContent(req: GenerateContentRequest): void {
+    this._loading.set(true);
+    this._error.set(null);
+
+    this.immerseApi.generateContent(req).subscribe({
+      next: (res) => {
+        this._content.set(res);
+        this._loading.set(false);
+        this.router.navigate(['/immerse', res.id]);
+      },
+      error: (err) => {
+        this._loading.set(false);
+        this._error.set(err.error?.message ?? 'Could not generate content');
+      },
+    });
+  }
 
   submitContent(req: ImmerseContentRequest): void {
     this._loading.set(true);
