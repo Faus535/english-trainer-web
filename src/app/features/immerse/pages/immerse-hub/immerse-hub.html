@@ -1,0 +1,87 @@
+<section class="immerse-hub">
+  <h1 class="page-title">Immerse</h1>
+  <p class="page-subtitle">Learn from real content</p>
+
+  <div class="input-section">
+    <div class="url-input-group">
+      <input
+        class="url-input"
+        type="url"
+        [ngModel]="urlInput()"
+        (ngModelChange)="urlInput.set($event)"
+        placeholder="Paste an HTTPS URL..."
+        aria-label="Content URL"
+      />
+      <button
+        class="submit-btn"
+        (click)="onSubmitUrl()"
+        [disabled]="loading() || !urlInput().trim()"
+        type="button"
+      >
+        @if (loading()) {
+          <span class="spinner" aria-hidden="true"></span>
+        }
+        Go
+      </button>
+    </div>
+    @if (urlError()) {
+      <p class="inline-error" role="alert">{{ urlError() }}</p>
+    }
+
+    <div class="divider">
+      <span class="divider-text">or</span>
+    </div>
+
+    <textarea
+      class="text-input"
+      [ngModel]="textInput()"
+      (ngModelChange)="textInput.set($event)"
+      [maxlength]="maxTextLength"
+      placeholder="Paste text content here..."
+      rows="4"
+      aria-label="Text content"
+    ></textarea>
+    <button
+      class="submit-btn full-width"
+      (click)="onSubmitText()"
+      [disabled]="loading() || !textInput().trim()"
+      type="button"
+    >
+      @if (loading()) {
+        <span class="spinner" aria-hidden="true"></span>
+      }
+      Analyze Text
+    </button>
+  </div>
+
+  @if (error()) {
+    <p class="inline-error" role="alert">{{ error() }}</p>
+  }
+
+  @if (suggestions().length > 0) {
+    <section class="suggestions">
+      <h2 class="section-title">Suggested for you</h2>
+      <div class="suggestion-grid">
+        @for (suggestion of suggestions(); track suggestion.id) {
+          <button class="suggestion-card" (click)="onSuggestionClick(suggestion)" type="button">
+            <span class="suggestion-title">{{ suggestion.title }}</span>
+            <span class="suggestion-desc">{{ suggestion.description }}</span>
+            <div class="suggestion-meta">
+              <span class="badge" [attr.data-level]="suggestion.difficulty">
+                {{ suggestion.difficulty | uppercase }}
+              </span>
+              <span class="duration">{{ suggestion.estimatedMinutes }} min</span>
+            </div>
+          </button>
+        }
+      </div>
+    </section>
+  }
+
+  @if (!suggestions().length && !urlInput() && !textInput()) {
+    <div class="empty-state">
+      <p class="empty-title">Start learning from real content</p>
+      <p class="empty-desc">Paste a URL or text above to begin</p>
+    </div>
+  }
+</section>
