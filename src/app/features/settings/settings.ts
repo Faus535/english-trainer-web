@@ -117,7 +117,7 @@ export class Settings implements OnInit {
     const profileId = this.auth.profileId();
     if (!profileId) {
       this.state.markTestIncomplete();
-      this.router.navigate(['/level-test']);
+      this.router.navigate(['/home']);
       return;
     }
 
@@ -126,12 +126,12 @@ export class Settings implements OnInit {
       next: () => {
         this.state.markTestIncomplete();
         this.retaking.set(false);
-        this.router.navigate(['/level-test']);
+        this.router.navigate(['/home']);
       },
       error: () => {
         this.state.markTestIncomplete();
         this.retaking.set(false);
-        this.router.navigate(['/level-test']);
+        this.router.navigate(['/home']);
       },
     });
   }
@@ -143,7 +143,7 @@ export class Settings implements OnInit {
       )
     ) {
       this.state.resetProgress();
-      this.router.navigate(['/level-test']);
+      this.router.navigate(['/home']);
     }
   }
 
