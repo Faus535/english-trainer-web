@@ -1,0 +1,28 @@
+:host {
+  display: block;
+}
+
+.streak-card {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+  background: var(--surface-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+}
+
+.flame {
+  font-size: var(--fs-xl);
+}
+
+.streak-count {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  color: var(--warning);
+}
+
+.streak-label {
+  font-size: var(--fs-sm);
+  color: var(--text-3);
+}

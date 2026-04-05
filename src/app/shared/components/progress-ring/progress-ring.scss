@@ -1,0 +1,15 @@
+:host {
+  display: inline-block;
+}
+
+.ring {
+  transform: rotate(-90deg);
+}
+
+.ring-bg {
+  stroke: var(--surface-1);
+}
+
+.ring-fill {
+  transition: stroke-dashoffset 500ms var(--ease);
+}

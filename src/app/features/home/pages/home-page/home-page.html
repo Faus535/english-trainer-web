@@ -1,4 +1,42 @@
-<section class="home-placeholder">
-  <h1 class="title">Home</h1>
-  <p class="subtitle">Coming soon</p>
+<section class="home-page">
+  @if (loading()) {
+    <div class="skeleton-layout" aria-busy="true">
+      <div class="skeleton-card large"></div>
+      <div class="skeleton-row">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </div>
+  } @else if (data()) {
+    <div class="header-row">
+      <h1 class="greeting">Welcome back</h1>
+      <button class="avatar-btn" (click)="goToProfile()" aria-label="Go to profile" type="button">
+        <span class="avatar" aria-hidden="true">👤</span>
+      </button>
+    </div>
+
+    <app-suggested-action-card
+      [type]="data()!.suggestedAction.type"
+      [title]="data()!.suggestedAction.title"
+      [description]="data()!.suggestedAction.description"
+      (tapped)="onActionTapped(data()!.suggestedAction.targetRoute)"
+    />
+
+    <div class="stats-row">
+      <app-daily-progress [xpToday]="data()!.progress.xpToday" [xpGoal]="data()!.progress.xpGoal" />
+      <app-streak-widget [streak]="data()!.progress.streak" />
+    </div>
+
+    @if (data()!.recentActivity.reviewDueCount > 0) {
+      <div class="review-badge">
+        <span class="badge-count">{{ data()!.recentActivity.reviewDueCount }}</span>
+        <span class="badge-text">reviews due today</span>
+      </div>
+    }
+  } @else {
+    <div class="empty-state">
+      <h1 class="greeting">Welcome</h1>
+      <p class="empty-desc">Start a conversation or explore content to begin learning</p>
+    </div>
+  }
 </section>

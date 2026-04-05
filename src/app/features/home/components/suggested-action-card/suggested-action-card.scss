@@ -1,0 +1,58 @@
+:host {
+  display: block;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  width: 100%;
+  padding: var(--sp-6);
+  border: none;
+  border-radius: var(--r-xl);
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    transform 200ms var(--ease),
+    opacity 200ms var(--ease);
+  min-height: 2.75rem;
+
+  &[data-type='talk'] {
+    background: var(--gradient-talk);
+  }
+
+  &[data-type='immerse'] {
+    background: var(--gradient-immerse);
+  }
+
+  &[data-type='review'] {
+    background: var(--gradient-review);
+  }
+
+  &:hover {
+    opacity: 0.95;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.card-title {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+
+.card-desc {
+  font-size: var(--fs-sm);
+  opacity: 0.85;
+}
+
+.card-cta {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  margin-top: var(--sp-2);
+}

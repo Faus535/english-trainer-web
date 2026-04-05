@@ -1,0 +1,7 @@
+<button class="card" [attr.data-type]="type()" (click)="onTap()" type="button">
+  <span class="card-title">{{ title() }}</span>
+  @if (description()) {
+    <span class="card-desc">{{ description() }}</span>
+  }
+  <span class="card-cta">Start &rarr;</span>
+</button>

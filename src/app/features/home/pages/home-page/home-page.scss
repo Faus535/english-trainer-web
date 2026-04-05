@@ -2,22 +2,122 @@
   display: block;
 }
 
-.home-placeholder {
+.home-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.greeting {
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+}
+
+.avatar-btn {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: var(--fs-lg);
+  transition: border-color 200ms var(--ease);
+
+  &:hover {
+    border-color: var(--border-active);
+  }
+}
+
+.stats-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+
+    app-daily-progress {
+      flex: 1;
+    }
+  }
+}
+
+.review-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+  background: var(--warning-soft);
+  border: 1px solid rgba(234, 179, 8, 0.2);
+  border-radius: var(--r-lg);
+}
+
+.badge-count {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--warning);
+}
+
+.badge-text {
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+}
+
+.skeleton-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.skeleton-card {
+  height: 4rem;
+  background: var(--surface-1);
+  border-radius: var(--r-lg);
+  animation: pulse 1.5s ease-in-out infinite;
+
+  &.large {
+    height: 8rem;
+  }
+}
+
+.skeleton-row {
+  display: flex;
+  gap: var(--sp-4);
+
+  .skeleton-card {
+    flex: 1;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: 60dvh;
-  gap: var(--sp-3);
+  gap: var(--sp-4);
+  padding: var(--sp-10);
+  text-align: center;
 }
 
-.title {
-  font-size: var(--fs-2xl);
-  font-weight: 700;
-  color: var(--text);
-}
-
-.subtitle {
+.empty-desc {
   font-size: var(--fs-base);
   color: var(--text-3);
 }
