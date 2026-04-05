@@ -35,6 +35,19 @@ export class ReviewApiService {
     });
   }
 
+  addAnnotatedWordToReview(
+    profileId: string,
+    word: string,
+    definition: string,
+    level: string,
+    source: string,
+  ): Observable<SpacedRepetitionItemResponse> {
+    return this.http.post<SpacedRepetitionItemResponse>(
+      `${this.baseUrl}/${profileId}/review/items`,
+      { itemType: 'vocabulary-word', word, definition, level, source },
+    );
+  }
+
   getDueReviews(profileId: string): Observable<SpacedRepetitionItemResponse[]> {
     return this.http.get<SpacedRepetitionItemResponse[]>(
       `${this.baseUrl}/${profileId}/reviews/due`,

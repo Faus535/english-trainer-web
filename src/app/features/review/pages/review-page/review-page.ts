@@ -76,7 +76,7 @@ export class ReviewPage implements OnInit {
   }
 
   protected goBack(): void {
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/home']);
   }
 
   private loadData(): void {

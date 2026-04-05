@@ -1,0 +1,31 @@
+<section class="stats-page">
+  <h1 class="page-title">Review Stats</h1>
+
+  @if (loading()) {
+    <div class="loading" aria-busy="true">
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+    </div>
+  } @else {
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-value">{{ totalItems() }}</span>
+        <span class="stat-label">Total Items</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">{{ dueToday() }}</span>
+        <span class="stat-label">Due Today</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">{{ completedToday() }}</span>
+        <span class="stat-label">Completed Today</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">{{ streak() }}</span>
+        <span class="stat-label">Day Streak</span>
+      </div>
+    </div>
+
+    <a class="back-link" routerLink="/review">Back to review queue</a>
+  }
+</section>
