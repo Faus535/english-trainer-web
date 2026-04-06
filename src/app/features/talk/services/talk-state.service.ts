@@ -1,55 +1,40 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
-import { Level } from '../../../shared/models/learning.model';
-import { AuthService } from '../../../core/services/auth.service';
 import { TalkApiService } from './talk-api.service';
-import { TalkSseService } from './talk-sse.service';
-import {
-  ConversationMessage,
-  ConversationStatus,
-  EndConversationResponse,
-} from '../models/talk.model';
+import { ConversationMessage, ConversationStatus, TalkEndResponse } from '../models/talk.model';
 
 @Injectable({ providedIn: 'root' })
 export class TalkStateService {
   private readonly talkApi = inject(TalkApiService);
-  private readonly sseService = inject(TalkSseService);
-  private readonly auth = inject(AuthService);
 
   private readonly _scenarioId = signal<string | null>(null);
-  private readonly _scenarioType = signal<string | null>(null);
   private readonly _conversationId = signal<string | null>(null);
   private readonly _messages = signal<ConversationMessage[]>([]);
   private readonly _status = signal<ConversationStatus>('idle');
-  private readonly _streaming = signal(false);
   private readonly _error = signal<string | null>(null);
-  private readonly _endResult = signal<EndConversationResponse | null>(null);
+  private readonly _endResult = signal<TalkEndResponse | null>(null);
+  private readonly _suggestEnd = signal(false);
+  private readonly _level = signal<string>('a2');
 
   readonly scenarioId = this._scenarioId.asReadonly();
-  readonly scenarioType = this._scenarioType.asReadonly();
   readonly conversationId = this._conversationId.asReadonly();
   readonly messages = this._messages.asReadonly();
   readonly status = this._status.asReadonly();
-  readonly streaming = this._streaming.asReadonly();
   readonly error = this._error.asReadonly();
   readonly endResult = this._endResult.asReadonly();
+  readonly suggestEnd = this._suggestEnd.asReadonly();
+  readonly level = this._level.asReadonly();
   readonly isActive = computed(() => !!this._conversationId());
   readonly messageCount = computed(() => this._messages().length);
+  readonly isSending = computed(() => this._status() === 'sending');
 
-  selectScenario(scenarioId: string, scenarioType: string): void {
-    this._scenarioId.set(scenarioId);
-    this._scenarioType.set(scenarioType);
-  }
-
-  startConversation(scenarioId: string, level: Level): void {
-    const profileId = this.auth.profileId();
-    if (!profileId) return;
-
+  startConversation(scenarioId: string, level: string): void {
     this._status.set('sending');
     this._error.set(null);
     this._endResult.set(null);
     this._scenarioId.set(scenarioId);
+    this._level.set(level);
 
-    this.talkApi.startConversation(profileId, { scenarioId, level }).subscribe({
+    this.talkApi.startConversation({ scenarioId, level }).subscribe({
       next: (res) => {
         this._conversationId.set(res.id);
         this._messages.set(res.messages);
@@ -62,7 +47,7 @@ export class TalkStateService {
     });
   }
 
-  sendMessageStreaming(content: string, confidence?: number): void {
+  sendMessage(content: string, confidence?: number): void {
     const conversationId = this._conversationId();
     if (!conversationId) return;
 
@@ -70,48 +55,29 @@ export class TalkStateService {
       id: crypto.randomUUID(),
       role: 'user',
       content,
-      timestamp: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
       confidence,
     };
     this._messages.update((msgs) => [...msgs, userMessage]);
     this._status.set('sending');
-    this._streaming.set(true);
     this._error.set(null);
 
-    const assistantMessage: ConversationMessage = {
-      id: crypto.randomUUID(),
-      role: 'assistant',
-      content: '',
-      timestamp: new Date().toISOString(),
-    };
-    this._messages.update((msgs) => [...msgs, assistantMessage]);
-
-    let accumulated = '';
-    this.sseService.streamMessage(conversationId, content, confidence).subscribe({
-      next: (event) => {
-        if (event.type === 'chunk') {
-          accumulated += event.text;
-          this._messages.update((msgs) => {
-            const updated = [...msgs];
-            updated[updated.length - 1] = { ...updated[updated.length - 1], content: accumulated };
-            return updated;
-          });
-        } else if (event.type === 'feedback') {
-          this._messages.update((msgs) => {
-            const updated = [...msgs];
-            updated[updated.length - 1] = { ...updated[updated.length - 1], feedback: event.data };
-            return updated;
-          });
-        }
-      },
-      complete: () => {
-        this._streaming.set(false);
+    this.talkApi.sendMessage(conversationId, content, confidence).subscribe({
+      next: (res) => {
+        const assistantMessage: ConversationMessage = {
+          id: crypto.randomUUID(),
+          role: 'assistant',
+          content: res.content,
+          createdAt: new Date().toISOString(),
+          correction: res.correction,
+        };
+        this._messages.update((msgs) => [...msgs, assistantMessage]);
+        this._suggestEnd.set(res.suggestEnd);
         this._status.set('idle');
       },
       error: () => {
-        this._streaming.set(false);
         this._status.set('error');
-        this._error.set('Error streaming response');
+        this._error.set('Error sending message');
       },
     });
   }
@@ -136,12 +102,12 @@ export class TalkStateService {
 
   resetConversation(): void {
     this._scenarioId.set(null);
-    this._scenarioType.set(null);
     this._conversationId.set(null);
     this._messages.set([]);
     this._status.set('idle');
-    this._streaming.set(false);
     this._error.set(null);
     this._endResult.set(null);
+    this._suggestEnd.set(false);
+    this._level.set('a2');
   }
 }

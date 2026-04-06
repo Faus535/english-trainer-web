@@ -1,0 +1,30 @@
+@let msg = message();
+
+<div
+  class="bubble"
+  [class.bubble--user]="msg.role === 'user'"
+  [class.bubble--assistant]="msg.role === 'assistant'"
+  [attr.aria-label]="msg.role === 'user' ? 'Your message' : 'Tutor response'"
+>
+  @if (msg.role === 'assistant') {
+    <span class="bubble-avatar" aria-hidden="true">AI</span>
+  }
+
+  <div class="bubble-content">
+    <p class="bubble-text">{{ msg.content }}</p>
+
+    @if (msg.confidence; as conf) {
+      <span class="bubble-confidence" aria-label="Recognition confidence">
+        {{ conf * 100 | number: '1.0-0' }}%
+      </span>
+    }
+
+    <time class="bubble-time" [attr.datetime]="msg.createdAt">
+      {{ msg.createdAt | date: 'HH:mm' }}
+    </time>
+  </div>
+</div>
+
+@if (msg.correction) {
+  <app-talk-feedback-card [correction]="msg.correction" />
+}

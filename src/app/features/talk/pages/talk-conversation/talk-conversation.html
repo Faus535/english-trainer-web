@@ -1,6 +1,6 @@
 <div class="conversation-layout">
   <app-conversation-header
-    [level]="'a2'"
+    [level]="$any(level())"
     [messageCount]="messageCount()"
     (endConversation)="onEndConversation()"
   />
@@ -15,17 +15,10 @@
     }
 
     @for (message of messages(); track message.id) {
-      <app-chat-bubble [message]="message" />
-      @if (message.feedback?.grammarCorrections?.length) {
-        <div class="corrections">
-          @for (correction of message.feedback!.grammarCorrections; track correction.original) {
-            <app-inline-correction [correction]="correction" />
-          }
-        </div>
-      }
+      <app-talk-chat-bubble [message]="message" />
     }
 
-    @if (streaming()) {
+    @if (status() === 'sending' && messages().length > 0) {
       <div class="typing-indicator" aria-label="AI is typing">
         <span class="dot"></span>
         <span class="dot"></span>

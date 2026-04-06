@@ -1,0 +1,54 @@
+@let c = correction();
+
+@if (hasFeedback() || c.encouragement) {
+  <div class="feedback" [class.feedback--expanded]="expanded()">
+    <button
+      class="feedback-toggle"
+      (click)="toggle()"
+      [attr.aria-expanded]="expanded()"
+      aria-controls="feedback-content"
+    >
+      <span class="feedback-toggle-label">Feedback</span>
+      <span class="feedback-toggle-icon" aria-hidden="true">{{ expanded() ? '▲' : '▼' }}</span>
+    </button>
+
+    @if (expanded()) {
+      <div class="feedback-content" id="feedback-content" role="region" aria-label="Tutor feedback">
+        @if (c.encouragement) {
+          <p class="feedback-encouragement">{{ c.encouragement }}</p>
+        }
+
+        @if (c.grammarFixes.length > 0) {
+          <div class="feedback-section">
+            <h4 class="feedback-section-title">Grammar</h4>
+            @for (fix of c.grammarFixes; track fix) {
+              <app-inline-correction [correction]="fix" />
+            }
+          </div>
+        }
+
+        @if (c.vocabularySuggestions.length > 0) {
+          <div class="feedback-section">
+            <h4 class="feedback-section-title">Vocabulary</h4>
+            <ul class="feedback-list">
+              @for (suggestion of c.vocabularySuggestions; track suggestion) {
+                <li>{{ suggestion }}</li>
+              }
+            </ul>
+          </div>
+        }
+
+        @if (c.pronunciationTips.length > 0) {
+          <div class="feedback-section">
+            <h4 class="feedback-section-title">Pronunciation</h4>
+            <ul class="feedback-list">
+              @for (tip of c.pronunciationTips; track tip) {
+                <li>{{ tip }}</li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}
