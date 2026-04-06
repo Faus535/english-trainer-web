@@ -43,7 +43,7 @@ export class ScenarioSelect implements OnInit {
 
   protected onScenarioSelected(scenario: Scenario): void {
     this.router.navigate(['/talk', 'conversation'], {
-      queryParams: { scenarioId: scenario.id },
+      queryParams: { scenarioId: scenario.id, level: scenario.cefrLevel },
     });
   }
 

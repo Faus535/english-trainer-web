@@ -1,4 +1,11 @@
-import { Level } from '../../../shared/models/learning.model';
+export interface TalkScenarioResponse {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  cefrLevel: string;
+  difficultyOrder: number;
+}
 
 export interface ScenarioCategory {
   id: string;
@@ -8,29 +15,69 @@ export interface ScenarioCategory {
 
 export interface Scenario {
   id: string;
-  name: string;
+  title: string;
   description: string;
-  difficulty: Level;
-  icon: string;
+  cefrLevel: string;
+  difficultyOrder: number;
+  category: string;
+}
+
+export interface TalkCorrection {
+  grammarFixes: string[];
+  vocabularySuggestions: string[];
+  pronunciationTips: string[];
+  encouragement: string | null;
+}
+
+export interface ConversationMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  createdAt: string;
+  correction?: TalkCorrection | null;
+  confidence?: number;
+}
+
+export type ConversationStatus = 'idle' | 'recording' | 'sending' | 'speaking' | 'error';
+
+export interface ConversationDetailResponse {
+  id: string;
+  userId: string;
+  scenarioId: string;
+  level: string;
+  status: string;
+  startedAt: string;
+  endedAt: string | null;
+  messages: ConversationMessage[];
+}
+
+export interface SendMessageResponse {
+  content: string;
+  correction: TalkCorrection;
+  suggestEnd: boolean;
+}
+
+export interface TalkEvaluation {
+  grammarAccuracy: number;
+  vocabularyRange: number;
+  fluency: number;
+  taskCompletion: number;
+  overallScore: number;
+  levelDemonstrated: string;
+  strengths: string[];
+  areasToImprove: string[];
+}
+
+export interface TalkEndResponse {
+  summary: string;
+  evaluation: TalkEvaluation;
+  turnCount: number;
+  errorCount: number;
 }
 
 export interface TalkStats {
   totalConversations: number;
+  completedConversations: number;
   totalMessages: number;
   averageScore: number;
-  streakDays: number;
-  favoriteScenario: string;
 }
-
-// Re-export tutor types used by Talk
-export type {
-  ConversationMessage,
-  TutorFeedback,
-  GrammarCorrection,
-  VocabSuggestion,
-  ConversationStatus,
-  ConversationDetailResponse,
-  ConversationEvaluation,
-  GoalResult,
-  EndConversationResponse,
-} from '../../tutor/models/tutor.model';
