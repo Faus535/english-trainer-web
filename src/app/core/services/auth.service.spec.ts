@@ -101,12 +101,25 @@ describe('AuthService', () => {
   });
 
   it('should logout and clear all stored data', () => {
-    // Simulate logged-in state
-    sessionStorage.setItem('et_token', 'some-token');
-    sessionStorage.setItem('et_refresh_token', 'some-refresh');
-    sessionStorage.setItem('et_profile_id', 'some-id');
+    // Login first so the service signals are properly set
+    const mockResponse = {
+      token: 'some-token',
+      refreshToken: 'some-refresh',
+      profileId: 'some-id',
+      email: 'test@test.com',
+    };
+
+    service.login({ email: 'test@test.com', password: '123456' }).subscribe();
+    const loginReq = httpMock.expectOne('http://localhost:8081/api/auth/login');
+    loginReq.flush(mockResponse);
+
+    expect(service.isAuthenticated()).toBe(true);
 
     service.logout();
+
+    // Flush the logout POST (fire-and-forget)
+    const logoutReq = httpMock.expectOne('http://localhost:8081/api/auth/logout');
+    logoutReq.flush(null);
 
     expect(service.isAuthenticated()).toBe(false);
     expect(service.token()).toBeNull();

@@ -1,4 +1,6 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { describe, expect, it, beforeEach } from 'vitest';
 import { StateService } from './state.service';
 
@@ -7,6 +9,9 @@ describe('StateService', () => {
 
   beforeEach(() => {
     localStorage.clear();
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    });
     service = TestBed.inject(StateService);
   });
 
@@ -21,41 +26,8 @@ describe('StateService', () => {
   });
 
   it('should set and get module level', () => {
-    service.setModuleLevel('listening', 'b1');
+    service.setModuleLevel('listening', 'b1', false);
     expect(service.getModuleLevel('listening')).toBe('b1');
-  });
-
-  it('should get empty module progress by default', () => {
-    const progress = service.getModuleProgress('listening');
-    expect(progress.currentUnit).toBe(0);
-    expect(progress.completedUnits).toEqual([]);
-  });
-
-  it('should complete a unit', () => {
-    const progress = service.completeUnit('listening', 0, 95);
-    expect(progress.completedUnits).toContain(0);
-    expect(progress.scores[0]).toBe(95);
-    expect(progress.currentUnit).toBe(1);
-  });
-
-  it('should not duplicate completed units', () => {
-    service.completeUnit('listening', 0, 90);
-    service.completeUnit('listening', 0, 95);
-    const progress = service.getModuleProgress('listening');
-    expect(progress.completedUnits.filter(u => u === 0).length).toBe(1);
-  });
-
-  it('should calculate module completion percent', () => {
-    expect(service.getModuleCompletionPercent('listening')).toBe(0);
-    service.completeUnit('listening', 0, 100);
-    expect(service.getModuleCompletionPercent('listening')).toBeGreaterThan(0);
-  });
-
-  it('should get next unit', () => {
-    const next = service.getNextUnit('listening');
-    expect(next).not.toBeNull();
-    expect(next!.unitIndex).toBe(0);
-    expect(next!.level).toBe('a1');
   });
 
   it('should record session and increment count', () => {
@@ -63,15 +35,15 @@ describe('StateService', () => {
     expect(service.totalSessions()).toBe(1);
   });
 
-  it('should track streaks', () => {
+  it('should track streaks via recordActivity', () => {
     expect(service.streak()).toBe(0);
     service.recordActivity();
     expect(service.streak()).toBe(1);
   });
 
   it('should calculate overall level as minimum module level', () => {
-    service.setModuleLevel('listening', 'b1');
-    service.setModuleLevel('vocabulary', 'a2');
+    service.setModuleLevel('listening', 'b1', false);
+    service.setModuleLevel('vocabulary', 'a2', false);
     expect(service.overallLevel()).toBe('a1'); // other modules still a1
   });
 

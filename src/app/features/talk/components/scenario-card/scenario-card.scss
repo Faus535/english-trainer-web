@@ -59,32 +59,32 @@
   letter-spacing: 0.05em;
 
   &[data-level='a1'] {
-    background: rgba(34, 197, 94, 0.1);
+    background: var(--level-a1-soft);
     color: var(--level-a1);
   }
 
   &[data-level='a2'] {
-    background: rgba(20, 184, 166, 0.1);
+    background: var(--level-a2-soft);
     color: var(--level-a2);
   }
 
   &[data-level='b1'] {
-    background: rgba(59, 130, 246, 0.1);
+    background: var(--level-b1-soft);
     color: var(--level-b1);
   }
 
   &[data-level='b2'] {
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--level-b2-soft);
     color: var(--level-b2);
   }
 
   &[data-level='c1'] {
-    background: rgba(168, 85, 247, 0.1);
+    background: var(--level-c1-soft);
     color: var(--level-c1);
   }
 
   &[data-level='c2'] {
-    background: rgba(234, 179, 8, 0.1);
+    background: var(--level-c2-soft);
     color: var(--level-c2);
   }
 }

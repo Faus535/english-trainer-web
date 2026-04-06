@@ -72,11 +72,37 @@ describe('authInterceptor', () => {
     }
   });
 
-  it('should not add header for auth endpoints', () => {
+  it('should not add header for public auth endpoints like /auth/login', () => {
     http.get('/api/auth/login').subscribe();
 
     const req = httpMock.expectOne('/api/auth/login');
     expect(req.request.headers.has('Authorization')).toBe(false);
     req.flush({});
+  });
+
+  it('should add Authorization header for /auth/me (authenticated endpoint)', () => {
+    const futureExp = Math.floor(Date.now() / 1000) + 3600;
+    const token = createJwt(futureExp);
+    sessionStorage.setItem('et_token', token);
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(withInterceptors([authInterceptor])),
+        provideHttpClientTesting(),
+        provideRouter([]),
+      ],
+    });
+
+    http = TestBed.inject(HttpClient);
+    httpMock = TestBed.inject(HttpTestingController);
+    const auth = TestBed.inject(AuthService);
+
+    if (auth.token()) {
+      http.get('/api/auth/me').subscribe();
+      const req = httpMock.expectOne('/api/auth/me');
+      expect(req.request.headers.get('Authorization')).toBe(`Bearer ${token}`);
+      req.flush({});
+    }
   });
 });

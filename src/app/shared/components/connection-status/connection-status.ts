@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { OfflineQueueService } from '../../../core/services/offline-queue.service';
 
 @Component({
@@ -24,7 +24,7 @@ import { OfflineQueueService } from '../../../core/services/offline-queue.servic
       right: 0;
       padding: 0.5rem 1rem;
       background: var(--color-warning, #f59e0b);
-      color: #000;
+      color: var(--text);
       font-size: 0.875rem;
       font-weight: 600;
       text-align: center;

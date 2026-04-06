@@ -5,7 +5,6 @@ import { environment } from './environment';
 import {
   ChangePasswordRequest,
   DeleteAccountRequest,
-  UpdateProfileRequest,
   UserAccountResponse,
   UserProfileResponse,
 } from '../../shared/models/api.model';
@@ -54,12 +53,8 @@ export class ProfileApiService {
     return this.http.get<UserAccountResponse>(`${environment.apiUrl}/auth/me`);
   }
 
-  updateProfile(profileId: string, data: UpdateProfileRequest): Observable<UserAccountResponse> {
-    return this.http.put<UserAccountResponse>(`${this.baseUrl}/${profileId}`, data);
-  }
-
   changePassword(data: ChangePasswordRequest): Observable<void> {
-    return this.http.put<void>(`${environment.apiUrl}/auth/password`, data);
+    return this.http.put<void>(`${environment.apiUrl}/auth/change-password`, data);
   }
 
   deleteAccount(data: DeleteAccountRequest): Observable<void> {

@@ -6,8 +6,7 @@
     <section class="profile-header">
       <div class="avatar">{{ getInitials() }}</div>
       <div class="header-info">
-        <span class="header-name">{{ account()!.name ?? account()!.email }}</span>
-        <span class="header-email">{{ account()!.email }}</span>
+        <span class="header-name">{{ account()!.email }}</span>
         <span class="account-badge" [class.google]="isGoogle()">
           {{ isGoogle() ? 'Google' : 'Email' }}
         </span>
@@ -41,19 +40,11 @@
 
       @switch (activeTab()) {
         @case ('account') {
-          <form [formGroup]="profileForm" (ngSubmit)="onSaveProfile()" class="edit-form">
-            <div class="field">
-              <label for="profile-name">Nombre</label>
-              <input id="profile-name" formControlName="name" placeholder="Tu nombre" />
-            </div>
-            <div class="field">
-              <label for="profile-avatar">URL del avatar</label>
-              <input id="profile-avatar" formControlName="avatarUrl" placeholder="https://..." />
-            </div>
-            <button type="submit" class="btn-primary" [disabled]="savingProfile()">
-              {{ savingProfile() ? 'Guardando...' : 'Guardar cambios' }}
-            </button>
-          </form>
+          <div class="account-info">
+            <p class="account-email">{{ account()!.email }}</p>
+            <p class="account-role">{{ account()!.role }}</p>
+            <p class="account-provider">Proveedor: {{ isGoogle() ? 'Google' : 'Email' }}</p>
+          </div>
 
           @if (!isGoogle()) {
             <button class="btn-outline" (click)="setTab('password')">Cambiar contrasena</button>

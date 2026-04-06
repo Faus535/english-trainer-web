@@ -2,6 +2,78 @@
   <h1 class="page-title">Immerse</h1>
   <p class="page-subtitle">Learn from real content</p>
 
+  <!-- Generate content section -->
+  <section class="generate-section">
+    <h2 class="section-title">Generate for me</h2>
+    <p class="section-desc">Pick a format and let AI create something for you</p>
+
+    <div class="content-type-selector">
+      @for (type of contentTypes; track type) {
+        <button
+          class="type-card"
+          [class.active]="selectedContentType() === type"
+          (click)="selectedContentType.set(type)"
+          type="button"
+        >
+          <span class="type-icon" aria-hidden="true">
+            @switch (type) {
+              @case ('TEXT') {
+                📝
+              }
+              @case ('AUDIO') {
+                🎧
+              }
+              @case ('VIDEO') {
+                🎬
+              }
+            }
+          </span>
+          <span class="type-label">{{ type }}</span>
+        </button>
+      }
+    </div>
+
+    <div class="generate-options">
+      <select
+        class="level-select"
+        [ngModel]="selectedLevel()"
+        (ngModelChange)="selectedLevel.set($event)"
+        aria-label="CEFR Level"
+      >
+        @for (level of levels; track level) {
+          <option [value]="level">{{ level | uppercase }}</option>
+        }
+      </select>
+
+      <input
+        class="topic-input"
+        type="text"
+        [ngModel]="topicInput()"
+        (ngModelChange)="topicInput.set($event)"
+        placeholder="Topic (optional)... e.g. space travel, cooking, music"
+        aria-label="Topic"
+      />
+    </div>
+
+    <button
+      class="submit-btn full-width"
+      (click)="onGenerate()"
+      [disabled]="loading() || generating()"
+      type="button"
+    >
+      @if (loading()) {
+        <span class="spinner" aria-hidden="true"></span>
+      }
+      Generate Content
+    </button>
+  </section>
+
+  <!-- Divider between generate and manual -->
+  <div class="divider">
+    <span class="divider-text">or bring your own</span>
+  </div>
+
+  <!-- Manual input section -->
   <div class="input-section">
     <div class="url-input-group">
       <input
@@ -58,30 +130,20 @@
     <p class="inline-error" role="alert">{{ error() }}</p>
   }
 
-  @if (suggestions().length > 0) {
-    <section class="suggestions">
-      <h2 class="section-title">Suggested for you</h2>
-      <div class="suggestion-grid">
-        @for (suggestion of suggestions(); track suggestion.id) {
-          <button class="suggestion-card" (click)="onSuggestionClick(suggestion)" type="button">
-            <span class="suggestion-title">{{ suggestion.title }}</span>
-            <span class="suggestion-desc">{{ suggestion.description }}</span>
-            <div class="suggestion-meta">
-              <span class="badge" [attr.data-level]="suggestion.difficulty">
-                {{ suggestion.difficulty | uppercase }}
-              </span>
-              <span class="duration">{{ suggestion.estimatedMinutes }} min</span>
-            </div>
-          </button>
-        }
-      </div>
-    </section>
-  }
-
-  @if (!suggestions().length && !urlInput() && !textInput()) {
+  @if (!urlInput() && !textInput()) {
     <div class="empty-state">
       <p class="empty-title">Start learning from real content</p>
       <p class="empty-desc">Paste a URL or text above to begin</p>
     </div>
+  }
+
+  @if (generating()) {
+    <app-generation-overlay
+      [step]="generationStep()"
+      [progress]="generationProgress()"
+      [error]="generationError()"
+      (cancelled)="onCancelGeneration()"
+      (retried)="onRetryGeneration()"
+    />
   }
 </section>

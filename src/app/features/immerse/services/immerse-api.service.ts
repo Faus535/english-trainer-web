@@ -5,11 +5,12 @@ import { environment } from '../../../core/services/environment';
 import {
   ImmerseContentRequest,
   ImmerseContentResponse,
-  ImmerseContentSuggestion,
   ImmerseExercise,
   ImmerseExerciseResult,
   VocabEntry,
   ImmerseContent,
+  GenerateContentRequest,
+  GenerateContentResponse,
 } from '../models/immerse.model';
 
 @Injectable({ providedIn: 'root' })
@@ -21,12 +22,12 @@ export class ImmerseApiService {
     return this.http.post<ImmerseContentResponse>(`${this.baseUrl}/content`, req);
   }
 
-  getContent(contentId: string): Observable<ImmerseContentResponse> {
-    return this.http.get<ImmerseContentResponse>(`${this.baseUrl}/content/${contentId}`);
+  generateContent(req: GenerateContentRequest): Observable<GenerateContentResponse> {
+    return this.http.post<GenerateContentResponse>(`${this.baseUrl}/generate`, req);
   }
 
-  getSuggested(): Observable<ImmerseContentSuggestion[]> {
-    return this.http.get<ImmerseContentSuggestion[]>(`${this.baseUrl}/content/suggested`);
+  getContent(contentId: string): Observable<ImmerseContentResponse> {
+    return this.http.get<ImmerseContentResponse>(`${this.baseUrl}/content/${contentId}`);
   }
 
   getExercises(contentId: string): Observable<ImmerseExercise[]> {

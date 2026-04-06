@@ -1,11 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Level, ModuleName, ModuleProgress, UnitReference } from '../models/learning.model';
+import { Level, ModuleName, UnitReference } from '../models/learning.model';
 import { ProfileStateService } from './profile-state.service';
-import { ProgressStateService } from './progress-state.service';
 import { ActivityStateService } from './activity-state.service';
 import { ReviewStateService } from './review-state.service';
-import { LearningPathStateService } from './learning-path-state.service';
 
 /**
  * Facade service — delegates to focused sub-services.
@@ -14,12 +12,8 @@ import { LearningPathStateService } from './learning-path-state.service';
 @Injectable({ providedIn: 'root' })
 export class StateService {
   private readonly profileState = inject(ProfileStateService);
-  private readonly progressState = inject(ProgressStateService);
   private readonly activityState = inject(ActivityStateService);
   private readonly reviewState = inject(ReviewStateService);
-
-  // Learning Path sub-service
-  readonly learningPath = inject(LearningPathStateService);
 
   // Profile delegates
   readonly profile = this.profileState.profile;
@@ -66,31 +60,6 @@ export class StateService {
 
   applyLevelsFromBackend(levels: Partial<Record<ModuleName, Level>>): void {
     this.profileState.applyLevelsFromBackend(levels);
-  }
-
-  // Progress methods
-  getModuleProgress(moduleName: ModuleName): ModuleProgress {
-    return this.progressState.getModuleProgress(moduleName);
-  }
-
-  saveModuleProgress(moduleName: ModuleName, progress: ModuleProgress): void {
-    this.progressState.saveModuleProgress(moduleName, progress);
-  }
-
-  completeUnit(moduleName: ModuleName, unitIndex: number, score: number): ModuleProgress {
-    return this.progressState.completeUnit(moduleName, unitIndex, score);
-  }
-
-  checkLevelUp(moduleName: ModuleName): boolean {
-    return this.progressState.checkLevelUp(moduleName);
-  }
-
-  getNextUnit(moduleName: ModuleName): UnitReference | null {
-    return this.progressState.getNextUnit(moduleName);
-  }
-
-  getModuleCompletionPercent(moduleName: ModuleName): number {
-    return this.progressState.getModuleCompletionPercent(moduleName);
   }
 
   // Session recording

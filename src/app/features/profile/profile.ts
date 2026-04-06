@@ -6,7 +6,7 @@ import {
   AbstractControl,
   ValidationErrors,
 } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { ProfileApiService } from '../../core/services/profile-api.service';
 import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../shared/services/notification.service';
@@ -41,12 +41,10 @@ export class Profile implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly profileApi = inject(ProfileApiService);
   private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
   private readonly notification = inject(NotificationService);
 
   protected readonly account = signal<UserAccountResponse | null>(null);
   protected readonly loading = signal(true);
-  protected readonly savingProfile = signal(false);
   protected readonly savingPassword = signal(false);
   protected readonly deleting = signal(false);
   protected readonly showDeleteConfirm = signal(false);
@@ -62,11 +60,6 @@ export class Profile implements OnInit {
     { label: 'Notificaciones', icon: Bell, path: '/notifications' },
     { label: 'Ajustes', icon: Settings, path: '/settings' },
   ];
-
-  readonly profileForm = this.fb.nonNullable.group({
-    name: [''],
-    avatarUrl: [''],
-  });
 
   readonly passwordForm = this.fb.nonNullable.group(
     {
@@ -86,7 +79,6 @@ export class Profile implements OnInit {
       next: (user) => {
         this.account.set(user);
         this.isGoogle.set(user.provider === 'google');
-        this.profileForm.patchValue({ name: user.name ?? '', avatarUrl: user.avatarUrl ?? '' });
         this.loading.set(false);
       },
       error: () => {
@@ -99,7 +91,6 @@ export class Profile implements OnInit {
   protected getInitials(): string {
     const user = this.account();
     if (!user) return '?';
-    if (user.name) return user.name.slice(0, 2).toUpperCase();
     return user.email.slice(0, 2).toUpperCase();
   }
 
@@ -109,24 +100,6 @@ export class Profile implements OnInit {
 
   protected onLogout(): void {
     this.auth.logout();
-  }
-
-  protected onSaveProfile(): void {
-    this.savingProfile.set(true);
-    const profileId = this.auth.profileId();
-    if (!profileId) return;
-
-    this.profileApi.updateProfile(profileId, this.profileForm.getRawValue()).subscribe({
-      next: (updated) => {
-        this.account.set(updated);
-        this.savingProfile.set(false);
-        this.notification.success('Perfil actualizado');
-      },
-      error: () => {
-        this.savingProfile.set(false);
-        this.notification.error('Error al actualizar el perfil');
-      },
-    });
   }
 
   protected onChangePassword(): void {

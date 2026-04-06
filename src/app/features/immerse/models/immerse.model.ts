@@ -7,6 +7,7 @@ export interface ImmerseContent {
   paragraphs: AnnotatedParagraph[];
   difficulty: Level;
   wordCount: number;
+  contentType?: ContentType;
 }
 
 export interface AnnotatedParagraph {
@@ -53,9 +54,48 @@ export interface ImmerseContentSuggestion {
   estimatedMinutes: number;
 }
 
+export type ContentType = 'TEXT' | 'AUDIO' | 'VIDEO';
+
+export interface GenerateContentRequest {
+  contentType: ContentType;
+  level?: Level;
+  topic?: string;
+}
+
 export interface ImmerseContentRequest {
   url?: string;
   text?: string;
 }
 
-export type ImmerseContentResponse = ImmerseContent;
+export type ImmerseContentStatus = 'PENDING' | 'PROCESSING' | 'PROCESSED' | 'FAILED';
+
+export type GenerationStep =
+  | 'idle'
+  | 'sending'
+  | 'analyzing'
+  | 'writing'
+  | 'annotating'
+  | 'finalizing';
+
+export interface GenerationStepConfig {
+  key: GenerationStep;
+  label: string;
+  threshold: number;
+}
+
+export const GENERATION_STEPS: GenerationStepConfig[] = [
+  { key: 'sending', label: 'Sending request...', threshold: 0 },
+  { key: 'analyzing', label: 'Analyzing topic...', threshold: 3 },
+  { key: 'writing', label: 'Writing content...', threshold: 8 },
+  { key: 'annotating', label: 'Annotating vocabulary...', threshold: 18 },
+  { key: 'finalizing', label: 'Finalizing...', threshold: 30 },
+];
+
+export interface GenerateContentResponse {
+  id: string;
+  status: ImmerseContentStatus;
+}
+
+export interface ImmerseContentResponse extends ImmerseContent {
+  status?: ImmerseContentStatus;
+}

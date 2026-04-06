@@ -1,20 +1,11 @@
-import {
-  Component,
-  ChangeDetectionStrategy,
-  inject,
-  signal,
-  computed,
-  OnInit,
-} from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
-import { TtsService } from '../speak/services/tts.service';
+import { TtsService } from '../../shared/services/tts.service';
 import { StateService } from '../../shared/services/state.service';
 import { I18nService, Locale } from '../../shared/services/i18n.service';
 import { FocusModeService } from '../../shared/services/focus-mode.service';
 import { ProfileApiService } from '../../core/services/profile-api.service';
 import { AuthService } from '../../core/services/auth.service';
-import { AssessmentApiService } from '../../core/services/assessment-api.service';
-import { TestHistoryResponse } from '../../shared/models/api.model';
 
 @Component({
   selector: 'app-settings',
@@ -22,7 +13,7 @@ import { TestHistoryResponse } from '../../shared/models/api.model';
   styleUrl: './settings.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Settings implements OnInit {
+export class Settings {
   private readonly tts = inject(TtsService);
   private readonly state = inject(StateService);
   private readonly router = inject(Router);
@@ -30,8 +21,6 @@ export class Settings implements OnInit {
   private readonly focusMode = inject(FocusModeService);
   private readonly profileApi = inject(ProfileApiService);
   private readonly auth = inject(AuthService);
-  private readonly assessmentApi = inject(AssessmentApiService);
-
   protected readonly locale = this.i18n.locale;
   protected readonly isFocusMode = this.focusMode.active;
 
@@ -40,39 +29,6 @@ export class Settings implements OnInit {
   protected readonly exportReady = signal(false);
   protected readonly isDark = signal(!document.documentElement.classList.contains('light-theme'));
   protected readonly retaking = signal(false);
-
-  private readonly _testHistory = signal<TestHistoryResponse[]>([]);
-
-  protected readonly testAttempts = computed(() => this._testHistory().length);
-
-  protected readonly cooldownRemaining = computed(() => {
-    const history = this._testHistory();
-    if (history.length === 0) return null;
-
-    const sorted = [...history].sort(
-      (a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime(),
-    );
-    const lastTest = new Date(sorted[0].completedAt).getTime();
-    const cooldownMs = 24 * 60 * 60 * 1000;
-    const remaining = lastTest + cooldownMs - Date.now();
-
-    if (remaining <= 0) return null;
-
-    const hours = Math.floor(remaining / (60 * 60 * 1000));
-    const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
-    return `${hours}h ${minutes}m`;
-  });
-
-  protected readonly showPracticeTip = computed(() => this.testAttempts() >= 3);
-
-  ngOnInit(): void {
-    const profileId = this.auth.profileId();
-    if (profileId) {
-      this.assessmentApi.getTestHistory(profileId).subscribe({
-        next: (history) => this._testHistory.set(history),
-      });
-    }
-  }
 
   protected toggleTheme(): void {
     this.isDark.update((v) => !v);
@@ -117,7 +73,7 @@ export class Settings implements OnInit {
     const profileId = this.auth.profileId();
     if (!profileId) {
       this.state.markTestIncomplete();
-      this.router.navigate(['/level-test']);
+      this.router.navigate(['/home']);
       return;
     }
 
@@ -126,12 +82,12 @@ export class Settings implements OnInit {
       next: () => {
         this.state.markTestIncomplete();
         this.retaking.set(false);
-        this.router.navigate(['/level-test']);
+        this.router.navigate(['/home']);
       },
       error: () => {
         this.state.markTestIncomplete();
         this.retaking.set(false);
-        this.router.navigate(['/level-test']);
+        this.router.navigate(['/home']);
       },
     });
   }
@@ -143,7 +99,7 @@ export class Settings implements OnInit {
       )
     ) {
       this.state.resetProgress();
-      this.router.navigate(['/level-test']);
+      this.router.navigate(['/home']);
     }
   }
 

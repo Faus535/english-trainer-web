@@ -1,4 +1,4 @@
-import { Level, ModuleName } from './learning.model';
+import { Level } from './learning.model';
 
 // Auth
 export interface LoginRequest {
@@ -45,73 +45,6 @@ export interface UserProfileResponse {
   sessionCount: number;
   sessionsThisWeek: number;
   xp: number;
-}
-
-// Module Progress
-export interface ModuleProgressResponse {
-  id: string;
-  userId: string;
-  moduleName: ModuleName;
-  level: Level;
-  currentUnit: number;
-  completedUnits: number[];
-  totalUnits: number;
-}
-
-// Assessment
-export interface LevelTestSubmitRequest {
-  answers: Record<string, number>;
-  scores: Record<ModuleName, number>;
-}
-
-export interface LevelTestResultResponse {
-  id: string;
-  levels: Record<ModuleName, Level>;
-  scores: Record<ModuleName, number>;
-  completedAt?: string;
-}
-
-export interface TestQuestionsResponse {
-  vocabulary: VocabQuestionResponse[];
-  grammar: GrammarQuestionResponse[];
-  listening: ListeningQuestionResponse[];
-  pronunciation: PronunciationQuestionResponse[];
-}
-
-export interface VocabQuestionResponse {
-  es: string;
-  answer: string;
-  alts?: string[];
-  level: Level;
-}
-
-export interface GrammarQuestionResponse {
-  sentence: string;
-  options: string[];
-  answer: number;
-  level: Level;
-}
-
-export interface ListeningQuestionResponse {
-  text: string;
-  level: Level;
-  speed: number;
-}
-
-export interface PronunciationQuestionResponse {
-  word: string;
-  options: string[];
-  answer: number;
-  level: Level;
-  special?: 'syllables' | 'words' | 'stress';
-}
-
-export interface TestHistoryResponse {
-  id: string;
-  levels: Record<ModuleName, Level>;
-  scores: Record<ModuleName, number>;
-  completedAt: string;
-  attemptNumber: number;
 }
 
 // Gamification
@@ -192,48 +125,6 @@ export interface BlockExercisesResponse {
   exercises: SessionExerciseResponse[];
 }
 
-// Vocabulary
-export interface VocabEntryResponse {
-  id: string;
-  en: string;
-  ipa: string;
-  es: string;
-  type: string;
-  example: string;
-  level: Level;
-  category?: string;
-  block?: number;
-  blockTitle?: string;
-}
-
-// Phrases
-export interface PhraseResponse {
-  id: string;
-  en: string;
-  es: string;
-  level: Level;
-}
-
-// Spaced Repetition
-export interface SpacedRepetitionItemResponse {
-  id: string;
-  userId: string;
-  itemType: string;
-  unitReference: string;
-  moduleName: string;
-  level: string;
-  unitIndex: number;
-  nextReviewDate: string;
-  intervalIndex: number;
-  reviewCount: number;
-  graduated: boolean;
-}
-
-// Review
-export interface CompleteReviewRequest {
-  quality: number;
-}
-
 // API Error
 export interface ApiError {
   status: number;
@@ -242,11 +133,6 @@ export interface ApiError {
 }
 
 // Profile Management
-export interface UpdateProfileRequest {
-  name?: string;
-  avatarUrl?: string;
-}
-
 export interface ChangePasswordRequest {
   currentPassword: string;
   newPassword: string;
@@ -257,11 +143,11 @@ export interface DeleteAccountRequest {
 }
 
 export interface UserAccountResponse {
-  id: string;
+  userId: string;
   email: string;
-  name: string | null;
-  avatarUrl: string | null;
-  provider: 'local' | 'google';
+  profileId: string;
+  role: string;
+  provider: string;
   createdAt: string;
 }
 
@@ -273,104 +159,4 @@ export interface ForgotPasswordRequest {
 export interface ResetPasswordRequest {
   token: string;
   newPassword: string;
-}
-
-// Reading
-export interface ReadingTextResponse {
-  id: string;
-  title: string;
-  content: string;
-  level: Level;
-  topic: string;
-  wordCount: number;
-  estimatedMinutes: number;
-}
-
-export interface ReadingQuestionResponse {
-  id: string;
-  textId: string;
-  question: string;
-  options: string[];
-  correctIndex: number;
-}
-
-export interface ReadingResultResponse {
-  textId: string;
-  score: number;
-  totalQuestions: number;
-  correctAnswers: number;
-}
-
-export interface SubmitReadingAnswersRequest {
-  answers: Record<string, number>;
-}
-
-// Writing
-export interface WritingExerciseResponse {
-  id: string;
-  prompt: string;
-  level: Level;
-  category: string;
-  minWords: number;
-  maxWords: number;
-}
-
-export interface WritingSubmissionRequest {
-  exerciseId: string;
-  content: string;
-}
-
-export interface WritingFeedbackResponse {
-  id: string;
-  exerciseId: string;
-  score: number;
-  corrections: WritingCorrection[];
-  suggestions: string[];
-  summary: string;
-  submittedAt: string;
-}
-
-export interface WritingCorrection {
-  original: string;
-  corrected: string;
-  type: 'grammar' | 'spelling' | 'style' | 'vocabulary';
-  explanation: string;
-}
-
-export interface WritingHistoryResponse {
-  id: string;
-  exerciseId: string;
-  prompt: string;
-  score: number;
-  wordCount: number;
-  submittedAt: string;
-}
-
-// Analytics
-export interface AnalyticsSummaryResponse {
-  totalSessions: number;
-  totalMinutes: number;
-  totalXp: number;
-  averageAccuracy: number;
-  currentStreak: number;
-  bestStreak: number;
-  sessionsThisWeek: number;
-  sessionsLastWeek: number;
-  minutesThisWeek: number;
-  minutesLastWeek: number;
-}
-
-export interface ModuleLevelHistoryResponse {
-  moduleName: string;
-  history: { date: string; level: string }[];
-}
-
-export interface ActivityHeatmapResponse {
-  dates: Record<string, number>;
-}
-
-export interface WeakAreaResponse {
-  moduleName: string;
-  accuracy: number;
-  suggestion: string;
 }

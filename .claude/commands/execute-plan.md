@@ -74,10 +74,11 @@ Skill mapping (read based on what the phase touches):
 - Logging, health → logging/
 - Package structure, new module → architecture/
 
-Read `SKILL.md` + key `references/*.md` from `.claude/plugins/s2-backend/skills/<skill>/` for each matched skill.
-Do NOT read all skills — only those matching the phase content.
+For **backend plans**: Read `SKILL.md` + key `references/*.md` from `/home/faustinoolivas/dev/proyectos/carmen/english-trainer-api/.claude/plugins/s2-backend/skills/<skill>/` for each matched skill.
 
-For **frontend plans**: Read relevant skills from `.claude/skills/angular/` if they exist.
+For **frontend plans**: Read relevant skills from `/home/faustinoolivas/dev/proyectos/carmen/english-trainer-web/.claude/skills/angular/` if they exist.
+
+Do NOT read all skills — only those matching the phase content.
 
 ### 1c. Implement
 
@@ -196,6 +197,8 @@ Deployed to: Railway
 - Only read skills that match the phase content (see mapping in Step 1b)
 - Never read all skills for every phase
 - Follow the patterns from the skills strictly (naming, structure, testing patterns)
+- **Backend skills**: `/home/faustinoolivas/dev/proyectos/carmen/english-trainer-api/.claude/plugins/s2-backend/skills/<skill>/`
+- **Frontend skills**: `/home/faustinoolivas/dev/proyectos/carmen/english-trainer-web/.claude/skills/angular/`
 
 ### Plan file updates
 

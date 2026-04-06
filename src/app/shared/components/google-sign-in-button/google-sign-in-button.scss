@@ -9,10 +9,10 @@
   gap: 0.75rem;
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid var(--color-border, #334155);
+  border: 1px solid var(--border, #3a3552);
   border-radius: 0.5rem;
-  background: var(--color-surface, #1e293b);
-  color: var(--color-text, #e2e8f0);
+  background: var(--surface-0, #1a1726);
+  color: var(--text, #faf8f5);
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
@@ -22,12 +22,12 @@
   min-height: 2.75rem;
 
   &:hover:not(:disabled) {
-    background: var(--color-input-bg, #0f172a);
-    border-color: var(--color-text-muted, #94a3b8);
+    background: var(--surface-1, #252237);
+    border-color: var(--text-3, #7a7290);
   }
 
   &:focus-visible {
-    outline: 2px solid var(--color-primary, #3b82f6);
+    outline: 2px solid var(--primary, #7c5cfc);
     outline-offset: 2px;
   }
 
@@ -45,8 +45,8 @@
   &__spinner {
     width: 1.25rem;
     height: 1.25rem;
-    border: 2px solid var(--color-border, #334155);
-    border-top-color: var(--color-primary, #3b82f6);
+    border: 2px solid var(--border, #3a3552);
+    border-top-color: var(--primary, #7c5cfc);
     border-radius: 50%;
     animation: spin 0.6s linear infinite;
     flex-shrink: 0;

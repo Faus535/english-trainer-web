@@ -96,11 +96,5 @@ export class ReviewStateService {
         },
       };
     });
-
-    const profileId = this.auth.profileId();
-    if (profileId) {
-      const unitIndex = parseInt(unitId, 10) || 0;
-      this.reviewApi.addUnitToReview(profileId, moduleName, level, unitIndex).subscribe();
-    }
   }
 }

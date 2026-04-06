@@ -9,7 +9,7 @@ import {
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
-import { TtsService } from '../../features/speak/services/tts.service';
+import { TtsService } from '../../shared/services/tts.service';
 import { Icon } from '../../shared/components/icon/icon';
 import { ConnectionStatus } from '../../shared/components/connection-status/connection-status';
 import { Toast } from '../../shared/components/toast/toast';

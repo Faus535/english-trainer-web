@@ -9,8 +9,6 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { UpperCasePipe } from '@angular/common';
 import { ImmerseStateService } from '../../services/immerse-state.service';
-import { ReviewApiService } from '../../../../core/services/review-api.service';
-import { AuthService } from '../../../../core/services/auth.service';
 import { AnnotatedWord } from '../../components/annotated-word/annotated-word';
 import { WordPopup } from '../../components/word-popup/word-popup';
 import { WordAnnotation, VocabEntry } from '../../models/immerse.model';
@@ -26,8 +24,6 @@ export class ImmerseReader implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly immerseState = inject(ImmerseStateService);
-  private readonly reviewApi = inject(ReviewApiService);
-  private readonly auth = inject(AuthService);
 
   protected readonly content = this.immerseState.content;
   protected readonly loading = this.immerseState.loading;
@@ -68,10 +64,6 @@ export class ImmerseReader implements OnInit {
   }
 
   protected onAddToReview(entry: VocabEntry): void {
-    const profileId = this.auth.profileId();
-    if (profileId) {
-      this.reviewApi.addWordToReview(profileId, entry.word, entry.level).subscribe();
-    }
     this.immerseState.saveWord(entry);
     this.immerseState.dismissWord();
   }

@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { catchError, EMPTY, Observable, switchMap, throwError, tap, share } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { NotificationService } from '../../shared/services/notification.service';
+import { isPublicAuthUrl } from './public-auth-urls';
 
 let refreshing$: Observable<unknown> | null = null;
 
@@ -12,7 +13,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401 && !req.url.includes('/auth/')) {
+      if (error.status === 401 && !isPublicAuthUrl(req.url)) {
         if (!refreshing$) {
           refreshing$ = auth.refresh().pipe(
             tap(() => {
