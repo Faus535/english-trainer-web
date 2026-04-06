@@ -1,0 +1,64 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build artifacts
+dist/
+.angular/
+
+# IDE
+.idea/
+.vscode/
+
+# Git internals
+.git/
+
+# Git config files
+.gitignore
+.editorconfig
+.prettierrc
+
+# GitHub Actions
+.github/
+
+# Husky git hooks
+.husky/
+
+# Docker
+Dockerfile
+.dockerignore
+nginx.conf
+
+# Railway config
+railway.toml
+
+# Docs/roadmaps obsoletos
+FEATURES_ROADMAP.md
+I18N_ROADMAP.md
+PLAN_MEJORAS.md
+READING_403_FIX.md
+README.md
+
+# Old/completed plans
+plans/
+
+# E2E tests
+e2e/
+playwright.config.ts
+
+# Migration scripts
+migration/
+
+# TypeScript configs (rara vez cambian)
+tsconfig.json
+tsconfig.app.json
+tsconfig.spec.json
+
+# ESLint config
+eslint.config.js
+
+# Static assets (icons, favicon, manifest)
+public/
+
+# PWA config
+ngsw-config.json
