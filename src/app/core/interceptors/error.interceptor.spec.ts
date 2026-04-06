@@ -1,11 +1,15 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { provideHttpClient, withInterceptors, HttpErrorResponse } from '@angular/common/http';
+import {
+  provideHttpClient,
+  withInterceptors,
+  HttpErrorResponse,
+  HttpClient,
+} from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { HttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
+import { describe, expect, it, beforeEach, afterEach } from 'vitest';
 import { errorInterceptor } from './error.interceptor';
-import { AuthService } from '../services/auth.service';
 
 @Component({ template: '', changeDetection: ChangeDetectionStrategy.OnPush })
 class DummyComponent {}
@@ -13,7 +17,6 @@ class DummyComponent {}
 describe('errorInterceptor', () => {
   let http: HttpClient;
   let httpMock: HttpTestingController;
-  let auth: AuthService;
 
   beforeEach(() => {
     localStorage.clear();
@@ -23,13 +26,12 @@ describe('errorInterceptor', () => {
       providers: [
         provideHttpClient(withInterceptors([errorInterceptor])),
         provideHttpClientTesting(),
-        provideRouter([{ path: 'auth/login', component: DummyComponent }]),
+        provideRouter([{ path: '**', component: DummyComponent }]),
       ],
     });
 
     http = TestBed.inject(HttpClient);
     httpMock = TestBed.inject(HttpTestingController);
-    auth = TestBed.inject(AuthService);
   });
 
   afterEach(() => {
@@ -47,49 +49,40 @@ describe('errorInterceptor', () => {
     req.flush({ value: 1 });
   });
 
-  it('should call logout on 401 for non-auth endpoints', () => {
-    const logoutSpy = vi.spyOn(auth, 'logout');
-
-    http.get('/api/protected').subscribe({
-      error: () => {
-        // expected
-      },
-    });
+  it('should attempt refresh on 401 for non-auth endpoints', () => {
+    http.get('/api/protected').subscribe({ error: () => {} });
 
     const req = httpMock.expectOne('/api/protected');
     req.flush(null, { status: 401, statusText: 'Unauthorized' });
 
-    expect(logoutSpy).toHaveBeenCalled();
+    // Interceptor attempts refresh
+    const refreshReq = httpMock.expectOne((r) => r.url.includes('/auth/refresh'));
+    expect(refreshReq.request.method).toBe('POST');
+
+    // Refresh fails → triggers logout
+    refreshReq.flush(null, { status: 401, statusText: 'Unauthorized' });
   });
 
-  it('should not call logout on 401 for auth endpoints', () => {
-    const logoutSpy = vi.spyOn(auth, 'logout');
-
-    http.post('/api/auth/login', {}).subscribe({
-      error: () => {
-        // expected
-      },
-    });
+  it('should not attempt refresh on 401 for public auth endpoints', () => {
+    http.post('/api/auth/login', {}).subscribe({ error: () => {} });
 
     const req = httpMock.expectOne('/api/auth/login');
     req.flush(null, { status: 401, statusText: 'Unauthorized' });
 
-    expect(logoutSpy).not.toHaveBeenCalled();
+    // No refresh should be attempted for public auth URLs
+    httpMock.expectNone((r) => r.url.includes('/auth/refresh'));
   });
 
-  it('should attempt refresh on 401 for /auth/me (authenticated endpoint)', () => {
-    const refreshSpy = vi.spyOn(auth, 'refresh');
-
-    http.get('/api/auth/me').subscribe({
-      error: () => {
-        // expected
-      },
-    });
+  it('should attempt refresh on 401 for /auth/me', () => {
+    http.get('/api/auth/me').subscribe({ error: () => {} });
 
     const req = httpMock.expectOne('/api/auth/me');
     req.flush(null, { status: 401, statusText: 'Unauthorized' });
 
-    expect(refreshSpy).toHaveBeenCalled();
+    // /auth/me is not a public auth URL, so refresh should be attempted
+    const refreshReq = httpMock.expectOne((r) => r.url.includes('/auth/refresh'));
+    expect(refreshReq.request.method).toBe('POST');
+    refreshReq.flush(null, { status: 401, statusText: 'Unauthorized' });
   });
 
   it('should propagate error to subscriber', () => {

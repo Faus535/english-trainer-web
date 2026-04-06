@@ -1,9 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Router, provideRouter } from '@angular/router';
 import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
 import { ImmerseStateService } from './immerse-state.service';
+
+@Component({ template: '', changeDetection: ChangeDetectionStrategy.OnPush })
+class DummyComponent {}
 import { environment } from '../../../core/services/environment';
 import { VocabEntry } from '../models/immerse.model';
 
@@ -15,7 +19,11 @@ describe('ImmerseStateService', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([{ path: '**', component: DummyComponent }]),
+      ],
     });
     service = TestBed.inject(ImmerseStateService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -220,18 +228,25 @@ describe('ImmerseStateService', () => {
       const postReq = httpMock.expectOne(`${environment.apiUrl}/immerse/generate`);
       postReq.flush(pendingResponse);
 
+      // Advance in 2s increments to flush polls as they arrive
+      for (let i = 0; i < 2; i++) {
+        vi.advanceTimersByTime(2000);
+        httpMock
+          .match(`${environment.apiUrl}/immerse/content/gen-1`)
+          .filter((r) => !r.cancelled)
+          .forEach((r) => r.flush(pollPending));
+      }
       // After 4 seconds, step should be 'analyzing' (threshold 3)
-      vi.advanceTimersByTime(4000);
-      httpMock
-        .match(`${environment.apiUrl}/immerse/content/gen-1`)
-        .forEach((r) => r.flush(pollPending));
       expect(service.generationStep()).toBe('analyzing');
 
-      // After 10 seconds total, step should be 'writing' (threshold 8)
-      vi.advanceTimersByTime(6000);
-      httpMock
-        .match(`${environment.apiUrl}/immerse/content/gen-1`)
-        .forEach((r) => r.flush(pollPending));
+      // Advance to 10s total
+      for (let i = 0; i < 3; i++) {
+        vi.advanceTimersByTime(2000);
+        httpMock
+          .match(`${environment.apiUrl}/immerse/content/gen-1`)
+          .filter((r) => !r.cancelled)
+          .forEach((r) => r.flush(pollPending));
+      }
       expect(service.generationStep()).toBe('writing');
 
       service.cancelGeneration();
@@ -243,10 +258,14 @@ describe('ImmerseStateService', () => {
       const postReq = httpMock.expectOne(`${environment.apiUrl}/immerse/generate`);
       postReq.flush(pendingResponse);
 
-      vi.advanceTimersByTime(10000);
-      httpMock
-        .match(`${environment.apiUrl}/immerse/content/gen-1`)
-        .forEach((r) => r.flush(pollPending));
+      // Advance in 2s increments to flush polls properly
+      for (let i = 0; i < 5; i++) {
+        vi.advanceTimersByTime(2000);
+        httpMock
+          .match(`${environment.apiUrl}/immerse/content/gen-1`)
+          .filter((r) => !r.cancelled)
+          .forEach((r) => r.flush(pollPending));
+      }
 
       expect(service.generationProgress()).toBeGreaterThan(0);
       expect(service.generationProgress()).toBeLessThanOrEqual(90);
