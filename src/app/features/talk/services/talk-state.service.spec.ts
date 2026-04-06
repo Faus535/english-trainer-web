@@ -3,7 +3,6 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { describe, expect, it, beforeEach } from 'vitest';
 import { TalkStateService } from './talk-state.service';
-import { AuthService } from '../../../core/services/auth.service';
 import { environment } from '../../../core/services/environment';
 
 describe('TalkStateService', () => {
@@ -12,17 +11,7 @@ describe('TalkStateService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        {
-          provide: AuthService,
-          useValue: {
-            profileId: () => 'test-profile-id',
-            token: () => 'test-token',
-          },
-        },
-      ],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     });
     service = TestBed.inject(TalkStateService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -32,7 +21,7 @@ describe('TalkStateService', () => {
     expect(service.status()).toBe('idle');
     expect(service.messages()).toEqual([]);
     expect(service.conversationId()).toBeNull();
-    expect(service.streaming()).toBe(false);
+    expect(service.isSending()).toBe(false);
   });
 
   it('startConversation() should set status to sending and set scenario signal', () => {
@@ -42,13 +31,24 @@ describe('TalkStateService', () => {
 
     const req = httpMock.expectOne(`${environment.apiUrl}/talk/conversations`);
     expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ scenarioId: 'restaurant', level: 'a2' });
     req.flush({
       id: 'conv-1',
+      userId: 'user-1',
+      scenarioId: 'restaurant',
       level: 'a2',
-      messages: [
-        { id: 'msg-1', role: 'assistant', content: 'Welcome!', timestamp: '2026-04-05T00:00:00Z' },
-      ],
+      status: 'active',
       startedAt: '2026-04-05T00:00:00Z',
+      endedAt: null,
+      messages: [
+        {
+          id: 'msg-1',
+          role: 'assistant',
+          content: 'Welcome!',
+          createdAt: '2026-04-05T00:00:00Z',
+          correction: null,
+        },
+      ],
     });
 
     expect(service.status()).toBe('idle');
@@ -56,26 +56,45 @@ describe('TalkStateService', () => {
     expect(service.messages().length).toBe(1);
   });
 
-  it('sendMessageStreaming() should append optimistic user message', () => {
-    // Setup: start a conversation first
+  it('sendMessage() should append optimistic user message and assistant response', () => {
     service.startConversation('restaurant', 'a2');
-    const req = httpMock.expectOne(`${environment.apiUrl}/talk/conversations`);
-    req.flush({
+    const startReq = httpMock.expectOne(`${environment.apiUrl}/talk/conversations`);
+    startReq.flush({
       id: 'conv-1',
+      userId: 'user-1',
+      scenarioId: 'restaurant',
       level: 'a2',
-      messages: [],
+      status: 'active',
       startedAt: '2026-04-05T00:00:00Z',
+      endedAt: null,
+      messages: [],
     });
 
-    service.sendMessageStreaming('Hello there');
+    service.sendMessage('Hello there');
 
-    // Should have user message + empty assistant placeholder
-    expect(service.messages().length).toBe(2);
+    expect(service.messages().length).toBe(1);
     expect(service.messages()[0].role).toBe('user');
     expect(service.messages()[0].content).toBe('Hello there');
+    expect(service.isSending()).toBe(true);
+
+    const msgReq = httpMock.expectOne(`${environment.apiUrl}/talk/conversations/conv-1/messages`);
+    expect(msgReq.request.method).toBe('POST');
+    msgReq.flush({
+      content: 'Hello! How can I help?',
+      correction: {
+        grammarFixes: [],
+        vocabularySuggestions: [],
+        pronunciationTips: [],
+        encouragement: null,
+      },
+      suggestEnd: false,
+    });
+
+    expect(service.messages().length).toBe(2);
     expect(service.messages()[1].role).toBe('assistant');
-    expect(service.messages()[1].content).toBe('');
-    expect(service.streaming()).toBe(true);
+    expect(service.messages()[1].content).toBe('Hello! How can I help?');
+    expect(service.isSending()).toBe(false);
+    expect(service.suggestEnd()).toBe(false);
   });
 
   it('endConversation() should call API and set endResult signal', () => {
@@ -83,9 +102,13 @@ describe('TalkStateService', () => {
     const startReq = httpMock.expectOne(`${environment.apiUrl}/talk/conversations`);
     startReq.flush({
       id: 'conv-1',
+      userId: 'user-1',
+      scenarioId: 'restaurant',
       level: 'a2',
-      messages: [],
+      status: 'active',
       startedAt: '2026-04-05T00:00:00Z',
+      endedAt: null,
+      messages: [],
     });
 
     service.endConversation();
@@ -94,13 +117,25 @@ describe('TalkStateService', () => {
     const endReq = httpMock.expectOne(`${environment.apiUrl}/talk/conversations/conv-1/end`);
     expect(endReq.request.method).toBe('POST');
     endReq.flush({
-      xpEarned: 45,
-      messagesCount: 10,
       summary: 'Great conversation',
+      evaluation: {
+        grammarAccuracy: 78,
+        vocabularyRange: 65,
+        fluency: 72,
+        taskCompletion: 90,
+        overallScore: 76,
+        levelDemonstrated: 'b1',
+        strengths: ['Good use of past tense'],
+        areasToImprove: ['Article usage'],
+      },
+      turnCount: 8,
+      errorCount: 2,
     });
 
     expect(service.status()).toBe('idle');
-    expect(service.endResult()?.xpEarned).toBe(45);
+    expect(service.endResult()?.turnCount).toBe(8);
+    expect(service.endResult()?.errorCount).toBe(2);
+    expect(service.endResult()?.evaluation.overallScore).toBe(76);
   });
 
   it('resetConversation() should clear all signals', () => {
@@ -108,11 +143,21 @@ describe('TalkStateService', () => {
     const req = httpMock.expectOne(`${environment.apiUrl}/talk/conversations`);
     req.flush({
       id: 'conv-1',
+      userId: 'user-1',
+      scenarioId: 'restaurant',
       level: 'a2',
-      messages: [
-        { id: 'msg-1', role: 'assistant', content: 'Hi', timestamp: '2026-04-05T00:00:00Z' },
-      ],
+      status: 'active',
       startedAt: '2026-04-05T00:00:00Z',
+      endedAt: null,
+      messages: [
+        {
+          id: 'msg-1',
+          role: 'assistant',
+          content: 'Hi',
+          createdAt: '2026-04-05T00:00:00Z',
+          correction: null,
+        },
+      ],
     });
 
     service.resetConversation();
@@ -121,8 +166,8 @@ describe('TalkStateService', () => {
     expect(service.messages()).toEqual([]);
     expect(service.status()).toBe('idle');
     expect(service.scenarioId()).toBeNull();
-    expect(service.scenarioType()).toBeNull();
     expect(service.endResult()).toBeNull();
     expect(service.error()).toBeNull();
+    expect(service.suggestEnd()).toBe(false);
   });
 });

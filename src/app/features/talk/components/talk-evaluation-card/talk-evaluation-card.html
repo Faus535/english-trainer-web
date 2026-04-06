@@ -1,0 +1,56 @@
+@let ev = evaluation();
+
+<div class="eval-card" role="region" aria-label="Conversation evaluation">
+  <div class="eval-overall" [class]="overallClass()">
+    <span class="eval-overall-score">{{ ev.overallScore }}</span>
+    <span class="eval-overall-label">Score</span>
+  </div>
+
+  <div class="eval-level">
+    <span
+      >Level demonstrated: <strong>{{ ev.levelDemonstrated.toUpperCase() }}</strong></span
+    >
+  </div>
+
+  <div class="eval-bars">
+    @for (score of scores(); track score.label) {
+      <div class="eval-bar-row">
+        <span class="eval-bar-label">{{ score.label }}</span>
+        <div class="eval-bar-track">
+          <div
+            class="eval-bar-fill"
+            [class]="score.cssClass"
+            [style.width.%]="score.value"
+            role="progressbar"
+            [attr.aria-valuenow]="score.value"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          ></div>
+        </div>
+        <span class="eval-bar-value">{{ score.value }}</span>
+      </div>
+    }
+  </div>
+
+  @if (ev.strengths.length > 0) {
+    <div class="eval-section">
+      <h4 class="eval-section-title">Strengths</h4>
+      @for (item of ev.strengths; track item) {
+        <div class="eval-item eval-item--strength">
+          <span>{{ item }}</span>
+        </div>
+      }
+    </div>
+  }
+
+  @if (ev.areasToImprove.length > 0) {
+    <div class="eval-section">
+      <h4 class="eval-section-title">Areas to improve</h4>
+      @for (item of ev.areasToImprove; track item) {
+        <div class="eval-item eval-item--improve">
+          <span>{{ item }}</span>
+        </div>
+      }
+    </div>
+  }
+</div>

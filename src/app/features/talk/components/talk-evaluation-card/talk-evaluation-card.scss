@@ -1,0 +1,144 @@
+:host {
+  display: block;
+  width: 100%;
+  max-width: 24rem;
+}
+
+.eval-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-5);
+}
+
+.eval-overall {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-1);
+
+  &.score--good .eval-overall-score {
+    color: var(--success);
+  }
+
+  &.score--ok .eval-overall-score {
+    color: var(--warning);
+  }
+
+  &.score--low .eval-overall-score {
+    color: var(--error);
+  }
+}
+
+.eval-overall-score {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.eval-overall-label {
+  font-size: var(--fs-sm);
+  color: var(--text-3);
+  font-weight: 600;
+}
+
+.eval-level {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+}
+
+.eval-bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.eval-bar-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.eval-bar-label {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-2);
+  width: 5rem;
+  flex-shrink: 0;
+}
+
+.eval-bar-track {
+  flex: 1;
+  height: 0.5rem;
+  background: var(--surface-2);
+  border-radius: var(--r-full);
+  overflow: hidden;
+}
+
+.eval-bar-fill {
+  height: 100%;
+  border-radius: var(--r-full);
+  transition: width 0.6s var(--ease);
+
+  &.score--good {
+    background: var(--success);
+  }
+
+  &.score--ok {
+    background: var(--warning);
+  }
+
+  &.score--low {
+    background: var(--error);
+  }
+}
+
+.eval-bar-value {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--text-2);
+  width: 1.75rem;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.eval-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.eval-section-title {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+}
+
+.eval-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+
+  &--strength {
+    color: var(--success);
+  }
+
+  &--improve {
+    color: var(--warning);
+  }
+
+  span {
+    color: var(--text-2);
+  }
+}
