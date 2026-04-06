@@ -1,0 +1,52 @@
+<div class="overlay-backdrop" role="dialog" aria-modal="true" aria-label="Generating content">
+  <div class="overlay-card">
+    @if (!isError()) {
+      <div class="overlay-header">
+        <h2 class="overlay-title">Generating your content</h2>
+        <p class="overlay-elapsed" aria-live="off">{{ elapsedDisplay() }}</p>
+      </div>
+
+      <div class="steps-list" aria-live="polite">
+        @for (s of GENERATION_STEPS; track s.key; let i = $index) {
+          <div
+            class="step-row"
+            [class.active]="i === activeStepIndex()"
+            [class.done]="i < activeStepIndex()"
+          >
+            <span class="step-indicator" aria-hidden="true">
+              @if (i < activeStepIndex()) {
+                &#10003;
+              } @else if (i === activeStepIndex()) {
+                <span class="step-spinner"></span>
+              } @else {
+                {{ i + 1 }}
+              }
+            </span>
+            <span class="step-label">{{ s.label }}</span>
+          </div>
+        }
+      </div>
+
+      <div
+        class="progress-bar-container"
+        role="progressbar"
+        [attr.aria-valuenow]="progress()"
+        aria-valuemin="0"
+        aria-valuemax="100"
+      >
+        <div class="progress-bar-fill" [style.width.%]="progress()"></div>
+      </div>
+
+      <button class="cancel-btn" (click)="cancelled.emit()" type="button">Cancel</button>
+    } @else {
+      <div class="error-state" role="alert">
+        <h2 class="overlay-title">Generation failed</h2>
+        <p class="error-message">{{ error() }}</p>
+        <div class="error-actions">
+          <button class="retry-btn" (click)="retried.emit()" type="button">Try Again</button>
+          <button class="cancel-btn" (click)="cancelled.emit()" type="button">Go Back</button>
+        </div>
+      </div>
+    }
+  </div>
+</div>
