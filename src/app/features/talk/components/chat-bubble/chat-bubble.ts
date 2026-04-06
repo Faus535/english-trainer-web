@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { ConversationMessage } from '../../models/talk.model';
 import { FeedbackCard } from '../feedback-card/feedback-card';
@@ -12,6 +12,4 @@ import { FeedbackCard } from '../feedback-card/feedback-card';
 })
 export class ChatBubble {
   readonly message = input.required<ConversationMessage>();
-  readonly speakWord = output<string>();
-  readonly addToReview = output<string>();
 }

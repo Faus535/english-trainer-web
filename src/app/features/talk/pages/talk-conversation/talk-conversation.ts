@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, inject, OnInit, computed } from '@a
 import { ActivatedRoute, Router } from '@angular/router';
 import { TalkStateService } from '../../services/talk-state.service';
 import { TalkChatBubble } from '../../components/talk-chat-bubble/talk-chat-bubble';
-import { ConversationHeader } from '../../../tutor/components/conversation-header/conversation-header';
+import { ConversationHeader } from '../../components/conversation-header/conversation-header';
 import { TalkInputBar } from '../../components/talk-input-bar/talk-input-bar';
 
 @Component({

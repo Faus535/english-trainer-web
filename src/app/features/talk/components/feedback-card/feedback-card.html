@@ -23,21 +23,11 @@
           <p class="feedback-encouragement">{{ fb.encouragement }}</p>
         }
 
-        @if (fb.grammarCorrections.length > 0) {
+        @if (fb.grammarFixes.length > 0) {
           <div class="feedback-section">
-            <h4 class="feedback-section-title">Gramatica</h4>
-            @for (correction of fb.grammarCorrections; track correction.original) {
-              <div class="grammar-item">
-                @if (correction.category) {
-                  <span class="grammar-category">{{ correction.category }}</span>
-                }
-                <div class="grammar-diff">
-                  <span class="grammar-original">{{ correction.original }}</span>
-                  <span class="grammar-arrow" aria-hidden="true">&rarr;</span>
-                  <span class="grammar-corrected">{{ correction.corrected }}</span>
-                </div>
-                <span class="grammar-rule">{{ correction.rule }}</span>
-              </div>
+            <h4 class="feedback-section-title">Gramática</h4>
+            @for (fix of fb.grammarFixes; track fix) {
+              <p class="feedback-item">{{ fix }}</p>
             }
           </div>
         }
@@ -45,62 +35,21 @@
         @if (fb.vocabularySuggestions.length > 0) {
           <div class="feedback-section">
             <h4 class="feedback-section-title">Vocabulario</h4>
-            @for (vocab of fb.vocabularySuggestions; track vocab.word) {
-              <div class="vocab-item">
-                <div class="vocab-header">
-                  <strong
-                    class="vocab-word vocab-word--clickable"
-                    role="button"
-                    tabindex="0"
-                    (click)="openVocabPopup(vocab.word)"
-                    >{{ vocab.word }}</strong
-                  >
-                  <button
-                    class="vocab-action"
-                    (click)="addToReview.emit(vocab.word)"
-                    aria-label="Anadir '{{ vocab.word }}' a repaso"
-                  >
-                    <app-icon [name]="addIcon" [size]="14" aria-hidden="true" />
-                  </button>
-                </div>
-                <span class="vocab-definition">{{ vocab.definition }}</span>
-                <span class="vocab-example">{{ vocab.example }}</span>
-              </div>
+            @for (suggestion of fb.vocabularySuggestions; track suggestion) {
+              <p class="feedback-item">{{ suggestion }}</p>
             }
           </div>
         }
 
         @if (fb.pronunciationTips.length > 0) {
           <div class="feedback-section">
-            <h4 class="feedback-section-title">Pronunciacion</h4>
-            @for (tip of fb.pronunciationTips; track tip.word) {
-              <div class="pron-item">
-                <div class="pron-header">
-                  <strong>{{ tip.word }}</strong>
-                  <span class="pron-ipa">/{{ tip.ipa }}/</span>
-                  <button
-                    class="pron-listen"
-                    (click)="speakWord.emit(tip.word)"
-                    aria-label="Escuchar '{{ tip.word }}'"
-                  >
-                    <app-icon [name]="speakIcon" [size]="14" aria-hidden="true" />
-                  </button>
-                </div>
-                <span class="pron-tip">{{ tip.tip }}</span>
-              </div>
+            <h4 class="feedback-section-title">Pronunciación</h4>
+            @for (tip of fb.pronunciationTips; track tip) {
+              <p class="feedback-item">{{ tip }}</p>
             }
           </div>
         }
       </div>
     }
   </div>
-
-  @if (showVocabPopup() && selectedVocabWord()) {
-    <app-vocab-popup
-      [word]="selectedVocabWord()"
-      [visible]="showVocabPopup()"
-      (closed)="closeVocabPopup()"
-      (addToReview)="onVocabAddToReview($event)"
-    />
-  }
 }

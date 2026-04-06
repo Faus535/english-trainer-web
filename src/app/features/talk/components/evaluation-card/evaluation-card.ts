@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, input, computed } from '@angular/core';
 import { Icon } from '../../../../shared/components/icon/icon';
 import { LucideIconData, Check, ArrowUp, Award } from 'lucide-angular';
-import { ConversationEvaluation } from '../../models/talk.model';
+import { TalkEvaluation } from '../../models/talk.model';
 
 interface ScoreBar {
   label: string;
@@ -17,7 +17,7 @@ interface ScoreBar {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EvaluationCard {
-  readonly evaluation = input.required<ConversationEvaluation>();
+  readonly evaluation = input.required<TalkEvaluation>();
   readonly selectedLevel = input<string>();
 
   protected readonly checkIcon: LucideIconData = Check;
