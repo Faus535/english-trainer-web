@@ -9,60 +9,60 @@
 }
 
 :root {
-  // --- Palette (desaturated, modern) ---
-  --primary: #6366f1;
-  --primary-hover: #4f46e5;
-  --primary-soft: rgba(99, 102, 241, 0.08);
-  --success: #22c55e;
-  --success-soft: rgba(34, 197, 94, 0.08);
-  --error: #ef4444;
-  --error-soft: rgba(239, 68, 68, 0.08);
-  --warning: #eab308;
-  --warning-soft: rgba(234, 179, 8, 0.08);
-  --accent: #ec4899;
-  --accent-soft: rgba(236, 72, 153, 0.08);
-  --violet: #8b5cf6;
+  // --- Palette (Ember — warm, inviting) ---
+  --primary: #f59e0b;
+  --primary-hover: #d97706;
+  --primary-soft: rgba(245, 158, 11, 0.1);
+  --success: #4ade80;
+  --success-soft: rgba(74, 222, 128, 0.08);
+  --error: #f87171;
+  --error-soft: rgba(248, 113, 113, 0.08);
+  --warning: #fbbf24;
+  --warning-soft: rgba(251, 191, 36, 0.08);
+  --accent: #fb923c;
+  --accent-soft: rgba(251, 146, 60, 0.08);
+  --violet: #c084fc;
 
-  // --- Surfaces (zinc scale, more contrast between levels) ---
-  --bg: #09090b;
-  --surface-0: #18181b;
-  --surface-1: #27272a;
-  --surface-2: #202026;
-  --surface-3: #3f3f46;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-active: rgba(255, 255, 255, 0.16);
+  // --- Surfaces (warm stone scale) ---
+  --bg: #0c0a09;
+  --surface-0: #1c1917;
+  --surface-1: #292524;
+  --surface-2: #211f1d;
+  --surface-3: #44403c;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-active: rgba(255, 255, 255, 0.14);
 
-  // --- Text ---
-  --text: #fafafa;
-  --text-2: #a1a1aa;
-  --text-3: #71717a;
+  // --- Text (warm whites) ---
+  --text: #fafaf9;
+  --text-2: #a8a29e;
+  --text-3: #78716c;
 
-  // --- Module colors (solid, desaturated) ---
-  --color-listening: #f97316;
-  --color-vocabulary: #22c55e;
-  --color-grammar: #8b5cf6;
-  --color-phrases: #eab308;
-  --color-pronunciation: #6366f1;
+  // --- Module colors ---
+  --color-listening: #fb923c;
+  --color-vocabulary: #4ade80;
+  --color-grammar: #c084fc;
+  --color-phrases: #fbbf24;
+  --color-pronunciation: #60a5fa;
 
   // --- CEFR level colors ---
-  --level-a1: #22c55e;
-  --level-a2: #14b8a6;
-  --level-b1: #3b82f6;
-  --level-b2: #6366f1;
-  --level-c1: #a855f7;
-  --level-c2: #eab308;
+  --level-a1: #4ade80;
+  --level-a2: #2dd4bf;
+  --level-b1: #60a5fa;
+  --level-b2: #c084fc;
+  --level-c1: #f472b6;
+  --level-c2: #f59e0b;
 
   // --- Module backgrounds (softer) ---
-  --color-listening-soft: rgba(249, 115, 22, 0.1);
-  --color-vocabulary-soft: rgba(34, 197, 94, 0.1);
-  --color-grammar-soft: rgba(139, 92, 246, 0.1);
-  --color-phrases-soft: rgba(234, 179, 8, 0.1);
-  --color-pronunciation-soft: rgba(99, 102, 241, 0.1);
-  --color-phonetics: #06b6d4;
-  --color-phonetics-soft: rgba(6, 182, 212, 0.1);
-  --surface-alt: #1e1e24;
-  --primary-light: #818cf8;
-  --success-strong: #4ade80;
+  --color-listening-soft: rgba(251, 146, 60, 0.1);
+  --color-vocabulary-soft: rgba(74, 222, 128, 0.1);
+  --color-grammar-soft: rgba(192, 132, 252, 0.1);
+  --color-phrases-soft: rgba(251, 191, 36, 0.1);
+  --color-pronunciation-soft: rgba(96, 165, 250, 0.1);
+  --color-phonetics: #22d3ee;
+  --color-phonetics-soft: rgba(34, 211, 238, 0.1);
+  --surface-alt: #1a1816;
+  --primary-light: #fcd34d;
+  --success-strong: #86efac;
 
   // --- Spacing ---
   --sp-1: 0.25rem;
@@ -91,46 +91,46 @@
   --r-full: 9999px;
 
   // --- Shadows ---
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--border);
-  --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--border);
-  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--border);
+  --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border);
+  --shadow-glow: 0 0 24px rgba(245, 158, 11, 0.18);
 
   // --- Feature gradients ---
   --surface-glass: rgba(255, 255, 255, 0.04);
-  --gradient-talk: linear-gradient(135deg, #6366f1, #8b5cf6);
-  --gradient-immerse: linear-gradient(135deg, #06b6d4, #0ea5e9);
-  --gradient-review: linear-gradient(135deg, #f59e0b, #ef4444);
+  --gradient-talk: linear-gradient(135deg, #f59e0b, #fb923c);
+  --gradient-immerse: linear-gradient(135deg, #4ade80, #22d3ee);
+  --gradient-review: linear-gradient(135deg, #c084fc, #f472b6);
 
   // --- Transition ---
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .light-theme {
-  --bg: #fafafa;
-  --surface-0: #f4f4f5;
-  --surface-1: #e4e4e7;
+  --bg: #fffbf5;
+  --surface-0: #fef3c7;
+  --surface-1: #fde68a;
   --surface-2: #ffffff;
-  --surface-3: #d4d4d8;
-  --border: rgba(0, 0, 0, 0.08);
-  --border-active: rgba(0, 0, 0, 0.16);
-  --text: #09090b;
-  --text-2: #3f3f46;
-  --text-3: #a1a1aa;
+  --surface-3: #d6d3d1;
+  --border: rgba(0, 0, 0, 0.07);
+  --border-active: rgba(0, 0, 0, 0.14);
+  --text: #0c0a09;
+  --text-2: #44403c;
+  --text-3: #a8a29e;
 
-  --color-listening-soft: rgba(249, 115, 22, 0.06);
-  --color-vocabulary-soft: rgba(34, 197, 94, 0.06);
-  --color-grammar-soft: rgba(139, 92, 246, 0.06);
-  --color-phrases-soft: rgba(234, 179, 8, 0.06);
-  --color-pronunciation-soft: rgba(99, 102, 241, 0.06);
+  --color-listening-soft: rgba(251, 146, 60, 0.08);
+  --color-vocabulary-soft: rgba(74, 222, 128, 0.08);
+  --color-grammar-soft: rgba(192, 132, 252, 0.08);
+  --color-phrases-soft: rgba(251, 191, 36, 0.08);
+  --color-pronunciation-soft: rgba(96, 165, 250, 0.08);
   --color-phonetics: #0891b2;
-  --color-phonetics-soft: rgba(6, 182, 212, 0.06);
-  --surface-alt: #f0f0f2;
-  --primary-light: #6366f1;
+  --color-phonetics-soft: rgba(34, 211, 238, 0.08);
+  --surface-alt: #fef9ee;
+  --primary-light: #f59e0b;
   --success-strong: #16a34a;
 
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 0 0 1px var(--border);
-  --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.06), 0 0 0 1px var(--border);
-  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.08);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 0 0 1px var(--border);
+  --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.08), 0 0 0 1px var(--border);
+  --shadow-glow: 0 0 20px rgba(245, 158, 11, 0.12);
 }
 
 html,
