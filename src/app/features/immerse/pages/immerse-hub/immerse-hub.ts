@@ -6,10 +6,11 @@ import { ImmerseApiService } from '../../services/immerse-api.service';
 import { ImmerseStateService } from '../../services/immerse-state.service';
 import { ContentType } from '../../models/immerse.model';
 import { Level, CEFR_LEVELS } from '../../../../shared/models/learning.model';
+import { GenerationOverlay } from '../../components/generation-overlay/generation-overlay';
 
 @Component({
   selector: 'app-immerse-hub',
-  imports: [FormsModule, UpperCasePipe],
+  imports: [FormsModule, UpperCasePipe, GenerationOverlay],
   templateUrl: './immerse-hub.html',
   styleUrl: './immerse-hub.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,6 +32,11 @@ export class ImmerseHub {
   protected readonly topicInput = signal('');
   protected readonly contentTypes: ContentType[] = ['TEXT', 'AUDIO', 'VIDEO'];
   protected readonly levels = CEFR_LEVELS;
+
+  protected readonly generating = this.immerseState.generating;
+  protected readonly generationStep = this.immerseState.generationStep;
+  protected readonly generationProgress = this.immerseState.generationProgress;
+  protected readonly generationError = this.immerseState.generationError;
 
   protected onGenerate(): void {
     this.immerseState.generateContent({
@@ -57,6 +63,15 @@ export class ImmerseHub {
     const text = this.textInput().trim();
     if (!text) return;
     this.immerseState.submitContent({ text });
+  }
+
+  protected onCancelGeneration(): void {
+    this.immerseState.cancelGeneration();
+  }
+
+  protected onRetryGeneration(): void {
+    this.immerseState.cancelGeneration();
+    this.onGenerate();
   }
 
   private isValidHttpsUrl(value: string): boolean {

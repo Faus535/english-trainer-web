@@ -58,7 +58,7 @@
     <button
       class="submit-btn full-width"
       (click)="onGenerate()"
-      [disabled]="loading()"
+      [disabled]="loading() || generating()"
       type="button"
     >
       @if (loading()) {
@@ -135,5 +135,15 @@
       <p class="empty-title">Start learning from real content</p>
       <p class="empty-desc">Paste a URL or text above to begin</p>
     </div>
+  }
+
+  @if (generating()) {
+    <app-generation-overlay
+      [step]="generationStep()"
+      [progress]="generationProgress()"
+      [error]="generationError()"
+      (cancelled)="onCancelGeneration()"
+      (retried)="onRetryGeneration()"
+    />
   }
 </section>
