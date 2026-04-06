@@ -10,6 +10,7 @@ import {
   VocabEntry,
   ImmerseContent,
   GenerateContentRequest,
+  GenerateContentResponse,
 } from '../models/immerse.model';
 
 @Injectable({ providedIn: 'root' })
@@ -21,8 +22,8 @@ export class ImmerseApiService {
     return this.http.post<ImmerseContentResponse>(`${this.baseUrl}/content`, req);
   }
 
-  generateContent(req: GenerateContentRequest): Observable<ImmerseContentResponse> {
-    return this.http.post<ImmerseContentResponse>(`${this.baseUrl}/generate`, req);
+  generateContent(req: GenerateContentRequest): Observable<GenerateContentResponse> {
+    return this.http.post<GenerateContentResponse>(`${this.baseUrl}/generate`, req);
   }
 
   getContent(contentId: string): Observable<ImmerseContentResponse> {

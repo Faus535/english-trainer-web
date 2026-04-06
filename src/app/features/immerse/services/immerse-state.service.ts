@@ -1,5 +1,15 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
+import {
+  Subscription,
+  interval,
+  switchMap,
+  takeWhile,
+  timeout,
+  retry,
+  catchError,
+  EMPTY,
+} from 'rxjs';
 import { ImmerseApiService } from './immerse-api.service';
 import {
   ImmerseContent,
@@ -9,6 +19,8 @@ import {
   VocabEntry,
   WordAnnotation,
   GenerateContentRequest,
+  GenerationStep,
+  GENERATION_STEPS,
 } from '../models/immerse.model';
 
 @Injectable({ providedIn: 'root' })
@@ -25,6 +37,15 @@ export class ImmerseStateService {
   private readonly _loading = signal(false);
   private readonly _error = signal<string | null>(null);
 
+  private readonly _generating = signal(false);
+  private readonly _generationStep = signal<GenerationStep>('idle');
+  private readonly _generationProgress = signal(0);
+  private readonly _generationError = signal<string | null>(null);
+
+  private _pollingSub: Subscription | null = null;
+  private _elapsedTimer: Subscription | null = null;
+  private _lastGenerateRequest: GenerateContentRequest | null = null;
+
   readonly content = this._content.asReadonly();
   readonly annotations = this._annotations.asReadonly();
   readonly exercises = this._exercises.asReadonly();
@@ -33,6 +54,11 @@ export class ImmerseStateService {
   readonly exerciseProgress = this._exerciseProgress.asReadonly();
   readonly loading = this._loading.asReadonly();
   readonly error = this._error.asReadonly();
+
+  readonly generating = this._generating.asReadonly();
+  readonly generationStep = this._generationStep.asReadonly();
+  readonly generationProgress = this._generationProgress.asReadonly();
+  readonly generationError = this._generationError.asReadonly();
 
   readonly capturedVocabCount = computed(() => this._capturedVocab().length);
   readonly exerciseCompletionRate = computed(() => {
@@ -43,20 +69,38 @@ export class ImmerseStateService {
   });
 
   generateContent(req: GenerateContentRequest): void {
-    this._loading.set(true);
-    this._error.set(null);
+    this._generating.set(true);
+    this._generationStep.set('sending');
+    this._generationProgress.set(0);
+    this._generationError.set(null);
+    this._lastGenerateRequest = req;
+
+    this.startElapsedTimer();
 
     this.immerseApi.generateContent(req).subscribe({
       next: (res) => {
-        this._content.set(res);
-        this._loading.set(false);
-        this.router.navigate(['/immerse', res.id]);
+        if (res.status === 'PROCESSED') {
+          this.stopTimers();
+          this._generating.set(false);
+          this._generationStep.set('idle');
+          this.router.navigate(['/immerse', res.id]);
+        } else {
+          this.startPolling(res.id);
+        }
       },
       error: (err) => {
-        this._loading.set(false);
-        this._error.set(err.error?.message ?? 'Could not generate content');
+        this.stopTimers();
+        this._generationError.set(err.error?.message ?? 'Could not generate content');
       },
     });
+  }
+
+  cancelGeneration(): void {
+    this.stopTimers();
+    this._generating.set(false);
+    this._generationStep.set('idle');
+    this._generationProgress.set(0);
+    this._generationError.set(null);
   }
 
   submitContent(req: ImmerseContentRequest): void {
@@ -132,6 +176,7 @@ export class ImmerseStateService {
   }
 
   reset(): void {
+    this.cancelGeneration();
     this._content.set(null);
     this._annotations.set([]);
     this._exercises.set([]);
@@ -140,5 +185,56 @@ export class ImmerseStateService {
     this._exerciseProgress.set([]);
     this._loading.set(false);
     this._error.set(null);
+  }
+
+  private startPolling(contentId: string): void {
+    this._pollingSub = interval(2000)
+      .pipe(
+        switchMap(() => this.immerseApi.getContent(contentId)),
+        retry({ count: 3, delay: 2000 }),
+        takeWhile((res) => res.status !== 'PROCESSED' && res.status !== 'FAILED', true),
+        timeout(60_000),
+        catchError(() => {
+          this.stopTimers();
+          this._generationError.set('Generation timed out. Please try again.');
+          return EMPTY;
+        }),
+      )
+      .subscribe({
+        next: (res) => {
+          if (res.status === 'PROCESSED') {
+            this.stopTimers();
+            this._content.set(res);
+            this._generating.set(false);
+            this._generationStep.set('idle');
+            this.router.navigate(['/immerse', res.id]);
+          } else if (res.status === 'FAILED') {
+            this.stopTimers();
+            this._generationError.set('Content generation failed. Please try again.');
+          }
+        },
+      });
+  }
+
+  private startElapsedTimer(): void {
+    let elapsed = 0;
+    this._elapsedTimer = interval(1000).subscribe(() => {
+      elapsed++;
+      this._generationProgress.set(Math.min(90, (elapsed / 60) * 90));
+
+      for (let i = GENERATION_STEPS.length - 1; i >= 0; i--) {
+        if (elapsed >= GENERATION_STEPS[i].threshold) {
+          this._generationStep.set(GENERATION_STEPS[i].key);
+          break;
+        }
+      }
+    });
+  }
+
+  private stopTimers(): void {
+    this._pollingSub?.unsubscribe();
+    this._pollingSub = null;
+    this._elapsedTimer?.unsubscribe();
+    this._elapsedTimer = null;
   }
 }
