@@ -1,0 +1,33 @@
+<div class="summary">
+  <div class="summary-header">
+    <h2 class="summary-title">{{ article().title }}</h2>
+    <span class="level-badge">{{ article().level }}</span>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat">
+      <span class="stat-value">{{ answers().length }}</span>
+      <span class="stat-label">questions answered</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">{{ savedWords().length }}</span>
+      <span class="stat-label">words saved</span>
+    </div>
+  </div>
+
+  @if (savedWords().length > 0) {
+    <section class="saved-section">
+      <h3 class="section-title">Words you saved</h3>
+      <ul class="saved-list">
+        @for (word of savedWords(); track word.id) {
+          <li class="saved-item">
+            <span class="word">{{ word.wordOrPhrase }}</span>
+            <span class="translation">{{ word.translation }}</span>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  <button type="button" class="home-btn" (click)="goHome()">Back to home</button>
+</div>

@@ -33,6 +33,20 @@
         <span class="badge-text">reviews due today</span>
       </div>
     }
+
+    <div
+      class="feature-card"
+      role="button"
+      tabindex="0"
+      (click)="onActionTapped('/article')"
+      (keydown.enter)="onActionTapped('/article')"
+    >
+      <span class="feature-icon" aria-hidden="true">📰</span>
+      <div class="feature-info">
+        <h3 class="feature-title">News Reader</h3>
+        <p class="feature-desc">Read an AI-generated article, mark words, answer questions.</p>
+      </div>
+    </div>
   } @else {
     <div class="empty-state">
       <h1 class="greeting">Welcome</h1>

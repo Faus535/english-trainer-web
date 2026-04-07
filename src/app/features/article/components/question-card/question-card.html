@@ -1,0 +1,40 @@
+<div class="question-card">
+  <p class="question-text">{{ question().questionText }}</p>
+
+  <textarea
+    class="answer-textarea"
+    [formControl]="answerCtrl"
+    rows="6"
+    [attr.disabled]="result() ? true : null"
+    placeholder="Write your answer here..."
+    aria-label="Your answer"
+  ></textarea>
+
+  <span class="word-count" [class.valid]="wordCount() >= minWords()">
+    {{ wordCount() }} / {{ minWords() }} words
+  </span>
+
+  @if (result()) {
+    <div class="correction">
+      <p class="correction-summary">{{ result()!.correctionSummary }}</p>
+      <p class="correction-detail"><strong>Grammar:</strong> {{ result()!.grammarFeedback }}</p>
+      <p class="correction-detail"><strong>Style:</strong> {{ result()!.styleFeedback }}</p>
+    </div>
+    <button type="button" class="next-btn" (click)="nextRequested.emit()">Next question</button>
+  } @else {
+    <div class="card-actions">
+      <button type="button" class="submit-btn" [disabled]="!canSubmit()" (click)="onSubmit()">
+        @if (submitting()) {
+          <span class="spinner" aria-hidden="true"></span>
+          Checking...
+        } @else {
+          Submit answer
+        }
+      </button>
+      <button type="button" class="hint-btn" (click)="hintRequested.emit()">Get a hint</button>
+    </div>
+    @if (hint()) {
+      <p class="hint-text">{{ hint() }}</p>
+    }
+  }
+</div>

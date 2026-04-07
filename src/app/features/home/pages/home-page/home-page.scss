@@ -108,6 +108,46 @@
   }
 }
 
+.feature-card {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-4) var(--sp-5);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  cursor: pointer;
+  transition: border-color 200ms var(--ease);
+
+  &:hover {
+    border-color: var(--border-active);
+  }
+}
+
+.feature-icon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.feature-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.feature-title {
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--text-1);
+  margin: 0;
+}
+
+.feature-desc {
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  margin: 0;
+}
+
 .empty-state {
   display: flex;
   flex-direction: column;

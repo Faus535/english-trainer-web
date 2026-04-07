@@ -1,0 +1,31 @@
+<section class="article-questions">
+  @if (qaComplete() && article()) {
+    <app-article-summary
+      [article]="article()!"
+      [savedWords]="savedWords()"
+      [answers]="state.answers()"
+    />
+  } @else if (currentQuestion()) {
+    <header class="questions-header">
+      <p class="progress-label">
+        Question {{ currentQuestionIndex() + 1 }}
+        @if (state.questions().length > 0) {
+          of {{ state.questions().length }}
+        }
+      </p>
+    </header>
+
+    <app-question-card
+      [question]="currentQuestion()!"
+      [hint]="activeHint()"
+      [result]="currentResult()"
+      (answerSubmitted)="onAnswerSubmitted($event)"
+      (hintRequested)="onHintRequested()"
+      (nextRequested)="onNextQuestion()"
+    />
+  } @else {
+    <div class="loading-state" aria-busy="true">
+      <p>Loading questions...</p>
+    </div>
+  }
+</section>

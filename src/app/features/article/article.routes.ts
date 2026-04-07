@@ -12,4 +12,10 @@ export default [
       import('./pages/article-reader/article-reader').then((m) => m.ArticleReader),
     title: 'Article - Read',
   },
+  {
+    path: ':articleId/questions',
+    loadComponent: () =>
+      import('./pages/article-questions/article-questions').then((m) => m.ArticleQuestions),
+    title: 'Article - Questions',
+  },
 ] satisfies Routes;
