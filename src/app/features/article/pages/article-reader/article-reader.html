@@ -1,0 +1,28 @@
+<section class="article-reader">
+  @if (loading()) {
+    <div class="loading-state" aria-busy="true">
+      <span class="spinner" aria-hidden="true"></span>
+      <p>Loading article...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-state" role="alert">
+      <p>{{ error() }}</p>
+    </div>
+  } @else if (article()) {
+    <header class="article-header">
+      <h1 class="article-title">{{ article()!.title }}</h1>
+      <span class="article-level">{{ article()!.level }}</span>
+    </header>
+
+    <div class="paragraphs">
+      @for (paragraph of article()!.paragraphs; track paragraph.id; let i = $index) {
+        <app-article-paragraph
+          [paragraph]="paragraph"
+          [isActive]="currentParagraphIndex() === i"
+          (readCompleted)="onParagraphRead()"
+          (wordSelected)="onWordSelected($event)"
+        />
+      }
+    </div>
+  }
+</section>

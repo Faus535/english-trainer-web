@@ -1,0 +1,57 @@
+<section class="article-hub">
+  <h1 class="page-title">News Reader</h1>
+  <p class="page-subtitle">Generate an AI-written article and practise reading in English</p>
+
+  <form class="hub-form" (ngSubmit)="onGenerate()">
+    <div class="form-field">
+      <label for="topic" class="field-label">Topic</label>
+      <input
+        id="topic"
+        class="topic-input"
+        type="text"
+        [formControl]="topicCtrl"
+        placeholder="e.g. climate change, space exploration, music..."
+        aria-label="Article topic"
+      />
+      @if (topicCtrl.invalid && topicCtrl.touched) {
+        <p class="field-error" role="alert">Topic is required (max 100 characters)</p>
+      }
+    </div>
+
+    <div class="level-field">
+      <span class="field-label">Level</span>
+      <div class="level-selector" role="group" aria-label="English level">
+        @for (level of levels; track level) {
+          <button
+            type="button"
+            class="level-btn"
+            [class.active]="selectedLevel() === level"
+            (click)="selectedLevel.set(level)"
+            [attr.aria-pressed]="selectedLevel() === level"
+          >
+            {{ level }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <button class="generate-btn" type="submit" [disabled]="topicCtrl.invalid || generating()">
+      @if (generating()) {
+        <span class="spinner" aria-hidden="true"></span>
+        Generating...
+      } @else {
+        Generate Article
+      }
+    </button>
+  </form>
+
+  @if (generating()) {
+    <app-generation-overlay
+      [step]="generationStep()"
+      [progress]="generationProgress()"
+      [error]="generationError()"
+      (cancelled)="onCancelGeneration()"
+      (retried)="onRetryGeneration()"
+    />
+  }
+</section>

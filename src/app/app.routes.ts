@@ -26,6 +26,11 @@ export const routes: Routes = [
     loadChildren: () => import('./features/immerse/immerse.routes'),
   },
   {
+    path: 'article',
+    canActivate: [authGuard],
+    loadChildren: () => import('./features/article/article.routes'),
+  },
+  {
     path: 'review',
     canActivate: [authGuard],
     loadChildren: () => import('./features/review/review.routes'),
