@@ -1,0 +1,21 @@
+<div class="saved-words-list">
+  <button type="button" class="toggle-btn" (click)="toggle()" [attr.aria-expanded]="expanded()">
+    <span class="label">Saved words</span>
+    <span class="count">{{ words().length }}</span>
+    <span class="chevron" [class.open]="expanded()" aria-hidden="true">&#8250;</span>
+  </button>
+
+  @if (expanded() && words().length > 0) {
+    <ul class="words-list">
+      @for (word of words(); track word.id) {
+        <li class="word-item">
+          <span class="word-phrase">{{ word.wordOrPhrase }}</span>
+          <span class="word-translation">{{ word.translation }}</span>
+          <p class="word-context">{{ word.contextSentence }}</p>
+        </li>
+      }
+    </ul>
+  } @else if (expanded() && words().length === 0) {
+    <p class="empty-msg">No words saved yet. Select text in the article to save a word.</p>
+  }
+</div>

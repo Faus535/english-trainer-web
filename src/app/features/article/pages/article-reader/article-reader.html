@@ -24,5 +24,16 @@
         />
       }
     </div>
+
+    <app-saved-words-list [words]="savedWords()" />
+  }
+
+  @if (activeWord() && articleId()) {
+    <app-word-translation-popup
+      [draft]="activeWord()!"
+      [articleId]="articleId()"
+      (saved)="onWordSaved($event)"
+      (dismissed)="onDismissWord()"
+    />
   }
 </section>

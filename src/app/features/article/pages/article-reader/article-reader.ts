@@ -5,11 +5,13 @@ import { map } from 'rxjs';
 import { ArticleStateService } from '../../services/article-state.service';
 import { TtsService } from '../../../../shared/services/tts.service';
 import { ArticleParagraph } from '../../components/article-paragraph/article-paragraph';
-import { SavedWordDraft } from '../../models/article.model';
+import { WordTranslationPopup } from '../../components/word-translation-popup/word-translation-popup';
+import { SavedWordsList } from '../../components/saved-words-list/saved-words-list';
+import { SavedWord, SavedWordDraft } from '../../models/article.model';
 
 @Component({
   selector: 'app-article-reader',
-  imports: [ArticleParagraph],
+  imports: [ArticleParagraph, WordTranslationPopup, SavedWordsList],
   templateUrl: './article-reader.html',
   styleUrl: './article-reader.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,6 +30,8 @@ export class ArticleReader {
   protected readonly currentParagraphIndex = this.state.currentParagraphIndex;
   protected readonly loading = this.state.loading;
   protected readonly error = this.state.error;
+  protected readonly activeWord = this.state.activeWord;
+  protected readonly savedWords = this.state.savedWords;
 
   constructor() {
     inject(DestroyRef).onDestroy(() => this.tts.stop());
@@ -45,7 +49,15 @@ export class ArticleReader {
     }
   }
 
-  protected onWordSelected(_draft: SavedWordDraft): void {
-    this.state.markWord(_draft);
+  protected onWordSelected(draft: SavedWordDraft): void {
+    this.state.markWord(draft);
+  }
+
+  protected onWordSaved(word: SavedWord): void {
+    this.state.saveActiveWord(word);
+  }
+
+  protected onDismissWord(): void {
+    this.state.dismissActiveWord();
   }
 }

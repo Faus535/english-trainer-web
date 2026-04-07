@@ -1,0 +1,23 @@
+<div class="popup" role="dialog" aria-label="Word translation">
+  @if (loading()) {
+    <div class="popup-loading" aria-busy="true">
+      <span class="spinner" aria-hidden="true"></span>
+      <p>Translating...</p>
+    </div>
+  } @else if (error()) {
+    <div class="popup-error">
+      <p class="error-msg" role="alert">{{ error() }}</p>
+      <button type="button" class="dismiss-btn" (click)="onDismiss()">Close</button>
+    </div>
+  } @else if (translation()) {
+    <div class="popup-content">
+      <p class="word-phrase">{{ translation()!.wordOrPhrase }}</p>
+      <p class="translation-text">{{ translation()!.translation }}</p>
+      <p class="context-sentence">{{ translation()!.contextSentence }}</p>
+      <div class="popup-actions">
+        <button type="button" class="save-btn" (click)="onConfirmSave()">Add to review</button>
+        <button type="button" class="dismiss-btn" (click)="onDismiss()">Close</button>
+      </div>
+    </div>
+  }
+</div>
