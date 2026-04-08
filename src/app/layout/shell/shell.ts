@@ -16,7 +16,7 @@ import { Toast } from '../../shared/components/toast/toast';
 import { IdleWarningModal } from '../../shared/components/idle-warning-modal/idle-warning-modal';
 import { IdleService } from '../../core/services/idle.service';
 import { AuthService } from '../../core/services/auth.service';
-import { LucideIconData, House, Mic, Square, BookOpen, RotateCcw } from 'lucide-angular';
+import { LucideIconData, House, Mic, Square, BookOpen, RotateCcw, Newspaper } from 'lucide-angular';
 
 interface NavTab {
   path: string;
@@ -54,6 +54,7 @@ export class Shell {
     { path: '/home', label: 'Home', icon: House },
     { path: '/talk', label: 'Talk', icon: Mic },
     { path: '/immerse', label: 'Immerse', icon: BookOpen },
+    { path: '/article', label: 'Article', icon: Newspaper },
     { path: '/review', label: 'Review', icon: RotateCcw },
   ];
 
