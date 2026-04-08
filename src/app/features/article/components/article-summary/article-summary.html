@@ -6,14 +6,36 @@
 
   <div class="stats-row">
     <div class="stat">
-      <span class="stat-value">{{ answers().length }}</span>
-      <span class="stat-label">questions answered</span>
+      <span class="stat-value">{{ summaryStats().answeredCorrectly }}</span>
+      <span class="stat-label">of {{ summaryStats().totalQuestions }} correct</span>
     </div>
     <div class="stat">
-      <span class="stat-value">{{ savedWords().length }}</span>
+      <span class="stat-value">{{ summaryStats().totalWords }}</span>
       <span class="stat-label">words saved</span>
     </div>
   </div>
+
+  <section class="xp-section">
+    <h3 class="section-title">XP Earned</h3>
+    <ul class="xp-list">
+      <li class="xp-item">
+        <span class="xp-label">Base</span>
+        <span class="xp-value">{{ summaryStats().xpBreakdown.baseXp }} XP</span>
+      </li>
+      <li class="xp-item">
+        <span class="xp-label">Correct answers (+5 each)</span>
+        <span class="xp-value">{{ summaryStats().xpBreakdown.correctAnswerXp }} XP</span>
+      </li>
+      <li class="xp-item">
+        <span class="xp-label">Marked words (+2 each)</span>
+        <span class="xp-value">{{ summaryStats().xpBreakdown.markedWordsXp }} XP</span>
+      </li>
+      <li class="xp-item xp-total">
+        <span class="xp-label">Total</span>
+        <span class="xp-value">{{ summaryStats().xpBreakdown.totalXp }} XP</span>
+      </li>
+    </ul>
+  </section>
 
   @if (savedWords().length > 0) {
     <section class="saved-section">

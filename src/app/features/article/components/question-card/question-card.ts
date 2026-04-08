@@ -12,6 +12,8 @@ import { ArticleQuestion, AnswerResult } from '../../models/article.model';
 })
 export class QuestionCard {
   readonly question = input.required<ArticleQuestion>();
+  readonly answered = input(false);
+  readonly previousAnswer = input<AnswerResult | undefined>(undefined);
   readonly hint = input<string | null>(null);
   readonly submitting = input(false);
   readonly result = input<AnswerResult | null>(null);

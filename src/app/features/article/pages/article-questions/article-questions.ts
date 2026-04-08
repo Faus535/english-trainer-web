@@ -28,6 +28,8 @@ export class ArticleQuestions {
       null,
   );
 
+  protected readonly currentPreviousAnswer = computed(() => this.state.currentQuestion()?.answer);
+
   private readonly articleId: string;
 
   constructor() {

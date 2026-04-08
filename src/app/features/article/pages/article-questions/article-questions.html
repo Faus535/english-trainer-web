@@ -4,6 +4,7 @@
       [article]="article()!"
       [savedWords]="savedWords()"
       [answers]="state.answers()"
+      [totalQuestions]="state.questions().length"
     />
   } @else if (currentQuestion()) {
     <header class="questions-header">
@@ -17,6 +18,8 @@
 
     <app-question-card
       [question]="currentQuestion()!"
+      [answered]="currentQuestion()!.answered"
+      [previousAnswer]="currentPreviousAnswer()"
       [hint]="activeHint()"
       [result]="currentResult()"
       (answerSubmitted)="onAnswerSubmitted($event)"

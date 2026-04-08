@@ -57,6 +57,7 @@ export interface ArticleQuestion {
   orderIndex: number;
   minWords: number;
   answered: boolean;
+  answer?: AnswerResult;
 }
 
 export interface SubmitAnswerRequest {
@@ -73,6 +74,18 @@ export interface AnswerResult {
 export interface QuestionAnswer {
   questionId: string;
   result: AnswerResult;
+}
+
+export interface SummaryStats {
+  totalQuestions: number;
+  answeredCorrectly: number;
+  totalWords: number;
+  xpBreakdown: {
+    baseXp: number;
+    correctAnswerXp: number;
+    markedWordsXp: number;
+    totalXp: number;
+  };
 }
 
 export interface ArticleHistoryItem {

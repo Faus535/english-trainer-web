@@ -1,5 +1,21 @@
 <div class="question-card">
-  <p class="question-text">{{ question().questionText }}</p>
+  <div class="question-header">
+    <p class="question-text">{{ question().questionText }}</p>
+    @if (answered()) {
+      <span class="badge-answered">Answered</span>
+    }
+  </div>
+
+  @if (previousAnswer()) {
+    <div
+      class="previous-feedback"
+      [class.feedback-correct]="previousAnswer()!.isContentCorrect"
+      [class.feedback-incorrect]="!previousAnswer()!.isContentCorrect"
+    >
+      <p class="previous-label">Your previous answer:</p>
+      <p class="previous-summary">{{ previousAnswer()!.correctionSummary }}</p>
+    </div>
+  }
 
   <textarea
     class="answer-textarea"
