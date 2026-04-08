@@ -7,6 +7,12 @@ export default [
     title: 'Article',
   },
   {
+    path: 'history',
+    loadComponent: () =>
+      import('./pages/article-history/article-history').then((m) => m.ArticleHistory),
+    title: 'Article History',
+  },
+  {
     path: ':articleId',
     loadComponent: () =>
       import('./pages/article-reader/article-reader').then((m) => m.ArticleReader),

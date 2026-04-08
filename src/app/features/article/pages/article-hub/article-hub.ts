@@ -1,12 +1,13 @@
 import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { ArticleStateService } from '../../services/article-state.service';
 import { GenerationOverlay } from '../../../immerse/components/generation-overlay/generation-overlay';
 import { ArticleLevel } from '../../models/article.model';
 
 @Component({
   selector: 'app-article-hub',
-  imports: [ReactiveFormsModule, GenerationOverlay],
+  imports: [ReactiveFormsModule, RouterLink, GenerationOverlay],
   templateUrl: './article-hub.html',
   styleUrl: './article-hub.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

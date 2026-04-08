@@ -20,6 +20,7 @@ import {
   ArticleQuestion,
   AnswerResult,
   QuestionAnswer,
+  ArticleHistoryItem,
 } from '../models/article.model';
 
 @Injectable({ providedIn: 'root' })
@@ -44,6 +45,10 @@ export class ArticleStateService {
   private readonly _activeWord = signal<SavedWordDraft | null>(null);
   private readonly _savedWords = signal<SavedWord[]>([]);
 
+  // History (Phase 6)
+  private readonly _history = signal<ArticleHistoryItem[]>([]);
+  private readonly _historyLoading = signal(false);
+
   // Q&A (Phase 3)
   private readonly _questions = signal<ArticleQuestion[]>([]);
   private readonly _currentQuestionIndex = signal(0);
@@ -65,6 +70,9 @@ export class ArticleStateService {
   readonly readingComplete = this._readingComplete.asReadonly();
   readonly activeWord = this._activeWord.asReadonly();
   readonly savedWords = this._savedWords.asReadonly();
+  readonly history = this._history.asReadonly();
+  readonly historyLoading = this._historyLoading.asReadonly();
+  readonly hasHistory = computed(() => this._history().length > 0);
   readonly questions = this._questions.asReadonly();
   readonly currentQuestionIndex = this._currentQuestionIndex.asReadonly();
   readonly answers = this._answers.asReadonly();
@@ -208,6 +216,27 @@ export class ArticleStateService {
   advanceQuestion(): void {
     this._currentQuestionIndex.update((i) => i + 1);
     this._activeHint.set(null);
+  }
+
+  loadHistory(): void {
+    this._historyLoading.set(true);
+    this.articleApi.getHistory().subscribe({
+      next: (items) => {
+        this._history.set(items);
+        this._historyLoading.set(false);
+      },
+      error: () => {
+        this._historyLoading.set(false);
+      },
+    });
+  }
+
+  deleteArticleFromHistory(id: string): void {
+    this.articleApi.deleteArticle(id).subscribe({
+      next: () => {
+        this._history.update((items) => items.filter((item) => item.id !== id));
+      },
+    });
   }
 
   reset(): void {

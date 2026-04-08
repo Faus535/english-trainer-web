@@ -68,3 +68,14 @@ export interface QuestionAnswer {
   questionId: string;
   result: AnswerResult;
 }
+
+export interface ArticleHistoryItem {
+  id: string;
+  topic: string;
+  level: ArticleLevel;
+  status: ArticleStatus;
+  createdAt: string;
+  questionCount: number;
+  answeredCount: number;
+  savedWordCount: number;
+}

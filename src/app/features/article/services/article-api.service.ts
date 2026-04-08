@@ -11,6 +11,7 @@ import {
   ArticleQuestion,
   SubmitAnswerRequest,
   AnswerResult,
+  ArticleHistoryItem,
 } from '../models/article.model';
 
 @Injectable({ providedIn: 'root' })
@@ -48,5 +49,13 @@ export class ArticleApiService {
 
   getHint(id: string, qId: string): Observable<{ hint: string }> {
     return this.http.get<{ hint: string }>(`${this.baseUrl}/${id}/questions/${qId}/hint`);
+  }
+
+  getHistory(): Observable<ArticleHistoryItem[]> {
+    return this.http.get<ArticleHistoryItem[]>(`${this.baseUrl}/history`);
+  }
+
+  deleteArticle(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 }

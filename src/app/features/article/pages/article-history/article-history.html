@@ -1,0 +1,63 @@
+<section class="article-history">
+  <div class="history-header">
+    <h1 class="page-title">Article History</h1>
+    <a class="back-link" routerLink="/article">Back</a>
+  </div>
+
+  @if (historyLoading()) {
+    <div class="skeleton-grid">
+      @for (i of [1, 2, 3]; track i) {
+        <div class="skeleton-card">
+          <div class="skeleton-line skeleton-title"></div>
+          <div class="skeleton-line skeleton-badge"></div>
+          <div class="skeleton-line skeleton-stats"></div>
+          <div class="skeleton-line skeleton-date"></div>
+          <div class="skeleton-actions">
+            <div class="skeleton-line skeleton-btn"></div>
+            <div class="skeleton-line skeleton-btn"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (!hasHistory()) {
+    <div class="empty-state">
+      <p class="empty-title">No articles yet</p>
+      <p class="empty-message">Generate your first article to start practising!</p>
+      <a class="empty-action" routerLink="/article">Create Article</a>
+    </div>
+  } @else {
+    <div class="history-grid">
+      @for (item of history(); track item.id) {
+        <div class="history-card">
+          <div class="card-header">
+            <h2 class="card-topic">{{ item.topic }}</h2>
+            <span class="level-badge" [class]="'level-' + item.level.toLowerCase()">
+              {{ item.level }}
+            </span>
+          </div>
+
+          <div class="card-stats">
+            <span class="stat">{{ item.questionCount }} questions</span>
+            <span class="stat-divider">/</span>
+            <span class="stat">{{ item.answeredCount }} answered</span>
+            <span class="stat-divider">/</span>
+            <span class="stat">{{ item.savedWordCount }} words</span>
+          </div>
+
+          <p class="card-date">{{ formatDate(item.createdAt) }}</p>
+
+          <div class="card-actions">
+            @if (confirmingDeleteId() === item.id) {
+              <span class="confirm-text">Delete this article?</span>
+              <button class="btn-confirm-yes" (click)="confirmDelete(item.id)">Yes</button>
+              <button class="btn-confirm-no" (click)="cancelDelete()">No</button>
+            } @else {
+              <button class="btn-resume" (click)="resume(item.id)">Resume</button>
+              <button class="btn-delete" (click)="requestDelete(item.id)">Delete</button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</section>
