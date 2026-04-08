@@ -45,6 +45,12 @@ export class ArticleStateService {
   private readonly _activeWord = signal<SavedWordDraft | null>(null);
   private readonly _savedWords = signal<SavedWord[]>([]);
 
+  // Pre-reading (Phase 7)
+  private readonly _keyWords = signal<SavedWord[]>([]);
+  private readonly _predictiveQuestion = signal<string | null>(null);
+  private readonly _preReadingLoading = signal(false);
+  private readonly _preReadingComplete = signal(false);
+
   // History (Phase 6)
   private readonly _history = signal<ArticleHistoryItem[]>([]);
   private readonly _historyLoading = signal(false);
@@ -70,6 +76,10 @@ export class ArticleStateService {
   readonly readingComplete = this._readingComplete.asReadonly();
   readonly activeWord = this._activeWord.asReadonly();
   readonly savedWords = this._savedWords.asReadonly();
+  readonly keyWords = this._keyWords.asReadonly();
+  readonly predictiveQuestion = this._predictiveQuestion.asReadonly();
+  readonly preReadingLoading = this._preReadingLoading.asReadonly();
+  readonly preReadingComplete = this._preReadingComplete.asReadonly();
   readonly history = this._history.asReadonly();
   readonly historyLoading = this._historyLoading.asReadonly();
   readonly hasHistory = computed(() => this._history().length > 0);
@@ -218,6 +228,25 @@ export class ArticleStateService {
     this._activeHint.set(null);
   }
 
+  loadPreReading(articleId: string): void {
+    this._preReadingLoading.set(true);
+    this.articleApi.getPreReading(articleId).subscribe({
+      next: (data) => {
+        this._keyWords.set(data.keyWords);
+        this._predictiveQuestion.set(data.predictiveQuestion);
+        this._preReadingLoading.set(false);
+      },
+      error: () => {
+        this._preReadingLoading.set(false);
+        this._preReadingComplete.set(true);
+      },
+    });
+  }
+
+  dismissPreReadingStage(): void {
+    this._preReadingComplete.set(true);
+  }
+
   loadHistory(): void {
     this._historyLoading.set(true);
     this.articleApi.getHistory().subscribe({
@@ -248,6 +277,10 @@ export class ArticleStateService {
     this._readingComplete.set(false);
     this._activeWord.set(null);
     this._savedWords.set([]);
+    this._keyWords.set([]);
+    this._predictiveQuestion.set(null);
+    this._preReadingLoading.set(false);
+    this._preReadingComplete.set(false);
     this._questions.set([]);
     this._currentQuestionIndex.set(0);
     this._answers.set([]);

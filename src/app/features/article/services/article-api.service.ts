@@ -12,6 +12,7 @@ import {
   SubmitAnswerRequest,
   AnswerResult,
   ArticleHistoryItem,
+  PreReadingData,
 } from '../models/article.model';
 
 @Injectable({ providedIn: 'root' })
@@ -49,6 +50,10 @@ export class ArticleApiService {
 
   getHint(id: string, qId: string): Observable<{ hint: string }> {
     return this.http.get<{ hint: string }>(`${this.baseUrl}/${id}/questions/${qId}/hint`);
+  }
+
+  getPreReading(id: string): Observable<PreReadingData> {
+    return this.http.get<PreReadingData>(`${this.baseUrl}/${id}/pre-reading`);
   }
 
   getHistory(): Observable<ArticleHistoryItem[]> {

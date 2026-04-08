@@ -9,23 +9,34 @@
       <p>{{ error() }}</p>
     </div>
   } @else if (article()) {
-    <header class="article-header">
-      <h1 class="article-title">{{ article()!.title }}</h1>
-      <span class="article-level">{{ article()!.level }}</span>
-    </header>
+    @if (!preReadingComplete()) {
+      <app-pre-reading-stage
+        [keyWords]="keyWords()"
+        [question]="predictiveQuestion()"
+        [loading]="preReadingLoading()"
+        (startReading)="onStartReading()"
+      />
+    }
 
-    <div class="paragraphs">
-      @for (paragraph of article()!.paragraphs; track paragraph.id; let i = $index) {
-        <app-article-paragraph
-          [paragraph]="paragraph"
-          [isActive]="currentParagraphIndex() === i"
-          (readCompleted)="onParagraphRead()"
-          (wordSelected)="onWordSelected($event)"
-        />
-      }
-    </div>
+    @if (preReadingComplete()) {
+      <header class="article-header">
+        <h1 class="article-title">{{ article()!.title }}</h1>
+        <span class="article-level">{{ article()!.level }}</span>
+      </header>
 
-    <app-saved-words-list [words]="savedWords()" />
+      <div class="paragraphs">
+        @for (paragraph of article()!.paragraphs; track paragraph.id; let i = $index) {
+          <app-article-paragraph
+            [paragraph]="paragraph"
+            [isActive]="currentParagraphIndex() === i"
+            (readCompleted)="onParagraphRead()"
+            (wordSelected)="onWordSelected($event)"
+          />
+        }
+      </div>
+
+      <app-saved-words-list [words]="savedWords()" />
+    }
   }
 
   @if (activeWord() && articleId()) {

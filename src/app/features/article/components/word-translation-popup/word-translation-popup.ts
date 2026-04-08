@@ -31,6 +31,7 @@ export class WordTranslationPopup implements OnInit, OnDestroy {
   protected readonly loading = signal(true);
   protected readonly translation = signal<SavedWord | null>(null);
   protected readonly error = signal<string | null>(null);
+  protected readonly showDefinition = signal(false);
 
   private boundOnKeydown = this.onKeydown.bind(this);
   private boundOnClickOutside = this.onClickOutside.bind(this);
@@ -66,6 +67,10 @@ export class WordTranslationPopup implements OnInit, OnDestroy {
     if (word) {
       this.saved.emit(word);
     }
+  }
+
+  protected toggleDefinition(): void {
+    this.showDefinition.update((v) => !v);
   }
 
   protected onDismiss(): void {

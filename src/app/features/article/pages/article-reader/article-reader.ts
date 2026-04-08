@@ -7,11 +7,12 @@ import { TtsService } from '../../../../shared/services/tts.service';
 import { ArticleParagraph } from '../../components/article-paragraph/article-paragraph';
 import { WordTranslationPopup } from '../../components/word-translation-popup/word-translation-popup';
 import { SavedWordsList } from '../../components/saved-words-list/saved-words-list';
+import { PreReadingStage } from '../../components/pre-reading-stage/pre-reading-stage';
 import { SavedWord, SavedWordDraft } from '../../models/article.model';
 
 @Component({
   selector: 'app-article-reader',
-  imports: [ArticleParagraph, WordTranslationPopup, SavedWordsList],
+  imports: [ArticleParagraph, WordTranslationPopup, SavedWordsList, PreReadingStage],
   templateUrl: './article-reader.html',
   styleUrl: './article-reader.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,6 +33,10 @@ export class ArticleReader {
   protected readonly error = this.state.error;
   protected readonly activeWord = this.state.activeWord;
   protected readonly savedWords = this.state.savedWords;
+  protected readonly keyWords = this.state.keyWords;
+  protected readonly predictiveQuestion = this.state.predictiveQuestion;
+  protected readonly preReadingLoading = this.state.preReadingLoading;
+  protected readonly preReadingComplete = this.state.preReadingComplete;
 
   constructor() {
     inject(DestroyRef).onDestroy(() => this.tts.stop());
@@ -39,6 +44,7 @@ export class ArticleReader {
     const id = this.route.snapshot.paramMap.get('articleId');
     if (id) {
       this.state.loadArticle(id);
+      this.state.loadPreReading(id);
     }
   }
 
@@ -59,5 +65,9 @@ export class ArticleReader {
 
   protected onDismissWord(): void {
     this.state.dismissActiveWord();
+  }
+
+  protected onStartReading(): void {
+    this.state.dismissPreReadingStage();
   }
 }

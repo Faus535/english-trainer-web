@@ -12,7 +12,17 @@
   } @else if (translation()) {
     <div class="popup-content">
       <p class="word-phrase">{{ translation()!.wordOrPhrase }}</p>
-      <p class="translation-text">{{ translation()!.translation }}</p>
+
+      @if (showDefinition()) {
+        <p class="definition-text">{{ translation()!.englishDefinition }}</p>
+      } @else {
+        <p class="translation-text">{{ translation()!.translation }}</p>
+      }
+
+      <button type="button" class="toggle-btn" (click)="toggleDefinition()">
+        {{ showDefinition() ? 'Show Spanish' : 'Show English' }}
+      </button>
+
       <p class="context-sentence">{{ translation()!.contextSentence }}</p>
       <div class="popup-actions">
         <button type="button" class="save-btn" (click)="onConfirmSave()">Add to review</button>

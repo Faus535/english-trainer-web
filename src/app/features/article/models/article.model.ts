@@ -37,7 +37,13 @@ export interface SavedWord {
   id: string;
   wordOrPhrase: string;
   translation: string;
+  englishDefinition: string;
   contextSentence: string;
+}
+
+export interface PreReadingData {
+  keyWords: SavedWord[];
+  predictiveQuestion: string | null;
 }
 
 export interface SavedWordDraft {

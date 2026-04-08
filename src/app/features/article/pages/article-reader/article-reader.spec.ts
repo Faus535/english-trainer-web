@@ -28,12 +28,18 @@ describe('ArticleReader', () => {
     readingComplete: signal(false),
     activeWord: signal<SavedWordDraft | null>(null),
     savedWords: signal<SavedWord[]>([]),
+    keyWords: signal<SavedWord[]>([]),
+    predictiveQuestion: signal<string | null>(null),
+    preReadingLoading: signal(false),
+    preReadingComplete: signal(false),
     loadArticle: vi.fn(),
+    loadPreReading: vi.fn(),
     advanceParagraph: vi.fn(),
     completeReading: vi.fn(),
     markWord: vi.fn(),
     saveActiveWord: vi.fn(),
     dismissActiveWord: vi.fn(),
+    dismissPreReadingStage: vi.fn(),
   };
 
   const mockTts = {
@@ -106,6 +112,7 @@ describe('ArticleReader', () => {
       id: 'w-1',
       wordOrPhrase: 'resilience',
       translation: 'resiliencia',
+      englishDefinition: 'The ability to recover quickly.',
       contextSentence: 'Context.',
     };
     fixture.componentInstance['onWordSaved'](word);
@@ -133,8 +140,9 @@ describe('ArticleReader', () => {
     mockState.readingComplete.set(false);
   });
 
-  it('should render saved-words-list when article is present', () => {
+  it('should render saved-words-list when article is present and pre-reading complete', () => {
     mockState.article.set(mockArticle);
+    mockState.preReadingComplete.set(true);
     const fixture = TestBed.createComponent(ArticleReader);
     fixture.detectChanges();
 
@@ -142,5 +150,46 @@ describe('ArticleReader', () => {
     expect(list).not.toBeNull();
 
     mockState.article.set(null);
+    mockState.preReadingComplete.set(false);
+  });
+
+  it('should show pre-reading stage when article loaded and pre-reading not complete', () => {
+    mockState.article.set(mockArticle);
+    mockState.preReadingComplete.set(false);
+    const fixture = TestBed.createComponent(ArticleReader);
+    fixture.detectChanges();
+
+    const preReading = fixture.nativeElement.querySelector('app-pre-reading-stage');
+    expect(preReading).not.toBeNull();
+
+    const paragraphs = fixture.nativeElement.querySelector('.paragraphs');
+    expect(paragraphs).toBeNull();
+
+    mockState.article.set(null);
+  });
+
+  it('should hide pre-reading stage and show reader when pre-reading complete', () => {
+    mockState.article.set(mockArticle);
+    mockState.preReadingComplete.set(true);
+    const fixture = TestBed.createComponent(ArticleReader);
+    fixture.detectChanges();
+
+    const preReading = fixture.nativeElement.querySelector('app-pre-reading-stage');
+    expect(preReading).toBeNull();
+
+    const paragraphs = fixture.nativeElement.querySelector('.paragraphs');
+    expect(paragraphs).not.toBeNull();
+
+    mockState.article.set(null);
+    mockState.preReadingComplete.set(false);
+  });
+
+  it('should call dismissPreReadingStage when onStartReading is invoked', () => {
+    const fixture = TestBed.createComponent(ArticleReader);
+    fixture.detectChanges();
+
+    fixture.componentInstance['onStartReading']();
+
+    expect(mockState.dismissPreReadingStage).toHaveBeenCalledOnce();
   });
 });

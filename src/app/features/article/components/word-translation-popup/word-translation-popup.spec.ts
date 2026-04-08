@@ -54,14 +54,12 @@ describe('WordTranslationPopup', () => {
     const spinner = fixture.nativeElement.querySelector('.spinner');
     expect(spinner).not.toBeNull();
 
-    httpMock
-      .expectOne(`${base}/art-1/words`)
-      .flush({
-        id: 'w-1',
-        wordOrPhrase: 'resilience',
-        translation: 'resiliencia',
-        contextSentence: 'Context.',
-      });
+    httpMock.expectOne(`${base}/art-1/words`).flush({
+      id: 'w-1',
+      wordOrPhrase: 'resilience',
+      translation: 'resiliencia',
+      contextSentence: 'Context.',
+    });
   });
 
   it('should display translation after success', () => {
@@ -125,14 +123,12 @@ describe('WordTranslationPopup', () => {
     const dismissedSpy = vi.fn();
     fixture.componentInstance.dismissed.subscribe(dismissedSpy);
 
-    httpMock
-      .expectOne(`${base}/art-1/words`)
-      .flush({
-        id: 'w-1',
-        wordOrPhrase: 'resilience',
-        translation: 'resiliencia',
-        contextSentence: 'Context.',
-      });
+    httpMock.expectOne(`${base}/art-1/words`).flush({
+      id: 'w-1',
+      wordOrPhrase: 'resilience',
+      translation: 'resiliencia',
+      contextSentence: 'Context.',
+    });
     fixture.detectChanges();
 
     const dismissBtn: HTMLButtonElement = fixture.nativeElement.querySelector('.dismiss-btn');
@@ -157,14 +153,55 @@ describe('WordTranslationPopup', () => {
 
     expect(dismissedSpy).toHaveBeenCalledOnce();
 
-    httpMock
-      .expectOne(`${base}/art-1/words`)
-      .flush({
-        id: 'w-1',
-        wordOrPhrase: 'resilience',
-        translation: 'resiliencia',
-        contextSentence: 'Context.',
-      });
+    httpMock.expectOne(`${base}/art-1/words`).flush({
+      id: 'w-1',
+      wordOrPhrase: 'resilience',
+      translation: 'resiliencia',
+      contextSentence: 'Context.',
+    });
+  });
+
+  it('should toggle between translation and definition', () => {
+    const fixture = TestBed.createComponent(WordTranslationPopup);
+    fixture.componentRef.setInput('draft', {
+      wordOrPhrase: 'resilience',
+      contextSentence: 'Context.',
+    });
+    fixture.componentRef.setInput('articleId', 'art-1');
+    fixture.detectChanges();
+
+    httpMock.expectOne(`${base}/art-1/words`).flush({
+      id: 'w-1',
+      wordOrPhrase: 'resilience',
+      translation: 'resiliencia',
+      englishDefinition: 'The ability to recover quickly.',
+      contextSentence: 'Context.',
+    });
+    fixture.detectChanges();
+
+    // Initially shows translation
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelector('.translation-text')).not.toBeNull();
+    expect(el.querySelector('.definition-text')).toBeNull();
+    expect(el.textContent).toContain('resiliencia');
+
+    // Click toggle to show definition
+    const toggleBtn: HTMLButtonElement = el.querySelector('.toggle-btn')!;
+    expect(toggleBtn.textContent).toContain('Show English');
+    toggleBtn.click();
+    fixture.detectChanges();
+
+    expect(el.querySelector('.definition-text')).not.toBeNull();
+    expect(el.querySelector('.translation-text')).toBeNull();
+    expect(el.textContent).toContain('The ability to recover quickly.');
+    expect(toggleBtn.textContent).toContain('Show Spanish');
+
+    // Click toggle again to show translation
+    toggleBtn.click();
+    fixture.detectChanges();
+
+    expect(el.querySelector('.translation-text')).not.toBeNull();
+    expect(el.querySelector('.definition-text')).toBeNull();
   });
 
   it('should show error message on API failure', () => {

@@ -1,0 +1,45 @@
+<div class="overlay" role="dialog" aria-label="Pre-reading stage">
+  <div class="modal">
+    <h2 class="modal-title">Ready to learn?</h2>
+
+    @if (loading()) {
+      <div class="loading-section">
+        <div class="skeleton-chips">
+          @for (i of [1, 2, 3, 4]; track i) {
+            <div class="skeleton-chip"></div>
+          }
+        </div>
+        <div class="skeleton-question"></div>
+      </div>
+    } @else {
+      @if (keyWords().length > 0) {
+        <div class="key-words-section">
+          <h3 class="section-label">Key vocabulary</h3>
+          <div class="word-chips">
+            @for (word of keyWords(); track word.id) {
+              <button
+                class="word-chip"
+                [class.expanded]="expandedWordId() === word.id"
+                (click)="toggleWord(word.id)"
+              >
+                <span class="chip-word">{{ word.wordOrPhrase }}</span>
+                @if (expandedWordId() === word.id) {
+                  <span class="chip-translation">{{ word.translation }}</span>
+                }
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      @if (question()) {
+        <div class="question-section">
+          <h3 class="section-label">Think about this</h3>
+          <p class="predictive-question">{{ question() }}</p>
+        </div>
+      }
+    }
+
+    <button class="start-btn" (click)="onStart()" [disabled]="loading()">Start reading</button>
+  </div>
+</div>
