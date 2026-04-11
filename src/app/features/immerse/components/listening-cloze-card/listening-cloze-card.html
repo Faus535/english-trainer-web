@@ -1,0 +1,54 @@
+@switch (_cardState()) {
+  @case ('idle') {
+    <div class="state-idle">
+      <button class="play-btn" (click)="play()" aria-label="Play audio">
+        <span class="play-icon">▶</span>
+      </button>
+      <p class="hint">Tap to listen</p>
+    </div>
+  }
+
+  @case ('playing') {
+    <div class="state-playing">
+      <div class="pulse-ring" aria-label="Audio playing">
+        <span class="speaker-icon">🔊</span>
+      </div>
+      <p class="hint">Listening...</p>
+    </div>
+  }
+
+  @case ('answering') {
+    <div class="state-answering">
+      <p class="question-label">What did you hear?</p>
+      <div class="options">
+        @for (option of exercise().options ?? []; track option) {
+          <button class="option-btn" (click)="selectAnswer(option)">
+            {{ option }}
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  @case ('feedback') {
+    <div class="state-feedback" [class.correct]="_isCorrect()" [class.incorrect]="!_isCorrect()">
+      <p class="verdict">
+        @if (_isCorrect()) {
+          ✓ Correct!
+        } @else {
+          ✗ Incorrect
+        }
+      </p>
+      <p class="reveal">
+        @for (word of revealWords(); track $index) {
+          @if ($index === exercise().blankPosition) {
+            <mark>{{ word }}</mark>
+          } @else {
+            {{ word }}{{ $index < revealWords().length - 1 ? ' ' : '' }}
+          }
+        }
+      </p>
+      <button class="next-btn" (click)="next()">Next</button>
+    </div>
+  }
+}
