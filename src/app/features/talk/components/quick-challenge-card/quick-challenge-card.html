@@ -1,0 +1,20 @@
+<div class="card" [class]="'card--' + difficultyClass()">
+  <div class="card-header">
+    <span class="card-title">{{ challenge().title }}</span>
+    <span class="card-badge" [class]="'badge--' + difficultyClass()">
+      {{ challenge().difficulty }}
+    </span>
+  </div>
+  <p class="card-desc">{{ challenge().description }}</p>
+  <div class="card-footer">
+    <span class="card-category">{{ challenge().category }}</span>
+    <button
+      class="card-start"
+      type="button"
+      (click)="onStart()"
+      aria-label="Start {{ challenge().title }}"
+    >
+      →
+    </button>
+  </div>
+</div>

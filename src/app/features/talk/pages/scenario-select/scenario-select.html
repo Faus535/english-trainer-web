@@ -18,6 +18,19 @@
       <p>No scenarios available</p>
     </div>
   } @else {
+    @if (quickChallenges().length > 0) {
+      <section class="quick-section">
+        <h2 class="section-title quick-title">&#x26A1; Quick Practice (5 min)</h2>
+        <div class="quick-grid">
+          @for (challenge of quickChallenges(); track challenge.id) {
+            <app-quick-challenge-card
+              [challenge]="challenge"
+              (started)="onQuickChallengeSelected($event)"
+            />
+          }
+        </div>
+      </section>
+    }
     @for (category of categories(); track category.id) {
       <section class="category">
         <h2 class="category-name">{{ category.name }}</h2>
