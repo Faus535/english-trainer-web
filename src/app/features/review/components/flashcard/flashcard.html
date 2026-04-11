@@ -1,0 +1,43 @@
+<div
+  class="card-scene"
+  (click)="flip()"
+  role="button"
+  tabindex="0"
+  (keydown.enter)="flip()"
+  (keydown.space)="flip()"
+  [attr.aria-label]="_flipped() ? 'Card flipped' : 'Tap to reveal answer'"
+>
+  <div class="card" [class.flipped]="_flipped()">
+    <!-- Front -->
+    <div class="card__front">
+      <div class="card__front-top">
+        @if (item().sourceType) {
+          <span class="source-badge source-badge--{{ item().sourceType!.toLowerCase() }}">
+            {{ item().sourceType }}
+          </span>
+        }
+        <span class="card__word">{{ item().targetWord || item().word }}</span>
+      </div>
+      <div class="card__front-bottom">
+        <span class="card__hint">Tap to reveal</span>
+      </div>
+    </div>
+
+    <!-- Back -->
+    <div class="card__back">
+      <span class="card__translation">{{ item().targetTranslation || item().translation }}</span>
+      @if (item().contextSentence) {
+        <p class="card__context">{{ item().contextSentence }}</p>
+      }
+      @if (item().contextTranslation) {
+        <p class="card__context-translation">{{ item().contextTranslation }}</p>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Verdict bar -->
+<div class="verdict-bar" [class.visible]="_flipped() && !_rating()">
+  <button class="verdict-btn verdict-btn--hard" (click)="rate('HARD')">Hard</button>
+  <button class="verdict-btn verdict-btn--easy" (click)="rate('EASY')">Easy</button>
+</div>
