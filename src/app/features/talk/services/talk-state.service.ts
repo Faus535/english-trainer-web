@@ -28,6 +28,7 @@ export class TalkStateService {
   private readonly _level = signal<string>('a2');
   readonly _quickMode = signal(false);
   readonly _quickChallengeTitle = signal<string | null>(null);
+  private readonly _autoEnded = signal(false);
 
   readonly scenarioId = this._scenarioId.asReadonly();
   readonly conversationId = this._conversationId.asReadonly();
@@ -39,6 +40,7 @@ export class TalkStateService {
   readonly level = this._level.asReadonly();
   readonly quickMode = this._quickMode.asReadonly();
   readonly quickChallengeTitle = this._quickChallengeTitle.asReadonly();
+  readonly autoEnded = this._autoEnded.asReadonly();
   readonly isActive = computed(() => !!this._conversationId());
   readonly messageCount = computed(() => this._messages().length);
   readonly isSending = computed(() => this._status() === 'sending');
@@ -98,6 +100,9 @@ export class TalkStateService {
         };
         this._messages.update((msgs) => [...msgs, assistantMessage]);
         this._suggestEnd.set(res.suggestEnd);
+        if (res.ended) {
+          this._autoEnded.set(true);
+        }
         this._status.set('idle');
       },
       error: () => {
@@ -147,5 +152,6 @@ export class TalkStateService {
     this._level.set('a2');
     this._quickMode.set(false);
     this._quickChallengeTitle.set(null);
+    this._autoEnded.set(false);
   }
 }

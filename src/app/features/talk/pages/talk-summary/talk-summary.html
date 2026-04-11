@@ -7,23 +7,42 @@
       <div class="skeleton-block short"></div>
     </div>
   } @else if (endResult()) {
-    <div class="stats-row">
-      <div class="stat-card">
-        <span class="stat-value">{{ turnCount() }}</span>
-        <span class="stat-label">Turns</span>
+    @if (quickMode()) {
+      <div class="quick-summary">
+        <div class="task-badge" [class.completed]="taskCompleted()">
+          {{ taskCompleted() ? '✓ Task Completed!' : '✗ Keep Practising' }}
+        </div>
+        @if (top3Corrections().length > 0) {
+          <div class="corrections">
+            <h3 class="corrections-title">Top Corrections</h3>
+            @for (correction of top3Corrections(); track correction) {
+              <p class="correction">→ {{ correction }}</p>
+            }
+          </div>
+        }
+        @if (encouragementNote()) {
+          <p class="encouragement">{{ encouragementNote() }}</p>
+        }
       </div>
-      <div class="stat-card">
-        <span class="stat-value">{{ errorCount() }}</span>
-        <span class="stat-label">Errors</span>
+    } @else {
+      <div class="stats-row">
+        <div class="stat-card">
+          <span class="stat-value">{{ turnCount() }}</span>
+          <span class="stat-label">Turns</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">{{ errorCount() }}</span>
+          <span class="stat-label">Errors</span>
+        </div>
       </div>
-    </div>
 
-    @if (summary()) {
-      <p class="summary-text">{{ summary() }}</p>
-    }
+      @if (summary()) {
+        <p class="summary-text">{{ summary() }}</p>
+      }
 
-    @if (evaluation()) {
-      <app-talk-evaluation-card [evaluation]="evaluation()!" />
+      @if (evaluation()) {
+        <app-talk-evaluation-card [evaluation]="evaluation()!" />
+      }
     }
 
     <div class="actions">

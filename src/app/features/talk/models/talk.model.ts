@@ -82,6 +82,7 @@ export interface SendMessageResponse {
   content: string;
   correction: TalkCorrection;
   suggestEnd: boolean;
+  ended?: boolean;
 }
 
 export interface TalkEvaluation {

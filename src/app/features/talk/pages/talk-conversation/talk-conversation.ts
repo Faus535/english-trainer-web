@@ -1,13 +1,21 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, computed } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  inject,
+  OnInit,
+  computed,
+  effect,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TalkStateService } from '../../services/talk-state.service';
 import { TalkChatBubble } from '../../components/talk-chat-bubble/talk-chat-bubble';
 import { ConversationHeader } from '../../components/conversation-header/conversation-header';
 import { TalkInputBar } from '../../components/talk-input-bar/talk-input-bar';
+import { QuickProgressBar } from '../../components/quick-progress-bar/quick-progress-bar';
 
 @Component({
   selector: 'app-talk-conversation',
-  imports: [TalkChatBubble, ConversationHeader, TalkInputBar],
+  imports: [TalkChatBubble, ConversationHeader, TalkInputBar, QuickProgressBar],
   templateUrl: './talk-conversation.html',
   styleUrl: './talk-conversation.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,13 +30,33 @@ export class TalkConversation implements OnInit {
   protected readonly error = this.talkState.error;
   protected readonly messageCount = this.talkState.messageCount;
   protected readonly level = this.talkState.level;
+  protected readonly quickMode = this.talkState.quickMode;
+  protected readonly quickExchangeCount = this.talkState.quickExchangeCount;
+  protected readonly quickChallengeTitle = this.talkState.quickChallengeTitle;
 
   protected readonly inputDisabled = computed(() => this.talkState.isSending());
 
+  constructor() {
+    effect(() => {
+      if (this.talkState.autoEnded()) {
+        this.router.navigate(['/talk', 'summary']);
+      }
+    });
+  }
+
   ngOnInit(): void {
-    const scenarioId = this.route.snapshot.queryParamMap.get('scenarioId');
-    const level = this.route.snapshot.queryParamMap.get('level') ?? 'a2';
-    if (scenarioId) {
+    const params = this.route.snapshot.queryParamMap;
+    const mode = params.get('mode');
+    const scenarioId = params.get('scenarioId');
+    const challengeId = params.get('challengeId');
+    const title = params.get('title');
+    const level = params.get('level') ?? 'a2';
+
+    if (mode === 'QUICK' && challengeId) {
+      this.talkState._quickMode.set(true);
+      this.talkState._quickChallengeTitle.set(title ? decodeURIComponent(title) : null);
+      this.talkState.startConversation(challengeId, level, 'QUICK', challengeId);
+    } else if (scenarioId) {
       this.talkState.startConversation(scenarioId, level);
     }
   }

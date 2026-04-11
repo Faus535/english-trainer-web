@@ -1,4 +1,11 @@
 <div class="conversation-layout">
+  @if (quickMode()) {
+    <app-quick-progress-bar
+      [exchangeCount]="quickExchangeCount()"
+      [challengeTitle]="quickChallengeTitle()"
+    />
+  }
+
   <app-conversation-header
     [level]="$any(level())"
     [messageCount]="messageCount()"

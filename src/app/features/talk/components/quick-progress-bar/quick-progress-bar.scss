@@ -1,0 +1,36 @@
+:host {
+  display: block;
+}
+
+.progress-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding: var(--sp-2) 0;
+}
+
+.challenge-title {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  font-style: italic;
+}
+
+.progress-label {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.progress-track {
+  height: 0.375rem;
+  background: var(--border);
+  border-radius: var(--r-full);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, #0d9488 100%);
+  border-radius: var(--r-full);
+  transition: width 0.3s ease;
+}

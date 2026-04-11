@@ -1,0 +1,15 @@
+<div class="progress-wrapper">
+  @if (challengeTitle()) {
+    <span class="challenge-title">{{ challengeTitle() }}</span>
+  }
+  <div class="progress-label">Exchange {{ exchangeCount() }} of {{ totalExchanges() }}</div>
+  <div
+    class="progress-track"
+    role="progressbar"
+    [attr.aria-valuenow]="exchangeCount()"
+    [attr.aria-valuemax]="totalExchanges()"
+    aria-valuemin="0"
+  >
+    <div class="progress-fill" [style.width.%]="fillPercent()"></div>
+  </div>
+</div>

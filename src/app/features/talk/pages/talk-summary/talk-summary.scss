@@ -109,6 +109,57 @@
   }
 }
 
+.quick-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  align-items: center;
+  text-align: center;
+}
+
+.task-badge {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  padding: var(--sp-3) var(--sp-6);
+  border-radius: var(--r-full);
+  background: #fee2e2;
+  color: #dc2626;
+
+  &.completed {
+    background: #dcfce7;
+    color: #15803d;
+  }
+}
+
+.corrections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  align-items: flex-start;
+  width: 100%;
+  text-align: left;
+}
+
+.corrections-title {
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--text-2);
+  margin: 0;
+}
+
+.correction {
+  font-size: var(--fs-sm);
+  color: var(--primary);
+  margin: 0;
+}
+
+.encouragement {
+  font-style: italic;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  margin: 0;
+}
+
 .empty-state {
   display: flex;
   flex-direction: column;
