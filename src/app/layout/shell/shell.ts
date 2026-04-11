@@ -14,6 +14,7 @@ import { Icon } from '../../shared/components/icon/icon';
 import { ConnectionStatus } from '../../shared/components/connection-status/connection-status';
 import { Toast } from '../../shared/components/toast/toast';
 import { IdleWarningModal } from '../../shared/components/idle-warning-modal/idle-warning-modal';
+import { Onboarding } from '../../shared/components/onboarding/onboarding';
 import { IdleService } from '../../core/services/idle.service';
 import { AuthService } from '../../core/services/auth.service';
 import { LucideIconData, House, Mic, Square, BookOpen, RotateCcw, Newspaper } from 'lucide-angular';
@@ -34,6 +35,7 @@ interface NavTab {
     ConnectionStatus,
     Toast,
     IdleWarningModal,
+    Onboarding,
   ],
   templateUrl: './shell.html',
   styleUrl: './shell.scss',
@@ -81,6 +83,10 @@ export class Shell {
 
   protected onIdleLogout(): void {
     this.auth.logout();
+  }
+
+  protected onOnboardingCompleted(): void {
+    this.router.navigate(['/home']);
   }
 
   protected stopAudio(): void {

@@ -1,37 +1,22 @@
-import { Component, ChangeDetectionStrategy, signal, output } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  signal,
+  inject,
+  output,
+  computed,
+} from '@angular/core';
+import { ProfileStateService } from '../../services/profile-state.service';
 
-const STEPS = [
-  {
-    title: 'Bienvenido a English Trainer',
-    description: 'Tu plataforma personalizada para aprender ingles.',
-    icon: '👋',
-  },
-  {
-    title: 'Test de nivel',
-    description: 'Evaluaremos tu nivel en gramatica, vocabulario, escucha, pronunciacion y frases.',
-    icon: '📝',
-  },
-  {
-    title: 'Sesiones de aprendizaje',
-    description: 'Genera sesiones personalizadas basadas en tu nivel y areas de mejora.',
-    icon: '📚',
-  },
-  {
-    title: 'Practica de habla',
-    description: 'Mejora tu pronunciacion con ejercicios de voz y feedback en tiempo real.',
-    icon: '🎤',
-  },
-  {
-    title: 'Tutor IA',
-    description: 'Conversa con un tutor de IA que se adapta a tu nivel.',
-    icon: '🤖',
-  },
-  {
-    title: 'Logros y racha',
-    description: 'Mantiene tu motivacion con logros, XP y rachas diarias.',
-    icon: '🏆',
-  },
+const CEFR_LEVELS = [
+  { code: 'A1', name: 'Beginner', description: 'Just starting out with English' },
+  { code: 'A2', name: 'Elementary', description: 'Can handle simple conversations' },
+  { code: 'B1', name: 'Intermediate', description: 'Comfortable with everyday topics' },
+  { code: 'B2', name: 'Upper-Intermediate', description: 'Can discuss complex topics' },
+  { code: 'C1', name: 'Advanced', description: 'Near-fluent in most situations' },
+  { code: 'C2', name: 'Proficient', description: 'Mastery of English language' },
 ];
+
 const STORAGE_KEY = 'et_onboarding_completed';
 
 @Component({
@@ -41,31 +26,40 @@ const STORAGE_KEY = 'et_onboarding_completed';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Onboarding {
+  private readonly profileState = inject(ProfileStateService);
+
   readonly completed = output<void>();
-  protected readonly currentStep = signal(0);
-  protected readonly steps = STEPS;
+
   protected readonly visible = signal(false);
-  protected readonly step = () => this.steps[this.currentStep()];
-  protected readonly isLast = () => this.currentStep() >= this.steps.length - 1;
+  protected readonly _step = signal<'welcome' | 'level' | 'ready'>('welcome');
+  protected readonly _selectedLevel = signal<string | null>(null);
+  protected readonly levels = CEFR_LEVELS;
+
+  protected readonly canContinue = computed(() => this._selectedLevel() !== null);
 
   constructor() {
     if (!localStorage.getItem(STORAGE_KEY)) {
-      localStorage.setItem(STORAGE_KEY, 'true');
       this.visible.set(true);
     }
   }
 
-  protected next(): void {
-    if (this.isLast()) this.finish();
-    else this.currentStep.update((i) => i + 1);
+  protected goToLevel(): void {
+    this._step.set('level');
   }
-  protected previous(): void {
-    this.currentStep.update((i) => Math.max(0, i - 1));
+
+  protected selectLevel(code: string): void {
+    this._selectedLevel.set(code);
   }
-  protected skip(): void {
-    this.finish();
+
+  protected confirm(): void {
+    const level = this._selectedLevel();
+    if (!level) return;
+    this.profileState.updateEnglishLevel(level);
+    this._step.set('ready');
   }
-  private finish(): void {
+
+  protected finish(): void {
+    localStorage.setItem(STORAGE_KEY, 'true');
     this.visible.set(false);
     this.completed.emit();
   }

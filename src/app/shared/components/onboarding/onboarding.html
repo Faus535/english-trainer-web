@@ -1,23 +1,51 @@
 @if (visible()) {
-  <div class="onboarding-overlay" role="dialog" aria-modal="true" aria-label="Tour de bienvenida">
+  <div class="onboarding-overlay" role="dialog" aria-modal="true" aria-label="Onboarding">
     <div class="onboarding-card">
-      <div class="onboarding-icon">{{ step().icon }}</div>
-      <h2 class="onboarding-title">{{ step().title }}</h2>
-      <p class="onboarding-desc">{{ step().description }}</p>
-      <div class="onboarding-dots">
-        @for (s of steps; track $index) {
-          <span class="dot" [class.active]="$index === currentStep()"></span>
-        }
-      </div>
-      <div class="onboarding-actions">
-        @if (currentStep() > 0) {
-          <button class="btn-secondary" (click)="previous()">Anterior</button>
-        }
-        <button class="btn-primary" (click)="next()">
-          {{ isLast() ? 'Empezar' : 'Siguiente' }}
-        </button>
-      </div>
-      <button class="skip-btn" (click)="skip()">Saltar tour</button>
+      @if (_step() === 'welcome') {
+        <div class="step-welcome">
+          <div class="logo-mark">ET</div>
+          <h2 class="step-title">Welcome to English Trainer</h2>
+          <p class="step-desc">
+            Practice reading, conversation, and vocabulary — tailored to your level.
+          </p>
+          <button class="btn-primary" (click)="goToLevel()">Get Started</button>
+        </div>
+      }
+
+      @if (_step() === 'level') {
+        <div class="step-level">
+          <h2 class="step-title">What's your current English level?</h2>
+          <p class="step-desc">We'll personalise your experience based on your level.</p>
+          <div class="level-grid">
+            @for (lvl of levels; track lvl.code) {
+              <button
+                class="level-card"
+                [class.selected]="_selectedLevel() === lvl.code"
+                (click)="selectLevel(lvl.code)"
+                type="button"
+              >
+                <span class="level-badge">{{ lvl.code }}</span>
+                <span class="level-name">{{ lvl.name }}</span>
+                <span class="level-desc">{{ lvl.description }}</span>
+              </button>
+            }
+          </div>
+          <button class="btn-primary" [disabled]="!canContinue()" (click)="confirm()">
+            Continue
+          </button>
+        </div>
+      }
+
+      @if (_step() === 'ready') {
+        <div class="step-ready">
+          <div class="check-icon" aria-hidden="true">✓</div>
+          <h2 class="step-title">You're all set!</h2>
+          <p class="step-desc">
+            Your level is saved. Explore articles, conversations, and immersion exercises.
+          </p>
+          <button class="btn-primary" (click)="finish()">Start Learning</button>
+        </div>
+      }
     </div>
   </div>
 }
