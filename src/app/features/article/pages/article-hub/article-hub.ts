@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ArticleStateService } from '../../services/article-state.service';
 import { GenerationOverlay } from '../../../immerse/components/generation-overlay/generation-overlay';
@@ -14,11 +14,11 @@ import { ArticleLevel } from '../../models/article.model';
 })
 export class ArticleHub {
   protected readonly state = inject(ArticleStateService);
+  private readonly fb = inject(FormBuilder);
 
-  protected readonly topicCtrl = new FormControl('', [
-    Validators.required,
-    Validators.maxLength(100),
-  ]);
+  protected readonly form = this.fb.nonNullable.group({
+    topic: ['', [Validators.required, Validators.maxLength(100)]],
+  });
   protected readonly selectedLevel = signal<ArticleLevel>('B1');
   protected readonly levels: ArticleLevel[] = ['B1', 'B2', 'C1'];
 
@@ -32,9 +32,9 @@ export class ArticleHub {
   }
 
   protected onGenerate(): void {
-    if (this.topicCtrl.invalid || this.generating()) return;
+    if (this.form.invalid || this.generating()) return;
     this.state.generate({
-      topic: this.topicCtrl.value!.trim(),
+      topic: this.form.controls.topic.value.trim(),
       level: this.selectedLevel(),
     });
   }

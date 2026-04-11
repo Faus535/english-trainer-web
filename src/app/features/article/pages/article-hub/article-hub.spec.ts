@@ -40,7 +40,7 @@ describe('ArticleHub', () => {
     const fixture = TestBed.createComponent(ArticleHub);
     fixture.detectChanges();
 
-    fixture.componentInstance['topicCtrl'].setValue('climate change');
+    fixture.componentInstance['form'].controls.topic.setValue('climate change');
     fixture.detectChanges();
 
     const button: HTMLButtonElement = fixture.nativeElement.querySelector('.generate-btn');
@@ -51,7 +51,7 @@ describe('ArticleHub', () => {
     const fixture = TestBed.createComponent(ArticleHub);
     fixture.detectChanges();
 
-    fixture.componentInstance['topicCtrl'].setValue('space exploration');
+    fixture.componentInstance['form'].controls.topic.setValue('space exploration');
     fixture.detectChanges();
 
     fixture.componentInstance['onGenerate']();
@@ -85,12 +85,29 @@ describe('ArticleHub', () => {
   it('should disable Generate button while generating', () => {
     mockState.generating.set(true);
     const fixture = TestBed.createComponent(ArticleHub);
-    fixture.componentInstance['topicCtrl'].setValue('AI');
+    fixture.componentInstance['form'].controls.topic.setValue('AI');
     fixture.detectChanges();
 
     const button: HTMLButtonElement = fixture.nativeElement.querySelector('.generate-btn');
     expect(button.disabled).toBe(true);
 
     mockState.generating.set(false);
+  });
+
+  it('should call state.generate() when form is submitted via DOM', () => {
+    const fixture = TestBed.createComponent(ArticleHub);
+    fixture.detectChanges();
+
+    fixture.componentInstance['form'].controls.topic.setValue('artificial intelligence');
+    fixture.detectChanges();
+
+    const formEl: HTMLFormElement = fixture.nativeElement.querySelector('form');
+    formEl.dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
+
+    expect(mockState.generate).toHaveBeenCalledWith({
+      topic: 'artificial intelligence',
+      level: 'B1',
+    });
   });
 });
