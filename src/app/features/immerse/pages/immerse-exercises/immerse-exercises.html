@@ -1,6 +1,15 @@
 <section class="exercises-page">
   <h1 class="page-title">Exercises</h1>
 
+  <div class="mode-toggle" role="group" aria-label="Exercise mode">
+    <button class="mode-btn" [class.active]="!listeningMode()" (click)="toggleMode()" type="button">
+      Reading Mode
+    </button>
+    <button class="mode-btn" [class.active]="listeningMode()" (click)="toggleMode()" type="button">
+      Listening Mode
+    </button>
+  </div>
+
   @if (loading()) {
     <div class="loading" aria-busy="true">
       <div class="skeleton-card"></div>
@@ -48,42 +57,50 @@
       </div>
     </div>
   } @else if (currentExercise()) {
-    <div class="exercise-card">
-      <span class="exercise-counter"> {{ currentIndex() + 1 }} / {{ exercises().length }} </span>
-      <p class="exercise-prompt">{{ currentExercise()!.prompt }}</p>
+    <span class="exercise-counter"> {{ currentIndex() + 1 }} / {{ exercises().length }} </span>
 
-      @if (currentExercise()!.type === 'definition-match' && currentExercise()!.options) {
-        <div class="options">
-          @for (option of currentExercise()!.options!; track option) {
-            <button
-              class="option-btn"
-              [class.selected]="selectedOption() === option"
-              (click)="selectOption(option)"
-              type="button"
-            >
-              {{ option }}
-            </button>
-          }
-        </div>
-      } @else {
-        <input
-          class="answer-input"
-          [ngModel]="currentAnswer()"
-          (ngModelChange)="currentAnswer.set($event)"
-          (keydown.enter)="submitAnswer()"
-          placeholder="Type your answer..."
-          aria-label="Your answer"
-        />
-      }
+    @if (listeningMode()) {
+      <app-listening-cloze-card
+        [exercise]="currentExercise()!"
+        (answered)="onListeningAnswered($event, currentIndex())"
+      />
+    } @else {
+      <div class="exercise-card">
+        <p class="exercise-prompt">{{ currentExercise()!.prompt }}</p>
 
-      <button
-        class="submit-btn"
-        (click)="submitAnswer()"
-        [disabled]="!currentAnswer().trim() && !selectedOption()"
-        type="button"
-      >
-        Submit
-      </button>
-    </div>
+        @if (currentExercise()!.type === 'definition-match' && currentExercise()!.options) {
+          <div class="options">
+            @for (option of currentExercise()!.options!; track option) {
+              <button
+                class="option-btn"
+                [class.selected]="selectedOption() === option"
+                (click)="selectOption(option)"
+                type="button"
+              >
+                {{ option }}
+              </button>
+            }
+          </div>
+        } @else {
+          <input
+            class="answer-input"
+            [ngModel]="currentAnswer()"
+            (ngModelChange)="currentAnswer.set($event)"
+            (keydown.enter)="submitAnswer()"
+            placeholder="Type your answer..."
+            aria-label="Your answer"
+          />
+        }
+
+        <button
+          class="submit-btn"
+          (click)="submitAnswer()"
+          [disabled]="!currentAnswer().trim() && !selectedOption()"
+          type="button"
+        >
+          Submit
+        </button>
+      </div>
+    }
   }
 </section>

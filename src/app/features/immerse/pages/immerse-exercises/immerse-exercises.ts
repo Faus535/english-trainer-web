@@ -10,10 +10,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ImmerseStateService } from '../../services/immerse-state.service';
 import { VocabChip } from '../../components/vocab-chip/vocab-chip';
+import { ListeningClozeCard } from '../../components/listening-cloze-card/listening-cloze-card';
 
 @Component({
   selector: 'app-immerse-exercises',
-  imports: [FormsModule, VocabChip],
+  imports: [FormsModule, VocabChip, ListeningClozeCard],
   templateUrl: './immerse-exercises.html',
   styleUrl: './immerse-exercises.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,6 +29,7 @@ export class ImmerseExercises implements OnInit {
   protected readonly capturedVocab = this.immerseState.capturedVocab;
   protected readonly loading = this.immerseState.loading;
   protected readonly completionRate = this.immerseState.exerciseCompletionRate;
+  protected readonly listeningMode = this.immerseState.listeningMode;
 
   protected readonly currentAnswer = signal('');
   protected readonly selectedOption = signal<string | null>(null);
@@ -96,5 +98,23 @@ export class ImmerseExercises implements OnInit {
   protected newContent(): void {
     this.immerseState.reset();
     this.router.navigate(['/immerse']);
+  }
+
+  protected toggleMode(): void {
+    this.currentIndex.set(0);
+    this.showResults.set(false);
+    this.immerseState.toggleMode();
+  }
+
+  protected onListeningAnswered(result: { correct: boolean }, index: number): void {
+    const exercise = this.exercises()[index];
+    if (!exercise) return;
+    this.immerseState.submitAnswer(this.contentId(), exercise.id, exercise.correctAnswer);
+    if (index < this.exercises().length - 1) {
+      this.currentIndex.update((i) => i + 1);
+    } else {
+      this.immerseState.completeExercises();
+      this.showResults.set(true);
+    }
   }
 }

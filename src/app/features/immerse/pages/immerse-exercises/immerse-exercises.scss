@@ -13,6 +13,39 @@
   font-weight: 700;
 }
 
+.mode-toggle {
+  display: flex;
+  border-radius: var(--r-full);
+  background: var(--surface-1);
+  padding: 0.25rem;
+  gap: 0.25rem;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: var(--r-full);
+  background: transparent;
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 200ms var(--ease);
+
+  &.active {
+    background: var(--primary);
+    color: #fff;
+  }
+}
+
+.exercise-counter {
+  font-size: var(--fs-sm);
+  color: var(--text-3);
+  font-weight: 600;
+}
+
 .exercise-card {
   display: flex;
   flex-direction: column;
@@ -21,12 +54,6 @@
   background: var(--surface-glass);
   border: 1px solid var(--border);
   border-radius: var(--r-xl);
-}
-
-.exercise-counter {
-  font-size: var(--fs-sm);
-  color: var(--text-3);
-  font-weight: 600;
 }
 
 .exercise-prompt {
