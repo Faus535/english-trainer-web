@@ -2,10 +2,13 @@ import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/c
 import { Router } from '@angular/router';
 import { TalkStateService } from '../../services/talk-state.service';
 import { TalkEvaluationCard } from '../../components/talk-evaluation-card/talk-evaluation-card';
+import { GrammarNotesSection } from '../../components/grammar-notes-section/grammar-notes-section';
+import { VocabSection } from '../../components/vocab-section/vocab-section';
+import { GrammarNote, VocabItem } from '../../models/talk.model';
 
 @Component({
   selector: 'app-talk-summary',
-  imports: [TalkEvaluationCard],
+  imports: [TalkEvaluationCard, GrammarNotesSection, VocabSection],
   templateUrl: './talk-summary.html',
   styleUrl: './talk-summary.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,6 +25,12 @@ export class TalkSummary {
   protected readonly turnCount = computed(() => this.endResult()?.turnCount ?? 0);
   protected readonly errorCount = computed(() => this.endResult()?.errorCount ?? 0);
   protected readonly summary = computed(() => this.endResult()?.summary ?? '');
+  protected readonly grammarNotes = computed<GrammarNote[]>(
+    () => this.endResult()?.grammarNotes ?? [],
+  );
+  protected readonly newVocabulary = computed<VocabItem[]>(
+    () => this.endResult()?.newVocabulary ?? [],
+  );
 
   // Quick mode result fields — backend may include these in the end response
   protected readonly taskCompleted = computed(() => {

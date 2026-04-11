@@ -25,6 +25,34 @@ const FULL_END_RESULT = {
   },
   turnCount: 8,
   errorCount: 2,
+  grammarNotes: [
+    { originalText: 'I goed', correction: 'I went', explanation: 'Irregular past tense.' },
+  ],
+  newVocabulary: [
+    {
+      word: 'elaborate',
+      definition: 'to explain in more detail',
+      usedInContext: 'Could you elaborate?',
+    },
+  ],
+};
+
+const FULL_END_RESULT_NO_FEEDBACK = {
+  summary: 'Nice conversation overall.',
+  evaluation: {
+    grammarAccuracy: 80,
+    vocabularyRange: 70,
+    fluency: 75,
+    taskCompletion: 85,
+    overallScore: 78,
+    levelDemonstrated: 'b1',
+    strengths: ['Good fluency'],
+    areasToImprove: ['Article usage'],
+  },
+  turnCount: 8,
+  errorCount: 2,
+  grammarNotes: [],
+  newVocabulary: [],
 };
 
 function makeStateMock(quickMode: boolean, endResult: unknown) {
@@ -75,5 +103,37 @@ describe('TalkSummary', () => {
     const statsRow = fixture.nativeElement.querySelector('.stats-row');
     expect(quickSection).toBeNull();
     expect(statsRow).not.toBeNull();
+  });
+
+  it('should render grammar-notes-section when grammarNotes array is non-empty', () => {
+    const fixture = setup(false, FULL_END_RESULT);
+    const section = fixture.nativeElement.querySelector('app-grammar-notes-section');
+    expect(section).not.toBeNull();
+  });
+
+  it('should render vocab-section when newVocabulary array is non-empty', () => {
+    const fixture = setup(false, FULL_END_RESULT);
+    const section = fixture.nativeElement.querySelector('app-vocab-section');
+    expect(section).not.toBeNull();
+  });
+
+  it('should NOT render grammar-notes-section when grammarNotes is empty', () => {
+    const fixture = setup(false, FULL_END_RESULT_NO_FEEDBACK);
+    const section = fixture.nativeElement.querySelector('app-grammar-notes-section');
+    expect(section).toBeNull();
+  });
+
+  it('should NOT render vocab-section when newVocabulary is empty', () => {
+    const fixture = setup(false, FULL_END_RESULT_NO_FEEDBACK);
+    const section = fixture.nativeElement.querySelector('app-vocab-section');
+    expect(section).toBeNull();
+  });
+
+  it('should NOT render grammar or vocab sections in quick mode', () => {
+    const fixture = setup(true, QUICK_END_RESULT);
+    const grammar = fixture.nativeElement.querySelector('app-grammar-notes-section');
+    const vocab = fixture.nativeElement.querySelector('app-vocab-section');
+    expect(grammar).toBeNull();
+    expect(vocab).toBeNull();
   });
 });

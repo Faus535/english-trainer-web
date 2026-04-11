@@ -22,6 +22,8 @@ export type TalkSummaryResponse =
       evaluation: TalkEvaluation;
       turnCount: number;
       errorCount: number;
+      grammarNotes?: GrammarNote[];
+      newVocabulary?: VocabItem[];
     }
   | { mode: 'QUICK'; taskCompleted: boolean; top3Corrections: string[]; encouragementNote: string };
 
@@ -96,11 +98,25 @@ export interface TalkEvaluation {
   areasToImprove: string[];
 }
 
+export interface GrammarNote {
+  originalText: string;
+  correction: string;
+  explanation: string;
+}
+
+export interface VocabItem {
+  word: string;
+  definition: string;
+  usedInContext: string;
+}
+
 export interface TalkEndResponse {
   summary: string;
   evaluation: TalkEvaluation;
   turnCount: number;
   errorCount: number;
+  grammarNotes?: GrammarNote[];
+  newVocabulary?: VocabItem[];
 }
 
 export interface TalkStats {

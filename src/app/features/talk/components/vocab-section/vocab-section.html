@@ -1,0 +1,19 @@
+<section class="vocab-section" aria-label="New vocabulary">
+  <h3 class="section-title">
+    <span class="section-icon" aria-hidden="true">★</span>
+    New Vocabulary
+  </h3>
+  <ul class="vocab-list" role="list">
+    @for (item of items(); track item.word) {
+      <li class="vocab-card">
+        <div class="vocab-header">
+          <span class="vocab-word">{{ item.word }}</span>
+        </div>
+        <p class="vocab-definition">{{ item.definition }}</p>
+        @if (item.usedInContext) {
+          <p class="vocab-context">"{{ item.usedInContext }}"</p>
+        }
+      </li>
+    }
+  </ul>
+</section>

@@ -1,0 +1,20 @@
+<section class="grammar-section" aria-label="Grammar corrections">
+  <h3 class="section-title">
+    <span class="section-icon" aria-hidden="true">✦</span>
+    Grammar Corrections
+  </h3>
+  <ul class="notes-list" role="list">
+    @for (note of notes(); track note.originalText) {
+      <li class="note-item">
+        <div class="correction-line">
+          <span class="original" aria-label="Original text">{{ note.originalText }}</span>
+          <span class="arrow" aria-hidden="true">→</span>
+          <span class="corrected" aria-label="Correction">{{ note.correction }}</span>
+        </div>
+        @if (note.explanation) {
+          <p class="explanation">{{ note.explanation }}</p>
+        }
+      </li>
+    }
+  </ul>
+</section>
