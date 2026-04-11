@@ -46,7 +46,7 @@
 .remaining-badge {
   font-size: var(--fs-xs);
   font-weight: 700;
-  padding: 0.25rem 0.625rem;
+  padding: var(--sp-1) var(--sp-2);
   border-radius: var(--r-full);
   background: var(--primary-soft);
   color: var(--primary);
