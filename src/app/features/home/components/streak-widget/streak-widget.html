@@ -1,5 +1,19 @@
 <div class="streak-card">
-  <span class="flame" aria-hidden="true">🔥</span>
-  <span class="streak-count">{{ streak() }}</span>
-  <span class="streak-label">day streak</span>
+  <div class="streak-header">
+    <span class="flame" aria-hidden="true">🔥</span>
+    <span class="streak-count">{{ streakDays() }}</span>
+    <span class="streak-label">day streak</span>
+  </div>
+  <div class="week-dots" aria-label="Weekly activity">
+    @for (active of weeklyActivity(); track $index) {
+      <div class="day-col">
+        <div
+          class="dot"
+          [class.dot--active]="active"
+          [attr.aria-label]="dayLabels[$index] + (active ? ' active' : '')"
+        ></div>
+        <span class="day-label" aria-hidden="true">{{ dayLabels[$index] }}</span>
+      </div>
+    }
+  </div>
 </div>

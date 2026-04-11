@@ -1,0 +1,10 @@
+@if (level()) {
+  <button
+    class="level-pill"
+    (click)="navigate()"
+    type="button"
+    [attr.aria-label]="'English level: ' + level() + '. Go to profile'"
+  >
+    {{ level() }}
+  </button>
+}

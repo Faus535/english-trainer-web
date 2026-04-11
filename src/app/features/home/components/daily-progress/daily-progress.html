@@ -1,7 +1,15 @@
-<div class="progress-card">
-  <app-progress-ring [value]="percentage()" [size]="64" [strokeWidth]="6" />
-  <div class="progress-info">
-    <span class="xp-text">{{ xpToday() }} / {{ xpGoal() }} XP</span>
-    <span class="label">Today's progress</span>
+<div class="xp-card">
+  <div class="xp-header">
+    <span class="xp-label">XP this week</span>
+    <span class="xp-value">{{ recentXpThisWeek() }}</span>
+  </div>
+  <div
+    class="xp-bar-track"
+    role="progressbar"
+    [attr.aria-valuenow]="recentXpThisWeek()"
+    aria-valuemin="0"
+    aria-valuemax="500"
+  >
+    <div class="xp-bar-fill" [style.width.%]="fillPercent()"></div>
   </div>
 </div>

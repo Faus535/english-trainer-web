@@ -1,20 +1,18 @@
 import { Component, ChangeDetectionStrategy, input, computed } from '@angular/core';
-import { ProgressRing } from '../../../../shared/components/progress-ring/progress-ring';
+
+const WEEKLY_XP_GOAL = 500;
 
 @Component({
   selector: 'app-daily-progress',
-  imports: [ProgressRing],
+  imports: [],
   templateUrl: './daily-progress.html',
   styleUrl: './daily-progress.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DailyProgress {
-  readonly xpToday = input(0);
-  readonly xpGoal = input(200);
+  readonly recentXpThisWeek = input.required<number>();
 
-  protected readonly percentage = computed(() => {
-    const goal = this.xpGoal();
-    if (goal <= 0) return 0;
-    return Math.min(Math.round((this.xpToday() / goal) * 100), 100);
-  });
+  protected readonly fillPercent = computed(() =>
+    Math.min((this.recentXpThisWeek() / WEEKLY_XP_GOAL) * 100, 100),
+  );
 }
