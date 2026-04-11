@@ -6,16 +6,15 @@ import {
   computed,
   OnInit,
 } from '@angular/core';
-import { Router } from '@angular/router';
-import { Icon } from '../../../../shared/components/icon/icon';
+import { Router, RouterLink } from '@angular/router';
 import { ReviewApiService } from '../../../../core/services/review-api.service';
-import { ReviewItem } from '../../models/review.model';
 import { AuthService } from '../../../../core/services/auth.service';
-import { LucideIconData, ArrowLeft, RotateCcw } from 'lucide-angular';
+import { ReviewItem, ReviewRating } from '../../models/review.model';
+import { Flashcard } from '../../components/flashcard/flashcard';
 
 @Component({
   selector: 'app-review-page',
-  imports: [Icon],
+  imports: [Flashcard, RouterLink],
   templateUrl: './review-page.html',
   styleUrl: './review-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,80 +24,55 @@ export class ReviewPage implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
-  protected readonly arrowLeftIcon: LucideIconData = ArrowLeft;
-  protected readonly repeatIcon: LucideIconData = RotateCcw;
+  protected readonly _items = signal<ReviewItem[]>([]);
+  protected readonly _currentIndex = signal(0);
+  protected readonly _correctCount = signal(0);
+  protected readonly _done = signal(false);
+  protected readonly _loading = signal(true);
 
-  protected readonly items = signal<ReviewItem[]>([]);
-  protected readonly currentIndex = signal(0);
-  protected readonly flipped = signal(false);
-  protected readonly loading = signal(true);
-  protected readonly completedToday = signal(0);
-  protected readonly totalItems = signal(0);
-  protected readonly dueToday = signal(0);
+  protected readonly _currentItem = computed(() => this._items()[this._currentIndex()]);
 
-  protected readonly currentItem = computed(() => {
-    const list = this.items();
-    const idx = this.currentIndex();
-    return idx < list.length ? list[idx] : null;
-  });
-
-  protected readonly progress = computed(() => {
-    const total = this.items().length;
-    return total > 0 ? Math.round((this.currentIndex() / total) * 100) : 0;
-  });
-
-  protected readonly allDone = computed(() => {
-    return (
-      !this.loading() && (this.items().length === 0 || this.currentIndex() >= this.items().length)
-    );
-  });
+  protected readonly _remaining = computed(() => this._items().length - this._currentIndex());
 
   ngOnInit(): void {
-    this.loadData();
+    const profileId = this.auth.profileId();
+    if (!profileId) return;
+
+    this.reviewApi.getDueReviews(profileId).subscribe({
+      next: (items) => {
+        this._items.set(items);
+        this._loading.set(false);
+        if (items.length === 0) {
+          this._done.set(true);
+        }
+      },
+      error: () => {
+        this._loading.set(false);
+        this._done.set(true);
+      },
+    });
   }
 
-  protected flipCard(): void {
-    this.flipped.set(true);
-  }
-
-  protected rateQuality(quality: number): void {
-    const item = this.currentItem();
+  protected onRated(rating: ReviewRating): void {
+    const item = this._currentItem();
     const profileId = this.auth.profileId();
     if (!item || !profileId) return;
 
-    const rating = quality >= 4 ? 'EASY' : 'HARD';
-    this.reviewApi.submitResult(profileId, item.id, rating).subscribe({
-      next: () => {
-        this.completedToday.update((c) => c + 1);
-        this.currentIndex.update((i) => i + 1);
-        this.flipped.set(false);
-      },
-    });
+    if (rating === 'EASY') {
+      this._correctCount.update((c) => c + 1);
+    }
+
+    this.reviewApi.submitResult(profileId, item.id, rating).subscribe();
+
+    const nextIndex = this._currentIndex() + 1;
+    if (nextIndex >= this._items().length) {
+      this._done.set(true);
+    } else {
+      this._currentIndex.set(nextIndex);
+    }
   }
 
   protected goBack(): void {
     this.router.navigate(['/home']);
-  }
-
-  private loadData(): void {
-    const profileId = this.auth.profileId();
-    if (!profileId) return;
-
-    this.reviewApi.getReviewStats(profileId).subscribe({
-      next: (stats) => {
-        this.totalItems.set(stats.totalItems);
-        this.dueToday.set(stats.dueToday);
-      },
-    });
-
-    this.reviewApi.getDueReviews(profileId).subscribe({
-      next: (items) => {
-        this.items.set(items);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.loading.set(false);
-      },
-    });
   }
 }

@@ -7,6 +7,23 @@
       <div class="skeleton-card"></div>
     </div>
   } @else {
+    <!-- Accuracy ring + mastered highlight -->
+    <div class="highlights">
+      <div class="accuracy-block">
+        <app-progress-ring [value]="accuracyPercent()" [size]="96" [strokeWidth]="8" />
+        <div class="accuracy-label">
+          <span class="accuracy-value">{{ accuracyPercent() }}%</span>
+          <span class="accuracy-caption">Accuracy</span>
+        </div>
+      </div>
+
+      <div class="mastered-block">
+        <span class="mastered-value">{{ totalMastered() }}</span>
+        <span class="mastered-caption">words mastered</span>
+      </div>
+    </div>
+
+    <!-- Stats grid -->
     <div class="stats-grid">
       <div class="stat-card">
         <span class="stat-value">{{ totalItems() }}</span>
@@ -19,10 +36,6 @@
       <div class="stat-card">
         <span class="stat-value">{{ weeklyReviewed() }}</span>
         <span class="stat-label">Weekly Reviewed</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-value">{{ totalMastered() }}</span>
-        <span class="stat-label">Mastered</span>
       </div>
     </div>
 

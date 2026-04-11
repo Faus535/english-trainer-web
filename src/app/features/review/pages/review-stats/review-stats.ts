@@ -1,11 +1,19 @@
-import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  inject,
+  signal,
+  computed,
+  OnInit,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ReviewApiService } from '../../../../core/services/review-api.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { ProgressRing } from '../../../../shared/components/progress-ring/progress-ring';
 
 @Component({
   selector: 'app-review-stats',
-  imports: [RouterLink],
+  imports: [RouterLink, ProgressRing],
   templateUrl: './review-stats.html',
   styleUrl: './review-stats.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,6 +28,8 @@ export class ReviewStats implements OnInit {
   protected readonly weeklyReviewed = signal(0);
   protected readonly accuracyRate = signal(0);
   protected readonly loading = signal(true);
+
+  protected readonly accuracyPercent = computed(() => Math.round(this.accuracyRate() * 100));
 
   ngOnInit(): void {
     const profileId = this.auth.profileId();

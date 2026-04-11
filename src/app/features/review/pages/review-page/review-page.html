@@ -1,102 +1,27 @@
 <div class="review-page">
   <!-- Header -->
   <div class="review-header">
-    <button class="back-btn" (click)="goBack()">
-      <app-icon [name]="arrowLeftIcon" [size]="20" aria-hidden="true" />
-    </button>
-    <h2 class="page-title">Repaso espaciado</h2>
+    <button class="back-btn" (click)="goBack()" aria-label="Go back">&#8592;</button>
+    <h2 class="page-title">Review</h2>
+    @if (!_done() && !_loading()) {
+      <span class="remaining-badge">{{ _remaining() }} left</span>
+    }
   </div>
 
-  <!-- Contextual mode can be toggled here in future -->
-
-  <!-- Stats bar -->
-  <div class="stats-bar">
-    <div class="stat">
-      <span class="stat-value">{{ totalItems() }}</span>
-      <span class="stat-label">Total</span>
-    </div>
-    <div class="stat">
-      <span class="stat-value">{{ dueToday() }}</span>
-      <span class="stat-label">Pendientes</span>
-    </div>
-    <div class="stat">
-      <span class="stat-value">{{ completedToday() }}</span>
-      <span class="stat-label">Completadas</span>
-    </div>
-  </div>
-
-  @if (loading()) {
+  @if (_loading()) {
     <div class="loading-state">
       <div class="spinner"></div>
-      <p>Cargando tarjetas...</p>
+      <p>Loading cards...</p>
     </div>
-  } @else if (allDone()) {
-    <div class="empty-state">
-      <div class="empty-icon">
-        <app-icon [name]="repeatIcon" [size]="48" aria-hidden="true" />
-      </div>
-      <h3>Todo repasado</h3>
-      <p>No tienes tarjetas pendientes por hoy. Vuelve manana para seguir practicando.</p>
-      <button class="btn-primary" (click)="goBack()">Volver al inicio</button>
+  } @else if (_done()) {
+    <div class="done-state">
+      <div class="done-icon">&#10003;</div>
+      <h3 class="done-title">Session complete!</h3>
+      <p class="done-subtitle">{{ _correctCount() }} correct out of {{ _items().length }}</p>
+      <a class="btn-primary" routerLink="/review/stats">View stats</a>
+      <button class="btn-secondary" (click)="goBack()">Back to home</button>
     </div>
   } @else {
-    <!-- Progress bar -->
-    <div class="progress-container">
-      <div class="progress-bar">
-        <div class="progress-fill" [style.width.%]="progress()"></div>
-      </div>
-      <span class="progress-text">{{ currentIndex() }} de {{ items().length }}</span>
-    </div>
-
-    <!-- Flashcard -->
-    @if (currentItem(); as item) {
-      <div
-        class="flashcard"
-        [class.flipped]="flipped()"
-        (click)="!flipped() ? flipCard() : null"
-        role="button"
-        tabindex="0"
-        (keydown.enter)="!flipped() ? flipCard() : null"
-        (keydown.space)="!flipped() ? flipCard() : null"
-      >
-        <div class="flashcard-inner">
-          <div class="flashcard-front">
-            <span class="flashcard-type">{{ item.sourceType }}</span>
-            <span class="flashcard-word">{{ item.targetWord || item.word }}</span>
-            <span class="flashcard-hint">Toca para revelar</span>
-          </div>
-          <div class="flashcard-back">
-            <span class="flashcard-type">{{ item.sourceType }}</span>
-            <span class="flashcard-word">{{ item.targetTranslation || item.translation }}</span>
-            <span class="flashcard-review-info">Intervalo: {{ item.interval }} días</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quality buttons (shown after flip) -->
-      @if (flipped()) {
-        <div class="quality-buttons">
-          <p class="quality-prompt">Como te ha ido?</p>
-          <div class="quality-grid">
-            <button class="quality-btn quality-fail" (click)="rateQuality(1)">
-              <span class="quality-emoji">&#10060;</span>
-              <span class="quality-label">No lo se</span>
-            </button>
-            <button class="quality-btn quality-hard" (click)="rateQuality(2)">
-              <span class="quality-emoji">&#128528;</span>
-              <span class="quality-label">Dificil</span>
-            </button>
-            <button class="quality-btn quality-good" (click)="rateQuality(4)">
-              <span class="quality-emoji">&#128077;</span>
-              <span class="quality-label">Bien</span>
-            </button>
-            <button class="quality-btn quality-easy" (click)="rateQuality(5)">
-              <span class="quality-emoji">&#11088;</span>
-              <span class="quality-label">Facil</span>
-            </button>
-          </div>
-        </div>
-      }
-    }
+    <app-flashcard [item]="_currentItem()!" (rated)="onRated($event)" />
   }
 </div>
