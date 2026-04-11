@@ -1,5 +1,11 @@
 export type ArticleLevel = 'B1' | 'B2' | 'C1';
-export type ArticleStatus = 'IN_PROGRESS' | 'READY' | 'FAILED';
+export type ArticleStatus =
+  | 'PENDING'
+  | 'PROCESSING'
+  | 'READY'
+  | 'FAILED'
+  | 'IN_PROGRESS'
+  | 'COMPLETED';
 export type ParagraphSpeaker = 'AI' | 'USER';
 
 export interface GenerateArticleRequest {
@@ -26,6 +32,8 @@ export interface ArticleResponse {
   level: ArticleLevel;
   status: ArticleStatus;
   paragraphs: ArticleParagraphDto[];
+  currentParagraphIndex: number;
+  currentQuestionIndex: number;
 }
 
 export interface SaveWordRequest {
@@ -41,8 +49,14 @@ export interface SavedWord {
   contextSentence: string;
 }
 
+export interface PreReadingKeyWord {
+  word: string;
+  translation: string;
+  definition: string;
+}
+
 export interface PreReadingData {
-  keyWords: SavedWord[];
+  keyWords: PreReadingKeyWord[];
   predictiveQuestion: string | null;
 }
 

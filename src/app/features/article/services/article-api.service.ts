@@ -63,4 +63,11 @@ export class ArticleApiService {
   deleteArticle(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
+
+  updateProgress(id: string, paragraphIndex: number, questionIndex: number): Observable<void> {
+    return this.http.patch<void>(`${this.baseUrl}/${id}/progress`, {
+      paragraphIndex,
+      questionIndex,
+    });
+  }
 }

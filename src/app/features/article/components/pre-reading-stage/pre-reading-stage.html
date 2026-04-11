@@ -16,15 +16,18 @@
         <div class="key-words-section">
           <h3 class="section-label">Key vocabulary</h3>
           <div class="word-chips">
-            @for (word of keyWords(); track word.id) {
+            @for (word of keyWords(); track word.word) {
               <button
                 class="word-chip"
-                [class.expanded]="expandedWordId() === word.id"
-                (click)="toggleWord(word.id)"
+                [class.expanded]="expandedWordId() === word.word"
+                (click)="toggleWord(word.word)"
               >
-                <span class="chip-word">{{ word.wordOrPhrase }}</span>
-                @if (expandedWordId() === word.id) {
+                <span class="chip-word">{{ word.word }}</span>
+                @if (expandedWordId() === word.word) {
                   <span class="chip-translation">{{ word.translation }}</span>
+                  @if (word.definition) {
+                    <span class="chip-definition">{{ word.definition }}</span>
+                  }
                 }
               </button>
             }

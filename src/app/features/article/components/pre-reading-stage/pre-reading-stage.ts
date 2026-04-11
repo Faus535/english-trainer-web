@@ -7,7 +7,7 @@ import {
   OnInit,
   OnDestroy,
 } from '@angular/core';
-import { SavedWord } from '../../models/article.model';
+import { PreReadingKeyWord } from '../../models/article.model';
 
 @Component({
   selector: 'app-pre-reading-stage',
@@ -16,7 +16,7 @@ import { SavedWord } from '../../models/article.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PreReadingStage implements OnInit, OnDestroy {
-  readonly keyWords = input.required<SavedWord[]>();
+  readonly keyWords = input.required<PreReadingKeyWord[]>();
   readonly question = input<string | null>(null);
   readonly loading = input(false);
 

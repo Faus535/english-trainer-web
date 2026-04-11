@@ -23,6 +23,7 @@ import {
   AnswerResult,
   QuestionAnswer,
   ArticleHistoryItem,
+  PreReadingKeyWord,
 } from '../models/article.model';
 
 @Injectable({ providedIn: 'root' })
@@ -52,7 +53,7 @@ export class ArticleStateService {
   private readonly _savedWords = signal<SavedWord[]>([]);
 
   // Pre-reading (Phase 7)
-  private readonly _keyWords = signal<SavedWord[]>([]);
+  private readonly _keyWords = signal<PreReadingKeyWord[]>([]);
   private readonly _predictiveQuestion = signal<string | null>(null);
   private readonly _preReadingLoading = signal(false);
   private readonly _preReadingComplete = signal(false);
@@ -152,6 +153,8 @@ export class ArticleStateService {
     this.articleApi.getArticle(id).subscribe({
       next: (res) => {
         this._article.set(res);
+        this._currentParagraphIndex.set(res.currentParagraphIndex ?? 0);
+        this._currentQuestionIndex.set(res.currentQuestionIndex ?? 0);
         this._loading.set(false);
         this._sessionStartedAt = Date.now();
       },
@@ -170,6 +173,7 @@ export class ArticleStateService {
       this._readingComplete.set(true);
     } else {
       this._currentParagraphIndex.set(nextIndex);
+      this.saveProgress(article.id);
     }
   }
 
@@ -234,6 +238,8 @@ export class ArticleStateService {
   advanceQuestion(): void {
     this._currentQuestionIndex.update((i) => i + 1);
     this._activeHint.set(null);
+    const article = this._article();
+    if (article) this.saveProgress(article.id);
   }
 
   loadPreReading(articleId: string): void {
@@ -301,7 +307,7 @@ export class ArticleStateService {
       .pipe(
         switchMap(() => this.articleApi.getArticle(articleId)),
         retry({ count: 3, delay: 2000 }),
-        takeWhile((res) => res.status !== 'READY' && res.status !== 'FAILED', true),
+        takeWhile((res) => res.status === 'PENDING' || res.status === 'PROCESSING', true),
         timeout(60_000),
         catchError(() => {
           this.stopTimers();
@@ -346,6 +352,13 @@ export class ArticleStateService {
     const durationSeconds = Math.max(1, Math.round((Date.now() - this._sessionStartedAt) / 1000));
     this.profileApi
       .recordSession(profileId, module, durationSeconds)
+      .pipe(catchError(() => EMPTY))
+      .subscribe();
+  }
+
+  private saveProgress(articleId: string): void {
+    this.articleApi
+      .updateProgress(articleId, this._currentParagraphIndex(), this._currentQuestionIndex())
       .pipe(catchError(() => EMPTY))
       .subscribe();
   }

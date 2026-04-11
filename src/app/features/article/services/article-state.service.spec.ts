@@ -26,6 +26,8 @@ describe('ArticleStateService', () => {
       { id: 'p-1', content: 'First paragraph.', orderIndex: 0, speaker: 'AI' },
       { id: 'p-2', content: 'Second paragraph.', orderIndex: 1, speaker: 'USER' },
     ],
+    currentParagraphIndex: 0,
+    currentQuestionIndex: 0,
   };
 
   beforeEach(() => {
@@ -72,15 +74,15 @@ describe('ArticleStateService', () => {
       service.cancelGeneration();
     });
 
-    it('should start polling when status is IN_PROGRESS', () => {
+    it('should start polling when status is PENDING', () => {
       service.generate({ topic: 'AI', level: 'B2' });
 
       const postReq = httpMock.expectOne(`${base}/generate`);
-      postReq.flush({ id: 'art-1', status: 'IN_PROGRESS' });
+      postReq.flush({ id: 'art-1', status: 'PENDING' });
 
       vi.advanceTimersByTime(2000);
       const pollReq = httpMock.expectOne(`${base}/art-1`);
-      pollReq.flush({ ...readyArticle, status: 'IN_PROGRESS' });
+      pollReq.flush({ ...readyArticle, status: 'PROCESSING' });
 
       expect(service.generating()).toBe(true);
 
@@ -162,12 +164,18 @@ describe('ArticleStateService', () => {
     it('should increment currentParagraphIndex', () => {
       expect(service.currentParagraphIndex()).toBe(0);
       service.advanceParagraph();
+      httpMock
+        .expectOne(`${base}/art-1/progress`)
+        .flush(null, { status: 204, statusText: 'No Content' });
       expect(service.currentParagraphIndex()).toBe(1);
     });
 
     it('should set readingComplete when past last paragraph', () => {
       service.advanceParagraph(); // move to index 1
-      service.advanceParagraph(); // past last (2 paragraphs, index 0 and 1)
+      httpMock
+        .expectOne(`${base}/art-1/progress`)
+        .flush(null, { status: 204, statusText: 'No Content' });
+      service.advanceParagraph(); // past last (2 paragraphs, index 0 and 1) — no progress call when complete
       expect(service.readingComplete()).toBe(true);
     });
   });
@@ -200,6 +208,8 @@ describe('ArticleStateService — session recording', () => {
     level: 'B2',
     status: 'READY',
     paragraphs: [{ id: 'p-1', content: 'First.', orderIndex: 0, speaker: 'AI' }],
+    currentParagraphIndex: 0,
+    currentQuestionIndex: 0,
   };
 
   beforeEach(() => {

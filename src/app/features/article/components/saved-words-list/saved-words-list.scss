@@ -84,6 +84,14 @@
   text-align: right;
 }
 
+.word-definition {
+  grid-column: 1 / -1;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary, #374151);
+  margin: 0.125rem 0 0;
+  line-height: 1.4;
+}
+
 .word-context {
   grid-column: 1 / -1;
   font-size: 0.8125rem;

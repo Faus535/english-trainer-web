@@ -31,9 +31,17 @@
         <div class="history-card">
           <div class="card-header">
             <h2 class="card-topic">{{ item.topic }}</h2>
-            <span class="level-badge" [class]="'level-' + item.level.toLowerCase()">
-              {{ item.level }}
-            </span>
+            <div class="card-badges">
+              <span class="level-badge" [class]="'level-' + item.level.toLowerCase()">
+                {{ item.level }}
+              </span>
+              <span
+                class="status-badge"
+                [class]="'status-' + item.status.toLowerCase().replace('_', '-')"
+              >
+                {{ statusLabel(item.status) }}
+              </span>
+            </div>
           </div>
 
           <div class="card-stats">

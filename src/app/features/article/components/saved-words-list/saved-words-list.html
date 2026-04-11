@@ -11,6 +11,9 @@
         <li class="word-item">
           <span class="word-phrase">{{ word.wordOrPhrase }}</span>
           <span class="word-translation">{{ word.translation }}</span>
+          @if (word.englishDefinition) {
+            <p class="word-definition">{{ word.englishDefinition }}</p>
+          }
           <p class="word-context">{{ word.contextSentence }}</p>
         </li>
       }

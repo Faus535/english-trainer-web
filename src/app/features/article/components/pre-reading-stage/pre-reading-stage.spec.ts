@@ -1,23 +1,19 @@
 import { TestBed } from '@angular/core/testing';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { PreReadingStage } from './pre-reading-stage';
-import { SavedWord } from '../../models/article.model';
+import { PreReadingKeyWord } from '../../models/article.model';
 
 describe('PreReadingStage', () => {
-  const sampleWords: SavedWord[] = [
+  const sampleWords: PreReadingKeyWord[] = [
     {
-      id: 'w-1',
-      wordOrPhrase: 'resilience',
+      word: 'resilience',
       translation: 'resiliencia',
-      englishDefinition: 'The ability to recover quickly.',
-      contextSentence: 'She showed great resilience.',
+      definition: 'The ability to recover quickly.',
     },
     {
-      id: 'w-2',
-      wordOrPhrase: 'unprecedented',
+      word: 'unprecedented',
       translation: 'sin precedentes',
-      englishDefinition: 'Never done or known before.',
-      contextSentence: 'An unprecedented event.',
+      definition: 'Never done or known before.',
     },
   ];
 

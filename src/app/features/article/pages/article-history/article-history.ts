@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ArticleStateService } from '../../services/article-state.service';
+import { ArticleStatus } from '../../models/article.model';
 
 @Component({
   selector: 'app-article-history',
@@ -37,6 +38,18 @@ export class ArticleHistory {
   protected confirmDelete(articleId: string): void {
     this.state.deleteArticleFromHistory(articleId);
     this.confirmingDeleteId.set(null);
+  }
+
+  protected statusLabel(status: ArticleStatus): string {
+    const labels: Record<ArticleStatus, string> = {
+      PENDING: 'Pending',
+      PROCESSING: 'Processing...',
+      READY: 'Ready',
+      FAILED: 'Failed',
+      IN_PROGRESS: 'In Progress',
+      COMPLETED: 'Completed',
+    };
+    return labels[status] ?? status;
   }
 
   protected formatDate(dateStr: string): string {
