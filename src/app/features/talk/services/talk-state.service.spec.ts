@@ -31,7 +31,9 @@ describe('TalkStateService', () => {
 
     const req = httpMock.expectOne(`${environment.apiUrl}/talk/conversations`);
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual({ scenarioId: 'restaurant', level: 'a2' });
+    expect(req.request.body.scenarioId).toBe('restaurant');
+    expect(req.request.body.level).toBe('a2');
+    expect(req.request.body.mode).toBe('FULL');
     req.flush({
       id: 'conv-1',
       userId: 'user-1',

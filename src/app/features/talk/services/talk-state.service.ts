@@ -3,7 +3,12 @@ import { catchError, EMPTY } from 'rxjs';
 import { TalkApiService } from './talk-api.service';
 import { ProfileApiService } from '../../../core/services/profile-api.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { ConversationMessage, ConversationStatus, TalkEndResponse } from '../models/talk.model';
+import {
+  ConversationMessage,
+  ConversationStatus,
+  TalkEndResponse,
+  TalkMode,
+} from '../models/talk.model';
 
 @Injectable({ providedIn: 'root' })
 export class TalkStateService {
@@ -21,6 +26,8 @@ export class TalkStateService {
   private readonly _endResult = signal<TalkEndResponse | null>(null);
   private readonly _suggestEnd = signal(false);
   private readonly _level = signal<string>('a2');
+  readonly _quickMode = signal(false);
+  readonly _quickChallengeTitle = signal<string | null>(null);
 
   readonly scenarioId = this._scenarioId.asReadonly();
   readonly conversationId = this._conversationId.asReadonly();
@@ -30,18 +37,28 @@ export class TalkStateService {
   readonly endResult = this._endResult.asReadonly();
   readonly suggestEnd = this._suggestEnd.asReadonly();
   readonly level = this._level.asReadonly();
+  readonly quickMode = this._quickMode.asReadonly();
+  readonly quickChallengeTitle = this._quickChallengeTitle.asReadonly();
   readonly isActive = computed(() => !!this._conversationId());
   readonly messageCount = computed(() => this._messages().length);
   readonly isSending = computed(() => this._status() === 'sending');
+  readonly quickExchangeCount = computed(
+    () => this._messages().filter((m) => m.role === 'user').length,
+  );
 
-  startConversation(scenarioId: string, level: string): void {
+  startConversation(
+    scenarioId: string,
+    level: string,
+    mode: TalkMode = 'FULL',
+    challengeId?: string,
+  ): void {
     this._status.set('sending');
     this._error.set(null);
     this._endResult.set(null);
     this._scenarioId.set(scenarioId);
     this._level.set(level);
 
-    this.talkApi.startConversation({ scenarioId, level }).subscribe({
+    this.talkApi.startConversation({ scenarioId, level, mode, challengeId }).subscribe({
       next: (res) => {
         this._conversationId.set(res.id);
         this._messages.set(res.messages);
@@ -128,5 +145,7 @@ export class TalkStateService {
     this._endResult.set(null);
     this._suggestEnd.set(false);
     this._level.set('a2');
+    this._quickMode.set(false);
+    this._quickChallengeTitle.set(null);
   }
 }

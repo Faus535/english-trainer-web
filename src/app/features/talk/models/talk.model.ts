@@ -1,3 +1,30 @@
+export type TalkMode = 'FULL' | 'QUICK';
+
+export interface QuickChallenge {
+  id: string;
+  title: string;
+  description: string;
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+  category: string;
+}
+
+export interface TalkStartRequest {
+  scenarioId?: string;
+  mode: TalkMode;
+  challengeId?: string;
+  level?: string;
+}
+
+export type TalkSummaryResponse =
+  | {
+      mode: 'FULL';
+      summary: string;
+      evaluation: TalkEvaluation;
+      turnCount: number;
+      errorCount: number;
+    }
+  | { mode: 'QUICK'; taskCompleted: boolean; top3Corrections: string[]; encouragementNote: string };
+
 export interface TalkScenarioResponse {
   id: string;
   title: string;

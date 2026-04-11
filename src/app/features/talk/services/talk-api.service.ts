@@ -10,6 +10,8 @@ import {
   ConversationDetailResponse,
   TalkEndResponse,
   SendMessageResponse,
+  QuickChallenge,
+  TalkStartRequest,
 } from '../models/talk.model';
 
 const CATEGORY_ICONS: Record<string, string> = {
@@ -35,10 +37,11 @@ export class TalkApiService {
       .pipe(map((raw) => this.groupByCategory(raw)));
   }
 
-  startConversation(req: {
-    scenarioId: string;
-    level: string;
-  }): Observable<ConversationDetailResponse> {
+  listQuickChallenges(): Observable<QuickChallenge[]> {
+    return this.http.get<QuickChallenge[]>(`${this.baseUrl}/quick-challenges`);
+  }
+
+  startConversation(req: TalkStartRequest): Observable<ConversationDetailResponse> {
     return this.http.post<ConversationDetailResponse>(`${this.baseUrl}/conversations`, req);
   }
 
