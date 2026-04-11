@@ -181,6 +181,9 @@ export class ProfileStateService {
       sessionCount: res.sessionCount,
       sessionsThisWeek: res.sessionsThisWeek,
     }));
+    if (res.englishLevel) {
+      localStorage.setItem('et_onboarding_completed', 'true');
+    }
     this.persistProfile();
   }
 

@@ -45,6 +45,7 @@ export interface UserProfileResponse {
   sessionCount: number;
   sessionsThisWeek: number;
   xp: number;
+  englishLevel: string | null;
 }
 
 // Gamification
