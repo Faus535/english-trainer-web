@@ -34,6 +34,14 @@ const incorrectResult: AnswerResult = {
   correctionSummary: 'Try again.',
 };
 
+const nullEnrichment = {
+  definition: null,
+  phonetics: null,
+  synonyms: null,
+  exampleSentence: null,
+  partOfSpeech: null,
+};
+
 const mockWords: SavedWord[] = [
   {
     id: 'w-1',
@@ -41,6 +49,7 @@ const mockWords: SavedWord[] = [
     translation: 'resiliencia',
     englishDefinition: 'The ability to recover quickly.',
     contextSentence: 'Context.',
+    ...nullEnrichment,
   },
   {
     id: 'w-2',
@@ -48,6 +57,7 @@ const mockWords: SavedWord[] = [
     translation: 'sin precedentes',
     englishDefinition: 'Never done before.',
     contextSentence: 'Context.',
+    ...nullEnrichment,
   },
   {
     id: 'w-3',
@@ -55,6 +65,7 @@ const mockWords: SavedWord[] = [
     translation: 'sostenible',
     englishDefinition: 'Able to be maintained.',
     contextSentence: 'Context.',
+    ...nullEnrichment,
   },
 ];
 

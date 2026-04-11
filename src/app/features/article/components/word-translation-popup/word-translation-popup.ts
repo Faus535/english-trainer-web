@@ -5,6 +5,7 @@ import {
   input,
   output,
   signal,
+  computed,
   OnInit,
   OnDestroy,
   ElementRef,
@@ -31,7 +32,13 @@ export class WordTranslationPopup implements OnInit, OnDestroy {
   protected readonly loading = signal(true);
   protected readonly translation = signal<SavedWord | null>(null);
   protected readonly error = signal<string | null>(null);
-  protected readonly showDefinition = signal(false);
+
+  protected readonly enrichmentPending = computed(() => {
+    const word = this.translation();
+    return word !== null && word.definition === null;
+  });
+
+  protected readonly synonymsList = computed(() => this.translation()?.synonyms ?? []);
 
   private boundOnKeydown = this.onKeydown.bind(this);
   private boundOnClickOutside = this.onClickOutside.bind(this);
@@ -67,10 +74,6 @@ export class WordTranslationPopup implements OnInit, OnDestroy {
     if (word) {
       this.saved.emit(word);
     }
-  }
-
-  protected toggleDefinition(): void {
-    this.showDefinition.update((v) => !v);
   }
 
   protected onDismiss(): void {

@@ -47,6 +47,12 @@ export interface SavedWord {
   translation: string;
   englishDefinition: string;
   contextSentence: string;
+  // Enrichment (async — null until enriched)
+  definition: string | null;
+  phonetics: string | null;
+  synonyms: string[] | null;
+  exampleSentence: string | null;
+  partOfSpeech: string | null;
 }
 
 export interface PreReadingKeyWord {

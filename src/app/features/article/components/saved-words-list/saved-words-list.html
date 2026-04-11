@@ -9,11 +9,22 @@
     <ul class="words-list">
       @for (word of words(); track word.id) {
         <li class="word-item">
-          <span class="word-phrase">{{ word.wordOrPhrase }}</span>
+          <!-- Row 1: word + pos badge -->
+          <div class="word-primary">
+            <span class="word-phrase">{{ word.wordOrPhrase }}</span>
+            @if (word.partOfSpeech) {
+              <span class="pos-badge">{{ word.partOfSpeech }}</span>
+            }
+          </div>
           <span class="word-translation">{{ word.translation }}</span>
-          @if (word.englishDefinition) {
+
+          <!-- Row 2: definition snippet -->
+          @if (word.definition) {
+            <p class="word-definition">{{ word.definition }}</p>
+          } @else if (word.englishDefinition) {
             <p class="word-definition">{{ word.englishDefinition }}</p>
           }
+
           <p class="word-context">{{ word.contextSentence }}</p>
         </li>
       }

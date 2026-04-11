@@ -2,7 +2,7 @@
   @if (loading()) {
     <div class="popup-loading" aria-busy="true">
       <span class="spinner" aria-hidden="true"></span>
-      <p>Translating...</p>
+      <p>Saving word...</p>
     </div>
   } @else if (error()) {
     <div class="popup-error">
@@ -11,19 +11,60 @@
     </div>
   } @else if (translation()) {
     <div class="popup-content">
-      <p class="word-phrase">{{ translation()!.wordOrPhrase }}</p>
+      <!-- Header: word + pos badge -->
+      <div class="popup-header">
+        <span class="word-phrase">{{ translation()!.wordOrPhrase }}</span>
+        @if (translation()!.partOfSpeech) {
+          <span class="pos-badge">{{ translation()!.partOfSpeech }}</span>
+        } @else if (enrichmentPending()) {
+          <span class="skeleton skeleton--pos" aria-hidden="true"></span>
+        }
+      </div>
 
-      @if (showDefinition()) {
-        <p class="definition-text">{{ translation()!.englishDefinition }}</p>
-      } @else {
-        <p class="translation-text">{{ translation()!.translation }}</p>
+      <!-- Phonetics -->
+      @if (translation()!.phonetics) {
+        <p class="phonetics">[ {{ translation()!.phonetics }} ]</p>
+      } @else if (enrichmentPending()) {
+        <div class="skeleton skeleton--line skeleton--short" aria-hidden="true"></div>
       }
 
-      <button type="button" class="toggle-btn" (click)="toggleDefinition()">
-        {{ showDefinition() ? 'Show Spanish' : 'Show English' }}
-      </button>
+      <!-- Translation -->
+      <p class="translation-text">{{ translation()!.translation }}</p>
 
+      <!-- Definition -->
+      @if (translation()!.definition) {
+        <p class="definition-text">{{ translation()!.definition }}</p>
+      } @else if (enrichmentPending()) {
+        <div class="skeleton-block" aria-label="Loading definition" aria-busy="true">
+          <div class="skeleton skeleton--line skeleton--long"></div>
+          <div class="skeleton skeleton--line skeleton--medium"></div>
+        </div>
+      }
+
+      <!-- Synonyms chips -->
+      @if (synonymsList().length > 0) {
+        <div class="synonyms" role="list" aria-label="Synonyms">
+          @for (synonym of synonymsList(); track synonym) {
+            <span class="synonym-chip" role="listitem">{{ synonym }}</span>
+          }
+        </div>
+      } @else if (enrichmentPending()) {
+        <div class="skeleton skeleton--line skeleton--medium" aria-hidden="true"></div>
+      }
+
+      <!-- Example sentence -->
+      @if (translation()!.exampleSentence) {
+        <p class="example-sentence">
+          <em>{{ translation()!.exampleSentence }}</em>
+        </p>
+      } @else if (enrichmentPending()) {
+        <div class="skeleton skeleton--line skeleton--long" aria-hidden="true"></div>
+      }
+
+      <!-- Context -->
       <p class="context-sentence">{{ translation()!.contextSentence }}</p>
+
+      <!-- Actions -->
       <div class="popup-actions">
         <button type="button" class="save-btn" (click)="onConfirmSave()">Add to review</button>
         <button type="button" class="dismiss-btn" (click)="onDismiss()">Close</button>

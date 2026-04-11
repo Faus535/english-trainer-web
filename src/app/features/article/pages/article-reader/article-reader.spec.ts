@@ -121,6 +121,11 @@ describe('ArticleReader', () => {
       translation: 'resiliencia',
       englishDefinition: 'The ability to recover quickly.',
       contextSentence: 'Context.',
+      definition: null,
+      phonetics: null,
+      synonyms: null,
+      exampleSentence: null,
+      partOfSpeech: null,
     };
     fixture.componentInstance['onWordSaved'](word);
 
