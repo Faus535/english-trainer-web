@@ -16,6 +16,8 @@ const mockArticle: ArticleResponse = {
   level: 'B2',
   status: 'READY',
   paragraphs: [],
+  currentParagraphIndex: 0,
+  currentQuestionIndex: 0,
 };
 
 const correctResult: AnswerResult = {

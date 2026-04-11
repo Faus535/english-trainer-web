@@ -26,8 +26,8 @@ export class TalkStateService {
   private readonly _endResult = signal<TalkEndResponse | null>(null);
   private readonly _suggestEnd = signal(false);
   private readonly _level = signal<string>('a2');
-  readonly _quickMode = signal(false);
-  readonly _quickChallengeTitle = signal<string | null>(null);
+  private readonly _quickMode = signal(false);
+  private readonly _quickChallengeTitle = signal<string | null>(null);
   private readonly _autoEnded = signal(false);
 
   readonly scenarioId = this._scenarioId.asReadonly();
@@ -47,6 +47,12 @@ export class TalkStateService {
   readonly quickExchangeCount = computed(
     () => this._messages().filter((m) => m.role === 'user').length,
   );
+
+  enterQuickMode(challengeId: string, level: string, title: string | null): void {
+    this._quickMode.set(true);
+    this._quickChallengeTitle.set(title);
+    this.startConversation(challengeId, level, 'QUICK', challengeId);
+  }
 
   startConversation(
     scenarioId: string,

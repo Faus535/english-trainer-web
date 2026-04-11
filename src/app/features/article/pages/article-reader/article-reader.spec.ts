@@ -5,7 +5,12 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ArticleReader } from './article-reader';
 import { ArticleStateService } from '../../services/article-state.service';
 import { TtsService } from '../../../../shared/services/tts.service';
-import { ArticleResponse, SavedWordDraft, SavedWord } from '../../models/article.model';
+import {
+  ArticleResponse,
+  SavedWordDraft,
+  SavedWord,
+  PreReadingKeyWord,
+} from '../../models/article.model';
 
 const mockArticle: ArticleResponse = {
   id: 'art-1',
@@ -17,6 +22,8 @@ const mockArticle: ArticleResponse = {
     { id: 'p-1', content: 'First.', orderIndex: 0, speaker: 'AI' },
     { id: 'p-2', content: 'Second.', orderIndex: 1, speaker: 'USER' },
   ],
+  currentParagraphIndex: 0,
+  currentQuestionIndex: 0,
 };
 
 describe('ArticleReader', () => {
@@ -28,7 +35,7 @@ describe('ArticleReader', () => {
     readingComplete: signal(false),
     activeWord: signal<SavedWordDraft | null>(null),
     savedWords: signal<SavedWord[]>([]),
-    keyWords: signal<SavedWord[]>([]),
+    keyWords: signal<PreReadingKeyWord[]>([]),
     predictiveQuestion: signal<string | null>(null),
     preReadingLoading: signal(false),
     preReadingComplete: signal(false),

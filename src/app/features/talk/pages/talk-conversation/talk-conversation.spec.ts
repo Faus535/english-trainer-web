@@ -20,11 +20,10 @@ function makeStateMock(overrides: Record<string, unknown> = {}) {
     isSending: signal(false),
     endResult: signal(null),
     startConversation: vi.fn(),
+    enterQuickMode: vi.fn(),
     sendMessage: vi.fn(),
     endConversation: vi.fn(),
     resetConversation: vi.fn(),
-    _quickMode: { set: vi.fn() },
-    _quickChallengeTitle: { set: vi.fn() },
     ...overrides,
   };
 }
@@ -59,14 +58,7 @@ describe('TalkConversation', () => {
   it('should read mode and challengeId from query params', () => {
     create({ mode: 'QUICK', challengeId: 'order-coffee', title: 'Order%20Coffee' });
 
-    expect(stateMock._quickMode.set).toHaveBeenCalledWith(true);
-    expect(stateMock._quickChallengeTitle.set).toHaveBeenCalledWith('Order Coffee');
-    expect(stateMock.startConversation).toHaveBeenCalledWith(
-      'order-coffee',
-      'a2',
-      'QUICK',
-      'order-coffee',
-    );
+    expect(stateMock.enterQuickMode).toHaveBeenCalledWith('order-coffee', 'a2', 'Order Coffee');
   });
 
   it('should show QuickProgressBar when in quick mode', () => {

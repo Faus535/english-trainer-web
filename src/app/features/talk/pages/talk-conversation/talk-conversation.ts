@@ -53,9 +53,7 @@ export class TalkConversation implements OnInit {
     const level = params.get('level') ?? 'a2';
 
     if (mode === 'QUICK' && challengeId) {
-      this.talkState._quickMode.set(true);
-      this.talkState._quickChallengeTitle.set(title ? decodeURIComponent(title) : null);
-      this.talkState.startConversation(challengeId, level, 'QUICK', challengeId);
+      this.talkState.enterQuickMode(challengeId, level, title ? decodeURIComponent(title) : null);
     } else if (scenarioId) {
       this.talkState.startConversation(scenarioId, level);
     }
