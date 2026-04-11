@@ -58,7 +58,7 @@ export class ReviewPage implements OnInit {
     const profileId = this.auth.profileId();
     if (!item || !profileId) return;
 
-    if (rating === 'EASY') {
+    if (rating === 'EASY' || rating === 'GOOD') {
       this._correctCount.update((c) => c + 1);
     }
 

@@ -99,10 +99,18 @@
   border-radius: var(--r-lg);
 }
 
+.stats-grid--sm2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
 .stat-value {
   font-size: var(--fs-xl);
   font-weight: 700;
   color: var(--primary);
+}
+
+.stat-value--retention {
+  color: var(--success);
 }
 
 .stat-label {

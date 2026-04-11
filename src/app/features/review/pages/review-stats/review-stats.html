@@ -39,6 +39,18 @@
       </div>
     </div>
 
+    <!-- SM-2 metrics grid -->
+    <div class="stats-grid stats-grid--sm2">
+      <div class="stat-card">
+        <span class="stat-value stat-value--retention">{{ retentionPercent() }}%</span>
+        <span class="stat-label">Retention Rate</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">{{ averageIntervalDisplay() }}</span>
+        <span class="stat-label">Avg Interval (days)</span>
+      </div>
+    </div>
+
     <a class="back-link" routerLink="/review">Back to review queue</a>
   }
 </section>

@@ -18,6 +18,8 @@ export interface ReviewStats {
   totalMastered: number;
   weeklyReviewed: number;
   accuracyRate: number;
+  retentionRate?: number;
+  averageInterval?: number;
 }
 
-export type ReviewRating = 'EASY' | 'HARD';
+export type ReviewRating = 'HARD' | 'GOOD' | 'EASY';

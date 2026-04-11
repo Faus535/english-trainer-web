@@ -12,6 +12,8 @@ const mockStats = {
   totalMastered: 42,
   weeklyReviewed: 35,
   accuracyRate: 0.78,
+  retentionRate: 0.85,
+  averageInterval: 6.3,
 };
 
 describe('ReviewStats', () => {
@@ -50,5 +52,27 @@ describe('ReviewStats', () => {
 
     const el: HTMLElement = fixture.nativeElement;
     expect(el.textContent).toContain('42');
+  });
+
+  it('should display retentionRate as percentage', async () => {
+    setup();
+    const fixture = TestBed.createComponent(ReviewStats);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.textContent).toContain('85%');
+  });
+
+  it('should display averageInterval', async () => {
+    setup();
+    const fixture = TestBed.createComponent(ReviewStats);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.textContent).toContain('6.3');
   });
 });

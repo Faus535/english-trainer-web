@@ -104,10 +104,56 @@ describe('ReviewPage', () => {
     fixture.detectChanges();
 
     const component = fixture.componentInstance as any;
-    component.onRated('EASY');
+    component.onRated('GOOD');
     component.onRated('HARD');
     fixture.detectChanges();
 
     expect(component._correctCount()).toBe(1);
+  });
+
+  it('should count GOOD rating as correct', async () => {
+    const { reviewApi, auth } = createMocks();
+
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter([]),
+        { provide: ReviewApiService, useValue: reviewApi },
+        { provide: AuthService, useValue: auth },
+      ],
+    });
+
+    const fixture = TestBed.createComponent(ReviewPage);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const component = fixture.componentInstance as any;
+    component.onRated('GOOD');
+    fixture.detectChanges();
+
+    expect(component._correctCount()).toBe(1);
+  });
+
+  it('should not count HARD rating as correct', async () => {
+    const { reviewApi, auth } = createMocks([mockItems[0]]);
+
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter([]),
+        { provide: ReviewApiService, useValue: reviewApi },
+        { provide: AuthService, useValue: auth },
+      ],
+    });
+
+    const fixture = TestBed.createComponent(ReviewPage);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const component = fixture.componentInstance as any;
+    component.onRated('HARD');
+    fixture.detectChanges();
+
+    expect(component._correctCount()).toBe(0);
   });
 });

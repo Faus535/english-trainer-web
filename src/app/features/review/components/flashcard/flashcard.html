@@ -38,6 +38,25 @@
 
 <!-- Verdict bar -->
 <div class="verdict-bar" [class.visible]="_flipped() && !_rating()">
-  <button class="verdict-btn verdict-btn--hard" (click)="rate('HARD')">Hard</button>
-  <button class="verdict-btn verdict-btn--easy" (click)="rate('EASY')">Easy</button>
+  <button
+    class="verdict-btn verdict-btn--hard"
+    (click)="rate('HARD')"
+    aria-label="Hard — I struggled"
+  >
+    Hard
+  </button>
+  <button
+    class="verdict-btn verdict-btn--good"
+    (click)="rate('GOOD')"
+    aria-label="Good — I recalled with effort"
+  >
+    Good
+  </button>
+  <button
+    class="verdict-btn verdict-btn--easy"
+    (click)="rate('EASY')"
+    aria-label="Easy — I recalled immediately"
+  >
+    Easy
+  </button>
 </div>

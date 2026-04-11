@@ -27,9 +27,13 @@ export class ReviewStats implements OnInit {
   protected readonly totalMastered = signal(0);
   protected readonly weeklyReviewed = signal(0);
   protected readonly accuracyRate = signal(0);
+  protected readonly retentionRate = signal(0);
+  protected readonly averageInterval = signal(0);
   protected readonly loading = signal(true);
 
   protected readonly accuracyPercent = computed(() => Math.round(this.accuracyRate() * 100));
+  protected readonly retentionPercent = computed(() => Math.round(this.retentionRate() * 100));
+  protected readonly averageIntervalDisplay = computed(() => this.averageInterval().toFixed(1));
 
   ngOnInit(): void {
     const profileId = this.auth.profileId();
@@ -42,6 +46,8 @@ export class ReviewStats implements OnInit {
         this.totalMastered.set(stats.totalMastered);
         this.weeklyReviewed.set(stats.weeklyReviewed);
         this.accuracyRate.set(stats.accuracyRate);
+        this.retentionRate.set(stats.retentionRate ?? 0);
+        this.averageInterval.set(stats.averageInterval ?? 0);
         this.loading.set(false);
       },
       error: () => {
