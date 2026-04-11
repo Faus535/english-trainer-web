@@ -2,8 +2,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
-import { Router } from '@angular/router';
-import { describe, expect, it, beforeEach, vi } from 'vitest';
+import { describe, expect, it, beforeEach } from 'vitest';
 import { HomePage } from './home-page';
 import { environment } from '../../../../core/services/environment';
 import { HomeResponse } from '../../models/home.model';
@@ -21,17 +20,10 @@ const mockHomeResponse: HomeResponse = {
 describe('HomePage', () => {
   let fixture: ComponentFixture<HomePage>;
   let httpMock: HttpTestingController;
-  const mockRouter = { navigate: vi.fn().mockResolvedValue(true) };
 
   beforeEach(() => {
-    vi.clearAllMocks();
     TestBed.configureTestingModule({
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        provideRouter([]),
-        { provide: Router, useValue: mockRouter },
-      ],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     });
     fixture = TestBed.createComponent(HomePage);
     httpMock = TestBed.inject(HttpTestingController);

@@ -56,7 +56,7 @@
 }
 
 .due-badge {
-  background: #ef4444;
+  background: var(--error);
   color: #fff;
   font-size: var(--fs-sm);
   font-weight: 700;
