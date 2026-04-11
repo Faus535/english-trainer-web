@@ -18,31 +18,15 @@ export class ProfileApiService {
     return this.http.get<UserProfileResponse>(`${this.baseUrl}/${profileId}`);
   }
 
-  markTestCompleted(profileId: string): Observable<UserProfileResponse> {
-    return this.http.put<UserProfileResponse>(`${this.baseUrl}/${profileId}/test-completed`, {});
+  recordSession(profileId: string, module: string, durationSeconds: number): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${profileId}/sessions`, {
+      module,
+      durationSeconds,
+    });
   }
 
-  resetTest(profileId: string): Observable<UserProfileResponse> {
-    return this.http.put<UserProfileResponse>(`${this.baseUrl}/${profileId}/reset-test`, {});
-  }
-
-  updateModuleLevel(
-    profileId: string,
-    module: string,
-    level: string,
-  ): Observable<UserProfileResponse> {
-    return this.http.put<UserProfileResponse>(
-      `${this.baseUrl}/${profileId}/modules/${module}/level`,
-      { level },
-    );
-  }
-
-  setAllLevels(profileId: string, levels: Record<string, string>): Observable<void> {
-    return this.http.put<void>(`${this.baseUrl}/${profileId}/levels`, { levels });
-  }
-
-  recordSession(profileId: string, data: { duration?: number }): Observable<UserProfileResponse> {
-    return this.http.post<UserProfileResponse>(`${this.baseUrl}/${profileId}/sessions`, data);
+  updateEnglishLevel(userId: string, level: string): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/${userId}/english-level`, { level });
   }
 
   addXp(profileId: string, amount: number): Observable<UserProfileResponse> {

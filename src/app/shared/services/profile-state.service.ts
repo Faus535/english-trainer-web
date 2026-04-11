@@ -1,5 +1,5 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
-import { Observable, of, tap, catchError } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import {
   CEFR_LEVELS,
   Level,
@@ -10,8 +10,6 @@ import {
 import { UserProfileResponse } from '../models/api.model';
 import { ProfileApiService } from '../../core/services/profile-api.service';
 import { AuthService } from '../../core/services/auth.service';
-import { OfflineQueueService } from '../../core/services/offline-queue.service';
-import { environment } from '../../core/services/environment';
 
 const STORAGE_PREFIX = 'english_modular_';
 
@@ -19,11 +17,9 @@ const STORAGE_PREFIX = 'english_modular_';
 export class ProfileStateService {
   private readonly profileApi = inject(ProfileApiService);
   private readonly auth = inject(AuthService);
-  private readonly offlineQueue = inject(OfflineQueueService);
 
   private readonly _profile = signal<UserProfile>(this.loadProfile());
   private readonly _syncing = signal(false);
-  private _savingLevels = false;
 
   readonly profile = this._profile.asReadonly();
   readonly syncing = this._syncing.asReadonly();
@@ -53,8 +49,6 @@ export class ProfileStateService {
     const profileId = this.auth.profileId();
     if (!profileId) return;
 
-    this.retryPendingLevels();
-
     this._syncing.set(true);
     this.profileApi.getProfile(profileId).subscribe({
       next: (res) => {
@@ -71,31 +65,17 @@ export class ProfileStateService {
     return this._profile().levels[moduleName] || 'a1';
   }
 
-  setModuleLevel(moduleName: ModuleName, level: Level, syncToBackend = true): void {
+  setModuleLevel(moduleName: ModuleName, level: Level, _syncToBackend = true): void {
     this._profile.update((p) => ({
       ...p,
       levels: { ...p.levels, [moduleName]: level },
     }));
     this.persistProfile();
-
-    if (syncToBackend) {
-      const profileId = this.auth.profileId();
-      if (profileId) {
-        this.profileApi.updateModuleLevel(profileId, moduleName, level).subscribe();
-      }
-    }
   }
 
-  markTestCompleted(syncToBackend = true): void {
+  markTestCompleted(_syncToBackend = true): void {
     this._profile.update((p) => ({ ...p, testCompleted: true }));
     this.persistProfile();
-
-    if (syncToBackend) {
-      const profileId = this.auth.profileId();
-      if (profileId) {
-        this.profileApi.markTestCompleted(profileId).subscribe();
-      }
-    }
   }
 
   setAllLevelsAndComplete(levels: Partial<Record<ModuleName, Level>>): Observable<void> {
@@ -105,25 +85,7 @@ export class ProfileStateService {
       levels: { ...p.levels, ...levels },
     }));
     this.persistProfile();
-
-    const profileId = this.auth.profileId();
-    if (!profileId) return of(undefined);
-
-    localStorage.setItem('et_pending_levels', JSON.stringify(levels));
-    this._savingLevels = true;
-
-    return this.profileApi.setAllLevels(profileId, levels as Record<string, string>).pipe(
-      tap(() => {
-        localStorage.removeItem('et_pending_levels');
-        this._savingLevels = false;
-      }),
-      catchError(() => {
-        this._savingLevels = false;
-        const url = `${environment.apiUrl}/profiles/${profileId}/levels`;
-        this.offlineQueue.enqueue('PUT', url, { levels });
-        return of(undefined);
-      }),
-    );
+    return of(undefined);
   }
 
   markTestIncomplete(): void {
@@ -149,7 +111,7 @@ export class ProfileStateService {
     this.persistProfile();
   }
 
-  recordSession(duration?: number): void {
+  recordSession(): void {
     this._profile.update((p) => {
       const weekStart = this.getCurrentWeekStart();
       const isNewWeek = p.weekStart !== weekStart;
@@ -161,11 +123,13 @@ export class ProfileStateService {
       };
     });
     this.persistProfile();
+  }
 
+  updateEnglishLevel(level: string): void {
     const profileId = this.auth.profileId();
-    if (profileId) {
-      this.profileApi.recordSession(profileId, { duration }).subscribe();
-    }
+    if (!profileId) return;
+
+    this.profileApi.updateEnglishLevel(profileId, level).subscribe();
   }
 
   updateProfile(updater: (p: UserProfile) => UserProfile): void {
@@ -201,35 +165,6 @@ export class ProfileStateService {
     keys.forEach((k) => localStorage.removeItem(k));
 
     this._profile.set(this.createDefaultProfile());
-  }
-
-  private retryPendingLevels(): void {
-    if (this._savingLevels) return;
-
-    try {
-      const raw = localStorage.getItem('et_pending_levels');
-      if (!raw) return;
-
-      const levels = JSON.parse(raw) as Record<string, string>;
-      const profileId = this.auth.profileId();
-      if (!profileId) return;
-
-      this._savingLevels = true;
-      this.profileApi.setAllLevels(profileId, levels).subscribe({
-        next: () => {
-          localStorage.removeItem('et_pending_levels');
-          this._savingLevels = false;
-        },
-        error: () => {
-          this._savingLevels = false;
-          const url = `${environment.apiUrl}/profiles/${profileId}/levels`;
-          this.offlineQueue.enqueue('PUT', url, { levels });
-        },
-      });
-    } catch {
-      this._savingLevels = false;
-      localStorage.removeItem('et_pending_levels');
-    }
   }
 
   private applyBackendProfile(res: UserProfileResponse): void {

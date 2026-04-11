@@ -79,10 +79,6 @@
   <section class="setting-group danger">
     <h3 class="group-title">Zona peligrosa</h3>
 
-    <button class="btn-action warning" [disabled]="retaking()" (click)="retakeTest()">
-      {{ retaking() ? 'Preparando...' : 'Repetir test de nivel' }}
-    </button>
-
     <button class="btn-action danger" (click)="resetAll()">Resetear todo el progreso</button>
   </section>
 </div>

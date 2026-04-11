@@ -63,12 +63,12 @@ export class StateService {
   }
 
   // Session recording
-  recordSession(sessionData: {
+  recordSession(_sessionData: {
     listening?: UnitReference | null;
     secondary?: UnitReference | null;
     duration?: number;
   }): void {
-    this.profileState.recordSession(sessionData.duration);
+    this.profileState.recordSession();
     this.activityState.recordActivity();
   }
 

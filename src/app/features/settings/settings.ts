@@ -4,8 +4,6 @@ import { TtsService } from '../../shared/services/tts.service';
 import { StateService } from '../../shared/services/state.service';
 import { I18nService, Locale } from '../../shared/services/i18n.service';
 import { FocusModeService } from '../../shared/services/focus-mode.service';
-import { ProfileApiService } from '../../core/services/profile-api.service';
-import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-settings',
@@ -19,8 +17,6 @@ export class Settings {
   private readonly router = inject(Router);
   private readonly i18n = inject(I18nService);
   private readonly focusMode = inject(FocusModeService);
-  private readonly profileApi = inject(ProfileApiService);
-  private readonly auth = inject(AuthService);
   protected readonly locale = this.i18n.locale;
   protected readonly isFocusMode = this.focusMode.active;
 
@@ -28,7 +24,6 @@ export class Settings {
   protected readonly voices = computed(() => this.tts.getVoices());
   protected readonly exportReady = signal(false);
   protected readonly isDark = signal(!document.documentElement.classList.contains('light-theme'));
-  protected readonly retaking = signal(false);
 
   protected toggleTheme(): void {
     this.isDark.update((v) => !v);
@@ -59,37 +54,6 @@ export class Settings {
     a.click();
     URL.revokeObjectURL(url);
     this.exportReady.set(true);
-  }
-
-  protected retakeTest(): void {
-    if (
-      !confirm(
-        'Repetir el test de nivel? Tu progreso en modulos se mantendra, pero se recalcularan tus niveles.',
-      )
-    ) {
-      return;
-    }
-
-    const profileId = this.auth.profileId();
-    if (!profileId) {
-      this.state.markTestIncomplete();
-      this.router.navigate(['/home']);
-      return;
-    }
-
-    this.retaking.set(true);
-    this.profileApi.resetTest(profileId).subscribe({
-      next: () => {
-        this.state.markTestIncomplete();
-        this.retaking.set(false);
-        this.router.navigate(['/home']);
-      },
-      error: () => {
-        this.state.markTestIncomplete();
-        this.retaking.set(false);
-        this.router.navigate(['/home']);
-      },
-    });
   }
 
   protected resetAll(): void {
