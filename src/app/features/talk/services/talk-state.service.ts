@@ -1,10 +1,17 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
+import { catchError, EMPTY } from 'rxjs';
 import { TalkApiService } from './talk-api.service';
+import { ProfileApiService } from '../../../core/services/profile-api.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { ConversationMessage, ConversationStatus, TalkEndResponse } from '../models/talk.model';
 
 @Injectable({ providedIn: 'root' })
 export class TalkStateService {
   private readonly talkApi = inject(TalkApiService);
+  private readonly profileApi = inject(ProfileApiService);
+  private readonly auth = inject(AuthService);
+
+  private _sessionStartedAt = 0;
 
   private readonly _scenarioId = signal<string | null>(null);
   private readonly _conversationId = signal<string | null>(null);
@@ -39,6 +46,7 @@ export class TalkStateService {
         this._conversationId.set(res.id);
         this._messages.set(res.messages);
         this._status.set('idle');
+        this._sessionStartedAt = Date.now();
       },
       error: (err) => {
         this._status.set('error');
@@ -92,12 +100,23 @@ export class TalkStateService {
       next: (res) => {
         this._endResult.set(res);
         this._status.set('idle');
+        this.fireRecordSession('TALK');
       },
       error: () => {
         this._status.set('error');
         this._error.set('Could not end conversation');
       },
     });
+  }
+
+  private fireRecordSession(module: string): void {
+    const profileId = this.auth.profileId();
+    if (!profileId) return;
+    const durationSeconds = Math.max(1, Math.round((Date.now() - this._sessionStartedAt) / 1000));
+    this.profileApi
+      .recordSession(profileId, module, durationSeconds)
+      .pipe(catchError(() => EMPTY))
+      .subscribe();
   }
 
   resetConversation(): void {

@@ -11,6 +11,8 @@ import {
   EMPTY,
 } from 'rxjs';
 import { ArticleApiService } from './article-api.service';
+import { ProfileApiService } from '../../../core/services/profile-api.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { GenerationStep, GENERATION_STEPS } from '../../immerse/models/immerse.model';
 import {
   GenerateArticleRequest,
@@ -26,7 +28,11 @@ import {
 @Injectable({ providedIn: 'root' })
 export class ArticleStateService {
   private readonly articleApi = inject(ArticleApiService);
+  private readonly profileApi = inject(ProfileApiService);
+  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+
+  private _sessionStartedAt = 0;
 
   // Generation
   private readonly _generating = signal(false);
@@ -147,6 +153,7 @@ export class ArticleStateService {
       next: (res) => {
         this._article.set(res);
         this._loading.set(false);
+        this._sessionStartedAt = Date.now();
       },
       error: () => {
         this._loading.set(false);
@@ -172,6 +179,7 @@ export class ArticleStateService {
 
     this.articleApi.completeArticle(articleId).subscribe({
       next: () => {
+        this.fireRecordSession('ARTICLE');
         this.loadQuestions(articleId);
         this.router.navigate(['/article', articleId, 'questions']);
       },
@@ -330,6 +338,16 @@ export class ArticleStateService {
         }
       }
     });
+  }
+
+  private fireRecordSession(module: string): void {
+    const profileId = this.auth.profileId();
+    if (!profileId) return;
+    const durationSeconds = Math.max(1, Math.round((Date.now() - this._sessionStartedAt) / 1000));
+    this.profileApi
+      .recordSession(profileId, module, durationSeconds)
+      .pipe(catchError(() => EMPTY))
+      .subscribe();
   }
 
   private stopTimers(): void {

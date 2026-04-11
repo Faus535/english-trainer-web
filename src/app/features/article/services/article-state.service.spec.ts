@@ -188,3 +188,55 @@ describe('ArticleStateService', () => {
     });
   });
 });
+
+describe('ArticleStateService — session recording', () => {
+  let service: ArticleStateService;
+  let httpMock: HttpTestingController;
+  const base = `${environment.apiUrl}/article`;
+  const readyArticle = {
+    id: 'art-1',
+    title: 'Test',
+    topic: 'AI',
+    level: 'B2',
+    status: 'READY',
+    paragraphs: [{ id: 'p-1', content: 'First.', orderIndex: 0, speaker: 'AI' }],
+  };
+
+  beforeEach(() => {
+    sessionStorage.setItem('et_profile_id', 'profile-1');
+    vi.useFakeTimers();
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([{ path: '**', component: DummyComponent }]),
+      ],
+    });
+    service = TestBed.inject(ArticleStateService);
+    httpMock = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => {
+    sessionStorage.removeItem('et_profile_id');
+    service.cancelGeneration();
+    httpMock.verify();
+    vi.useRealTimers();
+  });
+
+  it('completeReading should call recordSession with ARTICLE module', () => {
+    service.loadArticle('art-1');
+    httpMock.expectOne(`${base}/art-1`).flush(readyArticle);
+
+    service.completeReading();
+    httpMock
+      .expectOne(`${base}/art-1/complete`)
+      .flush(null, { status: 204, statusText: 'No Content' });
+    httpMock.expectOne(`${base}/art-1/questions`).flush([]);
+
+    const sessionReq = httpMock.expectOne(`${environment.apiUrl}/profiles/profile-1/sessions`);
+    expect(sessionReq.request.method).toBe('POST');
+    expect(sessionReq.request.body.module).toBe('ARTICLE');
+    expect(sessionReq.request.body.durationSeconds).toBeGreaterThanOrEqual(1);
+    sessionReq.flush(null, { status: 201, statusText: 'Created' });
+  });
+});

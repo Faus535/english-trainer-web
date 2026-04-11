@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
-import { describe, expect, it, beforeEach } from 'vitest';
+import { afterEach, describe, expect, it, beforeEach } from 'vitest';
 import { TalkStateService } from './talk-state.service';
 import { environment } from '../../../core/services/environment';
 
@@ -169,5 +169,61 @@ describe('TalkStateService', () => {
     expect(service.endResult()).toBeNull();
     expect(service.error()).toBeNull();
     expect(service.suggestEnd()).toBe(false);
+  });
+});
+
+describe('TalkStateService — session recording', () => {
+  let service: TalkStateService;
+  let httpMock: HttpTestingController;
+
+  beforeEach(() => {
+    sessionStorage.setItem('et_profile_id', 'profile-1');
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    });
+    service = TestBed.inject(TalkStateService);
+    httpMock = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => {
+    sessionStorage.removeItem('et_profile_id');
+    httpMock.verify();
+  });
+
+  it('endConversation should call recordSession with TALK module', () => {
+    service.startConversation('restaurant', 'a2');
+    httpMock.expectOne(`${environment.apiUrl}/talk/conversations`).flush({
+      id: 'conv-1',
+      userId: 'user-1',
+      scenarioId: 'restaurant',
+      level: 'a2',
+      status: 'active',
+      startedAt: '2026-04-05T00:00:00Z',
+      endedAt: null,
+      messages: [],
+    });
+
+    service.endConversation();
+    httpMock.expectOne(`${environment.apiUrl}/talk/conversations/conv-1/end`).flush({
+      summary: 'Good job',
+      evaluation: {
+        grammarAccuracy: 80,
+        vocabularyRange: 70,
+        fluency: 75,
+        taskCompletion: 85,
+        overallScore: 78,
+        levelDemonstrated: 'b1',
+        strengths: [],
+        areasToImprove: [],
+      },
+      turnCount: 5,
+      errorCount: 1,
+    });
+
+    const sessionReq = httpMock.expectOne(`${environment.apiUrl}/profiles/profile-1/sessions`);
+    expect(sessionReq.request.method).toBe('POST');
+    expect(sessionReq.request.body.module).toBe('TALK');
+    expect(sessionReq.request.body.durationSeconds).toBeGreaterThanOrEqual(1);
+    sessionReq.flush(null, { status: 201, statusText: 'Created' });
   });
 });

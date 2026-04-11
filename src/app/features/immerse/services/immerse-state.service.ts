@@ -11,6 +11,8 @@ import {
   EMPTY,
 } from 'rxjs';
 import { ImmerseApiService } from './immerse-api.service';
+import { ProfileApiService } from '../../../core/services/profile-api.service';
+import { AuthService } from '../../../core/services/auth.service';
 import {
   ImmerseContent,
   ImmerseContentRequest,
@@ -26,7 +28,11 @@ import {
 @Injectable({ providedIn: 'root' })
 export class ImmerseStateService {
   private readonly immerseApi = inject(ImmerseApiService);
+  private readonly profileApi = inject(ProfileApiService);
+  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+
+  private _sessionStartedAt = 0;
 
   private readonly _content = signal<ImmerseContent | null>(null);
   private readonly _annotations = signal<WordAnnotation[]>([]);
@@ -159,6 +165,7 @@ export class ImmerseStateService {
         this._exercises.set(exercises);
         this._exerciseProgress.set([]);
         this._loading.set(false);
+        this._sessionStartedAt = Date.now();
       },
       error: () => {
         this._loading.set(false);
@@ -175,6 +182,10 @@ export class ImmerseStateService {
     });
   }
 
+  completeExercises(): void {
+    this.fireRecordSession('IMMERSE');
+  }
+
   reset(): void {
     this.cancelGeneration();
     this._content.set(null);
@@ -185,6 +196,16 @@ export class ImmerseStateService {
     this._exerciseProgress.set([]);
     this._loading.set(false);
     this._error.set(null);
+  }
+
+  private fireRecordSession(module: string): void {
+    const profileId = this.auth.profileId();
+    if (!profileId) return;
+    const durationSeconds = Math.max(1, Math.round((Date.now() - this._sessionStartedAt) / 1000));
+    this.profileApi
+      .recordSession(profileId, module, durationSeconds)
+      .pipe(catchError(() => EMPTY))
+      .subscribe();
   }
 
   private startPolling(contentId: string): void {

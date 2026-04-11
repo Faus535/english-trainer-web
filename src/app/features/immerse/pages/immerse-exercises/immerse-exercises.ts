@@ -80,6 +80,7 @@ export class ImmerseExercises implements OnInit {
     if (this.currentIndex() < this.exercises().length - 1) {
       this.currentIndex.update((i) => i + 1);
     } else {
+      this.immerseState.completeExercises();
       this.showResults.set(true);
     }
   }

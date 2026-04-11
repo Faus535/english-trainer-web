@@ -315,3 +315,44 @@ describe('ImmerseStateService', () => {
     });
   });
 });
+
+describe('ImmerseStateService — session recording', () => {
+  let service: ImmerseStateService;
+  let httpMock: HttpTestingController;
+
+  beforeEach(() => {
+    sessionStorage.setItem('et_profile_id', 'profile-1');
+    vi.useFakeTimers();
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([{ path: '**', component: DummyComponent }]),
+      ],
+    });
+    service = TestBed.inject(ImmerseStateService);
+    httpMock = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => {
+    sessionStorage.removeItem('et_profile_id');
+    service.cancelGeneration();
+    httpMock.verify();
+    vi.useRealTimers();
+  });
+
+  it('completeExercises should call recordSession with IMMERSE module', () => {
+    service.loadExercises('content-1');
+    httpMock
+      .expectOne(`${environment.apiUrl}/immerse/content/content-1/exercises`)
+      .flush([{ id: 'ex-1', type: 'fill-blank', prompt: 'Fill __', answer: 'in' }]);
+
+    service.completeExercises();
+
+    const sessionReq = httpMock.expectOne(`${environment.apiUrl}/profiles/profile-1/sessions`);
+    expect(sessionReq.request.method).toBe('POST');
+    expect(sessionReq.request.body.module).toBe('IMMERSE');
+    expect(sessionReq.request.body.durationSeconds).toBeGreaterThanOrEqual(1);
+    sessionReq.flush(null, { status: 201, statusText: 'Created' });
+  });
+});
