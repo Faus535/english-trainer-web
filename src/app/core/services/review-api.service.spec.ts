@@ -17,7 +17,7 @@ describe('ReviewApiService', () => {
 
   afterEach(() => httpMock.verify());
 
-  it('submitResult should send quality 4 for EASY', () => {
+  it('submitResult should send quality 5 for EASY', () => {
     const mockResponse: ReviewResultResponse = {
       id: 'item-1',
       nextReviewAt: '2026-04-18',
@@ -27,6 +27,23 @@ describe('ReviewApiService', () => {
     };
 
     service.submitResult('profile-1', 'item-1', 'EASY').subscribe();
+
+    const req = httpMock.expectOne((r) => r.url.includes('/review/items/item-1/result'));
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ quality: 5 });
+    req.flush(mockResponse);
+  });
+
+  it('submitResult should send quality 4 for GOOD', () => {
+    const mockResponse: ReviewResultResponse = {
+      id: 'item-1',
+      nextReviewAt: '2026-04-15',
+      intervalDays: 4,
+      easeFactor: 2.3,
+      consecutiveCorrect: 2,
+    };
+
+    service.submitResult('profile-1', 'item-1', 'GOOD').subscribe();
 
     const req = httpMock.expectOne((r) => r.url.includes('/review/items/item-1/result'));
     expect(req.request.method).toBe('POST');

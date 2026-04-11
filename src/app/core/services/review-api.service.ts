@@ -27,8 +27,9 @@ export interface ReviewResultResponse {
 }
 
 const RATING_QUALITY: Record<ReviewRating, number> = {
-  EASY: 4,
   HARD: 2,
+  GOOD: 4,
+  EASY: 5,
 };
 
 @Injectable({ providedIn: 'root' })

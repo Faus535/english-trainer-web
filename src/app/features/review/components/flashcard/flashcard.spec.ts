@@ -109,4 +109,47 @@ describe('Flashcard', () => {
     const backFace = fixture.nativeElement.querySelector('.card__back');
     expect(backFace?.textContent).toContain('I run every morning.');
   });
+
+  it('should show three verdict buttons after flip', () => {
+    const fixture = TestBed.createComponent(Flashcard);
+    fixture.componentRef.setInput('item', mockItem);
+    fixture.detectChanges();
+
+    const scene = fixture.nativeElement.querySelector('.card-scene') as HTMLElement;
+    scene.click();
+    fixture.detectChanges();
+
+    const buttons = fixture.nativeElement.querySelectorAll('.verdict-btn');
+    expect(buttons.length).toBe(3);
+  });
+
+  it('should have Hard, Good, Easy buttons in order', () => {
+    const fixture = TestBed.createComponent(Flashcard);
+    fixture.componentRef.setInput('item', mockItem);
+    fixture.detectChanges();
+
+    const buttons = fixture.nativeElement.querySelectorAll('.verdict-btn');
+    expect(buttons[0].textContent?.trim()).toBe('Hard');
+    expect(buttons[1].textContent?.trim()).toBe('Good');
+    expect(buttons[2].textContent?.trim()).toBe('Easy');
+  });
+
+  it('should emit rated with GOOD on Good click', () => {
+    const fixture = TestBed.createComponent(Flashcard);
+    fixture.componentRef.setInput('item', mockItem);
+    fixture.detectChanges();
+
+    const scene = fixture.nativeElement.querySelector('.card-scene') as HTMLElement;
+    scene.click();
+    fixture.detectChanges();
+
+    const spy = vi.fn();
+    fixture.componentInstance.rated.subscribe(spy);
+
+    const goodBtn = fixture.nativeElement.querySelector('.verdict-btn--good') as HTMLElement;
+    goodBtn.click();
+    fixture.detectChanges();
+
+    expect(spy).toHaveBeenCalledWith('GOOD');
+  });
 });

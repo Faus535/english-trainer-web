@@ -7,18 +7,18 @@
     <a class="history-link" routerLink="/article/history">View History</a>
   </div>
 
-  <form class="hub-form" (ngSubmit)="onGenerate()">
+  <form class="hub-form" [formGroup]="form" (ngSubmit)="onGenerate()">
     <div class="form-field">
       <label for="topic" class="field-label">Topic</label>
       <input
         id="topic"
         class="topic-input"
         type="text"
-        [formControl]="topicCtrl"
+        formControlName="topic"
         placeholder="e.g. climate change, space exploration, music..."
         aria-label="Article topic"
       />
-      @if (topicCtrl.invalid && topicCtrl.touched) {
+      @if (form.controls.topic.invalid && form.controls.topic.touched) {
         <p class="field-error" role="alert">Topic is required (max 100 characters)</p>
       }
     </div>
@@ -40,7 +40,7 @@
       </div>
     </div>
 
-    <button class="generate-btn" type="submit" [disabled]="topicCtrl.invalid || generating()">
+    <button class="generate-btn" type="submit" [disabled]="form.invalid || generating()">
       @if (generating()) {
         <span class="spinner" aria-hidden="true"></span>
         Generating...
