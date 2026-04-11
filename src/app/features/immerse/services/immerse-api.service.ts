@@ -30,8 +30,13 @@ export class ImmerseApiService {
     return this.http.get<ImmerseContentResponse>(`${this.baseUrl}/content/${contentId}`);
   }
 
-  getExercises(contentId: string): Observable<ImmerseExercise[]> {
-    return this.http.get<ImmerseExercise[]>(`${this.baseUrl}/content/${contentId}/exercises`);
+  getExercises(
+    contentId: string,
+    type: 'ALL' | 'LISTENING_CLOZE' | 'REGULAR' = 'ALL',
+  ): Observable<ImmerseExercise[]> {
+    const url = `${this.baseUrl}/content/${contentId}/exercises`;
+    const params = type !== 'ALL' ? `?type=${type}` : '';
+    return this.http.get<ImmerseExercise[]>(`${url}${params}`);
   }
 
   submitExerciseAnswer(

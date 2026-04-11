@@ -24,12 +24,16 @@ export interface WordAnnotation {
   level: Level;
 }
 
+export type ExerciseType = 'fill-blank' | 'definition-match' | 'context-use' | 'LISTENING_CLOZE';
+
 export interface ImmerseExercise {
   id: string;
-  type: 'fill-blank' | 'definition-match' | 'context-use';
+  type: ExerciseType;
   prompt: string;
   options?: string[];
   correctAnswer: string;
+  listenText?: string;
+  blankPosition?: number;
 }
 
 export interface ImmerseExerciseResult {

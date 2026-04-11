@@ -33,6 +33,7 @@ export class ImmerseStateService {
   private readonly router = inject(Router);
 
   private _sessionStartedAt = 0;
+  private _currentContentId = '';
 
   private readonly _content = signal<ImmerseContent | null>(null);
   private readonly _annotations = signal<WordAnnotation[]>([]);
@@ -47,6 +48,9 @@ export class ImmerseStateService {
   private readonly _generationStep = signal<GenerationStep>('idle');
   private readonly _generationProgress = signal(0);
   private readonly _generationError = signal<string | null>(null);
+
+  private readonly _listeningMode = signal(false);
+  private readonly _ttsPlaying = signal(false);
 
   private _pollingSub: Subscription | null = null;
   private _elapsedTimer: Subscription | null = null;
@@ -65,6 +69,9 @@ export class ImmerseStateService {
   readonly generationStep = this._generationStep.asReadonly();
   readonly generationProgress = this._generationProgress.asReadonly();
   readonly generationError = this._generationError.asReadonly();
+
+  readonly listeningMode = this._listeningMode.asReadonly();
+  readonly ttsPlaying = this._ttsPlaying.asReadonly();
 
   readonly capturedVocabCount = computed(() => this._capturedVocab().length);
   readonly exerciseCompletionRate = computed(() => {
@@ -156,11 +163,12 @@ export class ImmerseStateService {
     this._capturedVocab.update((vocab) => [...vocab, entry]);
   }
 
-  loadExercises(contentId: string): void {
+  loadExercises(contentId: string, type: 'ALL' | 'LISTENING_CLOZE' | 'REGULAR' = 'ALL'): void {
     this._loading.set(true);
     this._error.set(null);
+    this._currentContentId = contentId;
 
-    this.immerseApi.getExercises(contentId).subscribe({
+    this.immerseApi.getExercises(contentId, type).subscribe({
       next: (exercises) => {
         this._exercises.set(exercises);
         this._exerciseProgress.set([]);
@@ -172,6 +180,14 @@ export class ImmerseStateService {
         this._error.set('Could not load exercises');
       },
     });
+  }
+
+  toggleMode(): void {
+    this._listeningMode.update((v) => !v);
+    const type = this._listeningMode() ? 'LISTENING_CLOZE' : 'REGULAR';
+    if (this._currentContentId) {
+      this.loadExercises(this._currentContentId, type);
+    }
   }
 
   submitAnswer(contentId: string, exerciseId: string, answer: string): void {
