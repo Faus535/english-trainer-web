@@ -62,13 +62,13 @@
         <div class="flashcard-inner">
           <div class="flashcard-front">
             <span class="flashcard-type">{{ item.sourceType }}</span>
-            <span class="flashcard-word">{{ item.frontContent }}</span>
+            <span class="flashcard-word">{{ item.targetWord || item.word }}</span>
             <span class="flashcard-hint">Toca para revelar</span>
           </div>
           <div class="flashcard-back">
             <span class="flashcard-type">{{ item.sourceType }}</span>
-            <span class="flashcard-word">{{ item.backContent }}</span>
-            <span class="flashcard-review-info">Racha: {{ item.consecutiveCorrect }}</span>
+            <span class="flashcard-word">{{ item.targetTranslation || item.translation }}</span>
+            <span class="flashcard-review-info">Intervalo: {{ item.interval }} días</span>
           </div>
         </div>
       </div>

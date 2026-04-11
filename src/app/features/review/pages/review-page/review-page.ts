@@ -8,7 +8,8 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Icon } from '../../../../shared/components/icon/icon';
-import { ReviewApiService, ReviewItemResponse } from '../../../../core/services/review-api.service';
+import { ReviewApiService } from '../../../../core/services/review-api.service';
+import { ReviewItem } from '../../models/review.model';
 import { AuthService } from '../../../../core/services/auth.service';
 import { LucideIconData, ArrowLeft, RotateCcw } from 'lucide-angular';
 
@@ -27,7 +28,7 @@ export class ReviewPage implements OnInit {
   protected readonly arrowLeftIcon: LucideIconData = ArrowLeft;
   protected readonly repeatIcon: LucideIconData = RotateCcw;
 
-  protected readonly items = signal<ReviewItemResponse[]>([]);
+  protected readonly items = signal<ReviewItem[]>([]);
   protected readonly currentIndex = signal(0);
   protected readonly flipped = signal(false);
   protected readonly loading = signal(true);
@@ -65,7 +66,8 @@ export class ReviewPage implements OnInit {
     const profileId = this.auth.profileId();
     if (!item || !profileId) return;
 
-    this.reviewApi.completeReview(profileId, item.id, quality).subscribe({
+    const rating = quality >= 4 ? 'EASY' : 'HARD';
+    this.reviewApi.submitResult(profileId, item.id, rating).subscribe({
       next: () => {
         this.completedToday.update((c) => c + 1);
         this.currentIndex.update((i) => i + 1);
@@ -86,7 +88,6 @@ export class ReviewPage implements OnInit {
       next: (stats) => {
         this.totalItems.set(stats.totalItems);
         this.dueToday.set(stats.dueToday);
-        this.completedToday.set(stats.completedToday);
       },
     });
 

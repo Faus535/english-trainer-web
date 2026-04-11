@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from './environment';
+import { ReviewItem, ReviewStats, ReviewRating } from '../../features/review/models/review.model';
 
 export interface ReviewItemResponse {
   id: string;
@@ -11,6 +12,10 @@ export interface ReviewItemResponse {
   nextReviewAt: string;
   intervalDays: number;
   consecutiveCorrect: number;
+  contextSentence?: string;
+  contextTranslation?: string;
+  targetWord?: string;
+  targetTranslation?: string;
 }
 
 export interface ReviewResultResponse {
@@ -21,31 +26,50 @@ export interface ReviewResultResponse {
   consecutiveCorrect: number;
 }
 
+const RATING_QUALITY: Record<ReviewRating, number> = {
+  EASY: 4,
+  HARD: 2,
+};
+
 @Injectable({ providedIn: 'root' })
 export class ReviewApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/profiles`;
 
-  getDueReviews(profileId: string): Observable<ReviewItemResponse[]> {
-    return this.http.get<ReviewItemResponse[]>(`${this.baseUrl}/${profileId}/review/queue`);
+  getDueReviews(profileId: string): Observable<ReviewItem[]> {
+    return this.http
+      .get<ReviewItemResponse[]>(`${this.baseUrl}/${profileId}/review/queue`)
+      .pipe(map((items) => items.map(this.mapResponseToItem)));
   }
 
-  completeReview(
+  submitResult(
     profileId: string,
     itemId: string,
-    quality: number,
+    rating: ReviewRating,
   ): Observable<ReviewResultResponse> {
+    const quality = RATING_QUALITY[rating];
     return this.http.post<ReviewResultResponse>(
       `${this.baseUrl}/${profileId}/review/items/${itemId}/result`,
       { quality },
     );
   }
 
-  getReviewStats(
-    profileId: string,
-  ): Observable<{ totalItems: number; dueToday: number; completedToday: number }> {
-    return this.http.get<{ totalItems: number; dueToday: number; completedToday: number }>(
-      `${this.baseUrl}/${profileId}/review/stats`,
-    );
+  getReviewStats(profileId: string): Observable<ReviewStats> {
+    return this.http.get<ReviewStats>(`${this.baseUrl}/${profileId}/review/stats`);
+  }
+
+  private mapResponseToItem(r: ReviewItemResponse): ReviewItem {
+    return {
+      id: r.id,
+      word: r.frontContent,
+      translation: r.backContent,
+      contextSentence: r.contextSentence,
+      contextTranslation: r.contextTranslation,
+      targetWord: r.targetWord,
+      targetTranslation: r.targetTranslation,
+      quality: r.consecutiveCorrect,
+      interval: r.intervalDays,
+      sourceType: r.sourceType as ReviewItem['sourceType'],
+    };
   }
 }

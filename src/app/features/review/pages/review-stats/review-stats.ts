@@ -16,9 +16,9 @@ export class ReviewStats implements OnInit {
 
   protected readonly totalItems = signal(0);
   protected readonly dueToday = signal(0);
-  protected readonly completedToday = signal(0);
-  protected readonly accuracy = signal(0);
-  protected readonly streak = signal(0);
+  protected readonly totalMastered = signal(0);
+  protected readonly weeklyReviewed = signal(0);
+  protected readonly accuracyRate = signal(0);
   protected readonly loading = signal(true);
 
   ngOnInit(): void {
@@ -29,7 +29,9 @@ export class ReviewStats implements OnInit {
       next: (stats) => {
         this.totalItems.set(stats.totalItems);
         this.dueToday.set(stats.dueToday);
-        this.completedToday.set(stats.completedToday);
+        this.totalMastered.set(stats.totalMastered);
+        this.weeklyReviewed.set(stats.weeklyReviewed);
+        this.accuracyRate.set(stats.accuracyRate);
         this.loading.set(false);
       },
       error: () => {

@@ -64,7 +64,7 @@ export class ReviewStateService {
 
     const profileId = this.auth.profileId();
     if (profileId) {
-      this.reviewApi.completeReview(profileId, unitId, 3).subscribe();
+      this.reviewApi.submitResult(profileId, unitId, 'HARD').subscribe();
     }
   }
 
