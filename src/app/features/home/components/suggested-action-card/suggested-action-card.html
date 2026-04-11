@@ -1,7 +1,13 @@
-<button class="card" [attr.data-type]="type()" (click)="onTap()" type="button">
-  <span class="card-title">{{ title() }}</span>
-  @if (description()) {
-    <span class="card-desc">{{ description() }}</span>
-  }
+<button class="card" [attr.data-type]="config().dataType" (click)="navigate()" type="button">
+  <div class="card-top">
+    <span class="card-icon" aria-hidden="true">{{ config().icon }}</span>
+    @if (suggestedModule() === 'REVIEW' && dueReviewCount() > 0) {
+      <span class="due-badge" aria-label="{{ dueReviewCount() }} words due">{{
+        dueReviewCount()
+      }}</span>
+    }
+  </div>
+  <span class="card-title">{{ config().title }}</span>
+  <span class="card-subtitle">{{ subtitle() }}</span>
   <span class="card-cta">Start &rarr;</span>
 </button>

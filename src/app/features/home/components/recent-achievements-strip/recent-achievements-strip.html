@@ -1,0 +1,18 @@
+@if (achievements().length > 0) {
+  <section class="strip-section" aria-label="Recent achievements">
+    <h2 class="strip-heading">Recent Achievements</h2>
+    <div class="strip-scroll">
+      @for (achievement of achievements(); track achievement.title) {
+        <div
+          class="badge-card"
+          role="article"
+          [attr.aria-label]="achievement.title + ', ' + achievement.xpReward + ' XP'"
+        >
+          <span class="badge-icon" aria-hidden="true">{{ achievement.icon }}</span>
+          <span class="badge-title">{{ achievement.title }}</span>
+          <span class="badge-xp">+{{ achievement.xpReward }} XP</span>
+        </div>
+      }
+    </div>
+  </section>
+}

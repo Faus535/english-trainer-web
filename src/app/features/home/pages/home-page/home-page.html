@@ -7,13 +7,17 @@
         <div class="skeleton-card"></div>
       </div>
     </div>
-  } @else if (data()) {
-    <div class="header-row">
-      <h1 class="greeting">Welcome back</h1>
-      <button class="avatar-btn" (click)="goToProfile()" aria-label="Go to profile" type="button">
-        <span class="avatar" aria-hidden="true">👤</span>
-      </button>
+  } @else if (data(); as home) {
+    <div class="home-header">
+      <app-streak-widget [streakDays]="home.streakDays" [weeklyActivity]="home.weeklyActivity" />
+      <app-level-badge [level]="home.englishLevel" />
     </div>
+    <app-daily-progress [recentXpThisWeek]="home.recentXpThisWeek" />
+    <app-suggested-action-card
+      [suggestedModule]="home.suggestedModule"
+      [dueReviewCount]="home.dueReviewCount"
+    />
+    <app-recent-achievements-strip [achievements]="home.recentAchievements" />
   } @else {
     <div class="empty-state">
       <h1 class="greeting">Welcome</h1>

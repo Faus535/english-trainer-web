@@ -5,7 +5,7 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-3);
+  gap: var(--sp-2);
   width: 100%;
   padding: var(--sp-6);
   border: none;
@@ -14,10 +14,10 @@
   text-align: left;
   cursor: pointer;
   font-family: inherit;
+  min-height: 5rem;
   transition:
     transform 200ms var(--ease),
     opacity 200ms var(--ease);
-  min-height: 2.75rem;
 
   &[data-type='talk'] {
     background: var(--gradient-talk);
@@ -31,6 +31,10 @@
     background: var(--gradient-review);
   }
 
+  &[data-type='article'] {
+    background: var(--gradient-immerse);
+  }
+
   &:hover {
     opacity: 0.95;
     transform: translateY(-2px);
@@ -41,12 +45,33 @@
   }
 }
 
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-icon {
+  font-size: var(--fs-xl);
+}
+
+.due-badge {
+  background: #ef4444;
+  color: #fff;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--r-full);
+  min-width: 1.5rem;
+  text-align: center;
+}
+
 .card-title {
   font-size: var(--fs-lg);
   font-weight: 700;
 }
 
-.card-desc {
+.card-subtitle {
   font-size: var(--fs-sm);
   opacity: 0.85;
 }

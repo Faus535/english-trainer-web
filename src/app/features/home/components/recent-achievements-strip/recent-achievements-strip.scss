@@ -1,0 +1,67 @@
+:host {
+  display: block;
+}
+
+.strip-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.strip-heading {
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--text-2);
+  margin: 0;
+}
+
+.strip-scroll {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding-bottom: var(--sp-2);
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  scrollbar-width: none;
+}
+
+.badge-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-1);
+  flex-shrink: 0;
+  width: 4rem;
+  padding: var(--sp-3);
+  background: var(--surface-glass);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.badge-icon {
+  font-size: 1.75rem;
+}
+
+.badge-title {
+  font-size: 0.625rem;
+  color: var(--text-2);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 3.5rem;
+}
+
+.badge-xp {
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-soft);
+  padding: 0.0625rem 0.25rem;
+  border-radius: var(--r-full);
+}

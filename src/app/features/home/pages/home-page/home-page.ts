@@ -1,18 +1,21 @@
 import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { HomeApiService } from '../../services/home-api.service';
 import { HomeResponse } from '../../models/home.model';
+import { SuggestedActionCard } from '../../components/suggested-action-card/suggested-action-card';
+import { DailyProgress } from '../../components/daily-progress/daily-progress';
+import { StreakWidget } from '../../components/streak-widget/streak-widget';
+import { LevelBadge } from '../../components/level-badge/level-badge';
+import { RecentAchievementsStrip } from '../../components/recent-achievements-strip/recent-achievements-strip';
 
 @Component({
   selector: 'app-home-page',
-  imports: [],
+  imports: [SuggestedActionCard, DailyProgress, StreakWidget, LevelBadge, RecentAchievementsStrip],
   templateUrl: './home-page.html',
   styleUrl: './home-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomePage implements OnInit {
   private readonly homeApi = inject(HomeApiService);
-  private readonly router = inject(Router);
 
   protected readonly data = signal<HomeResponse | null>(null);
   protected readonly loading = signal(true);
@@ -27,9 +30,5 @@ export class HomePage implements OnInit {
         this.loading.set(false);
       },
     });
-  }
-
-  protected goToProfile(): void {
-    this.router.navigate(['/profile']);
   }
 }
