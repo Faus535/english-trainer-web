@@ -11,7 +11,17 @@ import { UpperCasePipe } from '@angular/common';
 import { ImmerseStateService } from '../../services/immerse-state.service';
 import { AnnotatedWord } from '../../components/annotated-word/annotated-word';
 import { WordPopup } from '../../components/word-popup/word-popup';
-import { WordAnnotation, VocabEntry } from '../../models/immerse.model';
+import { WordAnnotation, VocabEntry, AnnotatedParagraph } from '../../models/immerse.model';
+
+interface TextSegment {
+  type: 'text';
+  content: string;
+}
+interface WordSegment {
+  type: 'word';
+  annotation: WordAnnotation;
+}
+type ParagraphSegment = TextSegment | WordSegment;
 
 @Component({
   selector: 'app-immerse-reader',
@@ -35,6 +45,12 @@ export class ImmerseReader implements OnInit {
   protected readonly contentId = computed(
     () => this.route.snapshot.paramMap.get('contentId') ?? '',
   );
+
+  protected readonly paragraphSegments = computed<ParagraphSegment[][]>(() => {
+    const c = this.content();
+    if (!c) return [];
+    return c.paragraphs.map((p) => this.buildSegments(p));
+  });
 
   protected readonly activeVocabEntry = computed<VocabEntry | null>(() => {
     const word = this.activeWord();
@@ -76,5 +92,23 @@ export class ImmerseReader implements OnInit {
 
   protected goToExercises(): void {
     this.router.navigate(['/immerse', this.contentId(), 'exercises']);
+  }
+
+  private buildSegments(paragraph: AnnotatedParagraph): ParagraphSegment[] {
+    const { text, annotations } = paragraph;
+    const segments: ParagraphSegment[] = [];
+    const sorted = [...annotations].sort((a, b) => a.startIndex - b.startIndex);
+    let cursor = 0;
+    for (const ann of sorted) {
+      if (ann.startIndex > cursor) {
+        segments.push({ type: 'text', content: text.slice(cursor, ann.startIndex) });
+      }
+      segments.push({ type: 'word', annotation: ann });
+      cursor = ann.endIndex;
+    }
+    if (cursor < text.length) {
+      segments.push({ type: 'text', content: text.slice(cursor) });
+    }
+    return segments;
   }
 }
