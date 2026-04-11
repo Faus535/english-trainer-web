@@ -106,10 +106,10 @@ export class ImmerseExercises implements OnInit {
     this.immerseState.toggleMode();
   }
 
-  protected onListeningAnswered(result: { correct: boolean }, index: number): void {
+  protected onListeningAnswered(result: { correct: boolean; answer: string }, index: number): void {
     const exercise = this.exercises()[index];
     if (!exercise) return;
-    this.immerseState.submitAnswer(this.contentId(), exercise.id, exercise.correctAnswer);
+    this.immerseState.submitAnswer(this.contentId(), exercise.id, result.answer);
     if (index < this.exercises().length - 1) {
       this.currentIndex.update((i) => i + 1);
     } else {

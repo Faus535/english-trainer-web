@@ -23,7 +23,7 @@ export class ListeningClozeCard {
   private readonly tts = inject(TtsService);
 
   readonly exercise = input.required<ImmerseExercise>();
-  readonly answered = output<{ correct: boolean }>();
+  readonly answered = output<{ correct: boolean; answer: string }>();
 
   protected readonly _cardState = signal<CardState>('idle');
   protected readonly _selectedAnswer = signal<string | null>(null);
@@ -51,6 +51,6 @@ export class ListeningClozeCard {
   }
 
   protected next(): void {
-    this.answered.emit({ correct: this._isCorrect() });
+    this.answered.emit({ correct: this._isCorrect(), answer: this._selectedAnswer() ?? '' });
   }
 }

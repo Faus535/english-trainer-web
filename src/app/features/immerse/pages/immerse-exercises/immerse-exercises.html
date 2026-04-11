@@ -2,10 +2,20 @@
   <h1 class="page-title">Exercises</h1>
 
   <div class="mode-toggle" role="group" aria-label="Exercise mode">
-    <button class="mode-btn" [class.active]="!listeningMode()" (click)="toggleMode()" type="button">
+    <button
+      class="mode-btn"
+      [class.active]="!listeningMode()"
+      (click)="listeningMode() && toggleMode()"
+      type="button"
+    >
       Reading Mode
     </button>
-    <button class="mode-btn" [class.active]="listeningMode()" (click)="toggleMode()" type="button">
+    <button
+      class="mode-btn"
+      [class.active]="listeningMode()"
+      (click)="!listeningMode() && toggleMode()"
+      type="button"
+    >
       Listening Mode
     </button>
   </div>

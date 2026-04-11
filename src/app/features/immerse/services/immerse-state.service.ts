@@ -50,7 +50,6 @@ export class ImmerseStateService {
   private readonly _generationError = signal<string | null>(null);
 
   private readonly _listeningMode = signal(false);
-  private readonly _ttsPlaying = signal(false);
 
   private _pollingSub: Subscription | null = null;
   private _elapsedTimer: Subscription | null = null;
@@ -71,7 +70,6 @@ export class ImmerseStateService {
   readonly generationError = this._generationError.asReadonly();
 
   readonly listeningMode = this._listeningMode.asReadonly();
-  readonly ttsPlaying = this._ttsPlaying.asReadonly();
 
   readonly capturedVocabCount = computed(() => this._capturedVocab().length);
   readonly exerciseCompletionRate = computed(() => {

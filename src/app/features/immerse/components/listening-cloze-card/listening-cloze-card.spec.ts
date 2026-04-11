@@ -85,7 +85,7 @@ describe('ListeningClozeCard', () => {
     const nextBtn = el.querySelector<HTMLButtonElement>('.next-btn');
     nextBtn?.click();
 
-    expect(spy).toHaveBeenCalledWith({ correct: true });
+    expect(spy).toHaveBeenCalledWith({ correct: true, answer: 'quick' });
   });
 
   it('should show sentence with highlighted word in feedback state', () => {
