@@ -1,0 +1,41 @@
+<div class="pronunciation-drills">
+  <header class="lab-header">
+    <h1 class="lab-title">Pronunciation Lab</h1>
+    <nav class="lab-tabs" aria-label="Pronunciation modes">
+      <a
+        routerLink="/pronunciation"
+        class="tab-link"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        >Analysis</a
+      >
+      <a routerLink="/pronunciation/drills" class="tab-link" routerLinkActive="active">Drills</a>
+      <a routerLink="/pronunciation/mini-conversation" class="tab-link" routerLinkActive="active"
+        >Mini-Conversation</a
+      >
+    </nav>
+  </header>
+
+  <app-drill-filter-bar (filterChanged)="onFilterChange($event)" />
+
+  @if (state.isDrillLoading()) {
+    <p class="loading-msg">Loading drills...</p>
+  } @else if (state.drillsComplete()) {
+    <div class="completion-summary">
+      <h2>All drills completed!</h2>
+      <button class="try-again-btn" type="button" (click)="onTryAgain()">Try Again</button>
+    </div>
+  } @else if (state.currentDrill()) {
+    <div class="drill-progress">
+      {{ state.drillProgress().current }} / {{ state.drillProgress().total }}
+    </div>
+
+    <app-drill-card
+      [drill]="state.currentDrill()!"
+      [scoreResult]="state.drillScoreFor(state.currentDrill()!.id)"
+      (attempted)="onAttempt($event)"
+    />
+  } @else if (!state.isDrillLoading()) {
+    <p class="empty-msg">No drills found. Try a different filter.</p>
+  }
+</div>

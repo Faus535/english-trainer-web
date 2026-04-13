@@ -1,0 +1,23 @@
+<div class="filter-bar" [formGroup]="form">
+  <select
+    class="filter-select"
+    formControlName="level"
+    aria-label="CEFR level filter"
+    (change)="onChange()"
+  >
+    @for (lvl of levels; track lvl.value) {
+      <option [value]="lvl.value">{{ lvl.label }}</option>
+    }
+  </select>
+
+  <select
+    class="filter-select"
+    formControlName="focus"
+    aria-label="Focus area filter"
+    (change)="onChange()"
+  >
+    @for (f of focuses; track f.value) {
+      <option [value]="f.value">{{ f.label }}</option>
+    }
+  </select>
+</div>

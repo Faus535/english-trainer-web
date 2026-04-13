@@ -1,0 +1,47 @@
+<div class="drill-card">
+  <div class="drill-meta">
+    <span class="focus-chip">{{ drill().focus }}</span>
+    <span class="level-chip">{{ drill().cefrLevel }}</span>
+    <span class="difficulty-chip">{{ drill().difficulty }}</span>
+  </div>
+
+  <p class="drill-phrase">{{ drill().phrase }}</p>
+
+  <div class="drill-actions">
+    <button class="play-btn" type="button" (click)="onPlay()" aria-label="Play drill phrase">
+      <app-icon [name]="playIcon" [size]="18" />
+      Play
+    </button>
+
+    @if (speechRec.supported()) {
+      <app-record-button
+        [recording]="speechRec.state() === 'recording'"
+        (recordingToggled)="onRecordToggle()"
+      />
+    } @else {
+      <p class="no-speech-warning">Recording not available in this browser.</p>
+    }
+  </div>
+
+  @if (scoreResult()) {
+    <div class="score-result">
+      <app-progress-ring
+        [value]="displayScore()"
+        [size]="64"
+        role="meter"
+        [attr.aria-valuenow]="displayScore()"
+        aria-valuemax="100"
+        aria-label="Drill score"
+      />
+      <div class="score-details">
+        <span class="score-value">{{ displayScore() }}<span class="score-max">/100</span></span>
+        <p class="score-feedback">{{ scoreResult()!.feedback }}</p>
+        @if (scoreResult()!.perfectStreak > 0) {
+          <span class="streak-badge" aria-label="Perfect streak">
+            🔥 ×{{ scoreResult()!.perfectStreak }}
+          </span>
+        }
+      </div>
+    </div>
+  }
+</div>
