@@ -1,0 +1,72 @@
+<div class="analysis-panel">
+  <div class="ipa-block">
+    <span class="ipa-text">{{ result().ipa }}</span>
+    <span class="syllables-chip">{{ result().syllables }}</span>
+    <span class="stress-chip">{{ result().stressPattern }}</span>
+  </div>
+
+  @if (result().tips.length > 0) {
+    <section class="section">
+      <h3 class="section-title">
+        <app-icon [name]="lightbulbIcon" [size]="16" />
+        Tips
+      </h3>
+      <ul class="tips-list">
+        @for (tip of result().tips; track tip) {
+          <li>{{ tip }}</li>
+        }
+      </ul>
+    </section>
+  }
+
+  @if (result().commonMistakes.length > 0) {
+    <section class="section">
+      <h3 class="section-title">Common Mistakes</h3>
+      <ul class="tips-list">
+        @for (mistake of result().commonMistakes; track mistake) {
+          <li>{{ mistake }}</li>
+        }
+      </ul>
+    </section>
+  }
+
+  @if (result().minimalPairs.length > 0) {
+    <section class="section">
+      <h3 class="section-title">Minimal Pairs</h3>
+      <div class="minimal-pairs">
+        @for (pair of result().minimalPairs; track pair) {
+          <button
+            class="pair-pill"
+            type="button"
+            [attr.aria-label]="'Play ' + pair"
+            (click)="playText(pair)"
+          >
+            {{ pair }}
+            <app-icon [name]="playIcon" [size]="12" />
+          </button>
+        }
+      </div>
+    </section>
+  }
+
+  @if (result().exampleSentences.length > 0) {
+    <section class="section">
+      <h3 class="section-title">Example Sentences</h3>
+      <ul class="sentences-list">
+        @for (sentence of result().exampleSentences; track sentence) {
+          <li class="sentence-item">
+            <span>{{ sentence }}</span>
+            <button
+              class="play-icon-btn"
+              type="button"
+              [attr.aria-label]="'Play sentence: ' + sentence"
+              (click)="playText(sentence)"
+            >
+              <app-icon [name]="playIcon" [size]="14" />
+            </button>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+</div>

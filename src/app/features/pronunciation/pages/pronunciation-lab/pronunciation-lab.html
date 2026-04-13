@@ -1,0 +1,69 @@
+<div class="pronunciation-lab">
+  <header class="lab-header">
+    <h1 class="lab-title">Pronunciation Lab</h1>
+    <nav class="lab-tabs" aria-label="Pronunciation modes">
+      <a
+        routerLink="/pronunciation"
+        class="tab-link"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        >Analysis</a
+      >
+      <a routerLink="/pronunciation/drills" class="tab-link" routerLinkActive="active">Drills</a>
+      <a routerLink="/pronunciation/mini-conversation" class="tab-link" routerLinkActive="active"
+        >Mini-Conversation</a
+      >
+    </nav>
+  </header>
+
+  <form class="analyze-form" [formGroup]="form" (ngSubmit)="onAnalyze()">
+    <div class="form-row">
+      <input
+        class="text-input"
+        type="text"
+        formControlName="text"
+        placeholder="Type a word or phrase to analyze..."
+        aria-label="Word or phrase to analyze"
+      />
+      <select class="level-select" formControlName="level" aria-label="CEFR level">
+        @for (lvl of levels; track lvl.value) {
+          <option [value]="lvl.value">{{ lvl.label }}</option>
+        }
+      </select>
+    </div>
+    <button
+      class="analyze-btn"
+      type="submit"
+      [disabled]="form.invalid || state.isAnalyzing()"
+      aria-label="Analyze pronunciation"
+    >
+      @if (state.isAnalyzing()) {
+        <span class="spinner" aria-hidden="true"></span>
+        Analyzing...
+      } @else {
+        Analyze
+      }
+    </button>
+  </form>
+
+  @if (state.analysisError()) {
+    <p class="error-msg" role="alert">Something went wrong. Please try again.</p>
+  }
+
+  @if (state.analysisResult()) {
+    <div class="result-section">
+      <div class="result-actions">
+        <button
+          class="play-btn"
+          type="button"
+          (click)="onPlay()"
+          [disabled]="tts.speaking()"
+          aria-label="Play analyzed text with TTS"
+        >
+          ▶ Play
+        </button>
+      </div>
+      <app-analysis-panel [result]="state.analysisResult()!" />
+    </div>
+  }
+</div>

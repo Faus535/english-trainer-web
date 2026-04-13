@@ -37,6 +37,12 @@ export const routes: Routes = [
     title: 'Review',
   },
   {
+    path: 'pronunciation',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/pronunciation/pronunciation.routes').then((r) => r.pronunciationRoutes),
+  },
+  {
     path: 'profile',
     canActivate: [authGuard],
     loadComponent: () => import('./features/profile/profile').then((m) => m.Profile),

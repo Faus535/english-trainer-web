@@ -17,7 +17,16 @@ import { IdleWarningModal } from '../../shared/components/idle-warning-modal/idl
 import { Onboarding } from '../../shared/components/onboarding/onboarding';
 import { IdleService } from '../../core/services/idle.service';
 import { AuthService } from '../../core/services/auth.service';
-import { LucideIconData, House, Mic, Square, BookOpen, RotateCcw, Newspaper } from 'lucide-angular';
+import {
+  LucideIconData,
+  House,
+  Mic,
+  Square,
+  BookOpen,
+  RotateCcw,
+  Newspaper,
+  AudioWaveform,
+} from 'lucide-angular';
 
 interface NavTab {
   path: string;
@@ -58,6 +67,7 @@ export class Shell {
     { path: '/immerse', label: 'Immerse', icon: BookOpen },
     { path: '/article', label: 'Article', icon: Newspaper },
     { path: '/review', label: 'Review', icon: RotateCcw },
+    { path: '/pronunciation', label: 'Pronunciation', icon: AudioWaveform },
   ];
 
   constructor() {
