@@ -1,0 +1,55 @@
+.turn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.bubble {
+  max-width: 80%;
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.ai-bubble {
+  align-self: flex-start;
+  background: var(--color-surface-2, #f3f4f6);
+  border-bottom-left-radius: 0.25rem;
+}
+
+.user-bubble {
+  align-self: flex-end;
+  background: var(--color-primary-light, #eef2ff);
+  border-bottom-right-radius: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.word-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.word-span {
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.25rem;
+  font-size: 0.9375rem;
+
+  &.score-low {
+    background: rgba(239, 68, 68, 0.2);
+    color: #b91c1c;
+  }
+
+  &.score-mid {
+    background: rgba(245, 158, 11, 0.2);
+    color: #b45309;
+  }
+
+  &.score-ok {
+    background: rgba(34, 197, 94, 0.2);
+    color: #15803d;
+  }
+}

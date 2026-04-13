@@ -1,0 +1,37 @@
+<div class="turn">
+  <!-- AI prompt bubble -->
+  <div class="bubble ai-bubble">
+    {{ turn().prompt }}
+  </div>
+
+  <!-- User bubble — shown when turn has been evaluated -->
+  @if (turn().recognizedText !== null) {
+    <div class="bubble user-bubble">
+      <div class="word-highlights">
+        @for (word of recognizedWords; track $index) {
+          @if (wordFeedbackFor(word); as wf) {
+            <span
+              class="word-span"
+              [class]="scoreClass(wf.score)"
+              [attr.aria-label]="wordLabel(wf)"
+              >{{ word }}</span
+            >
+          } @else {
+            <span class="word-span">{{ word }}</span>
+          }
+        }
+      </div>
+
+      @if (turn().score !== null) {
+        <app-progress-ring
+          [value]="turn().score!"
+          [size]="40"
+          role="meter"
+          [attr.aria-valuenow]="turn().score"
+          aria-valuemax="100"
+          aria-label="Turn score"
+        />
+      }
+    </div>
+  }
+</div>

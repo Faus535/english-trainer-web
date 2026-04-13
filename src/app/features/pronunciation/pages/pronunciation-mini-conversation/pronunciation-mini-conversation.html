@@ -1,0 +1,97 @@
+<div class="mini-conversation">
+  <header class="lab-header">
+    <h1 class="lab-title">Pronunciation Lab</h1>
+    <nav class="lab-tabs" aria-label="Pronunciation modes">
+      <a
+        routerLink="/pronunciation"
+        class="tab-link"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        >Analysis</a
+      >
+      <a routerLink="/pronunciation/drills" class="tab-link" routerLinkActive="active">Drills</a>
+      <a routerLink="/pronunciation/mini-conversation" class="tab-link" routerLinkActive="active"
+        >Mini-Conversation</a
+      >
+    </nav>
+  </header>
+
+  @if (!state.miniConvId()) {
+    <!-- Start form -->
+    <form class="start-form" [formGroup]="startForm" (ngSubmit)="onStart()">
+      <h2 class="start-title">Start a Mini-Conversation</h2>
+
+      <div class="form-group">
+        <label class="form-label" for="focus-select">Focus area</label>
+        <select id="focus-select" class="form-select" formControlName="focus">
+          @for (f of focuses; track f.value) {
+            <option [value]="f.value">{{ f.label }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="level-select">Level</label>
+        <select id="level-select" class="form-select" formControlName="level">
+          @for (lvl of levels; track lvl.value) {
+            <option [value]="lvl.value">{{ lvl.label }}</option>
+          }
+        </select>
+      </div>
+
+      <button
+        class="start-btn"
+        type="submit"
+        [disabled]="startForm.invalid || state.miniConvStatus() === 'starting'"
+      >
+        @if (state.miniConvStatus() === 'starting') {
+          Starting...
+        } @else {
+          Start
+        }
+      </button>
+    </form>
+  } @else {
+    <!-- Conversation view -->
+    <div class="turns-list" aria-live="polite">
+      @for (turn of state.miniConvTurns(); track turn.id) {
+        <app-utterance-bubble [turn]="turn" />
+      }
+    </div>
+
+    @if (state.miniConvStatus() === 'evaluating') {
+      <p class="evaluating-msg">Evaluating your pronunciation...</p>
+    }
+
+    @if (state.currentTurn() && state.miniConvStatus() !== 'complete') {
+      <div class="action-bar">
+        <div class="target-phrase">
+          <span class="target-label">Say:</span>
+          <strong>{{ state.currentTurn()!.targetPhrase }}</strong>
+        </div>
+
+        <div class="action-buttons">
+          <button
+            class="play-btn"
+            type="button"
+            (click)="onPlay()"
+            [disabled]="tts.speaking()"
+            aria-label="Play target phrase"
+          >
+            ▶ Play
+          </button>
+
+          @if (speechRec.supported()) {
+            <app-record-button
+              [recording]="speechRec.state() === 'recording'"
+              [attr.aria-disabled]="state.miniConvStatus() === 'evaluating'"
+              (recordingToggled)="onRecordToggle()"
+            />
+          } @else {
+            <p class="no-speech-warning">Recording not available in this browser.</p>
+          }
+        </div>
+      </div>
+    }
+  }
+</div>
