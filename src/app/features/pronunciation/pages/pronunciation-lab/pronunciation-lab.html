@@ -57,13 +57,32 @@
           class="play-btn"
           type="button"
           (click)="onPlay()"
-          [disabled]="tts.speaking()"
+          [disabled]="tts.speaking() || !state.analysisResult()"
           aria-label="Play analyzed text with TTS"
         >
           ▶ Play
         </button>
+
+        @if (speechRec.supported()) {
+          <app-record-button
+            [recording]="speechRec.state() === 'recording'"
+            [attr.aria-disabled]="state.isAnalyzing()"
+            (recordingToggled)="onRecordToggle()"
+          />
+        } @else {
+          <p class="no-speech-warning">Recording not available in this browser.</p>
+        }
       </div>
+
       <app-analysis-panel [result]="state.analysisResult()!" />
     </div>
+  }
+
+  @if (state.isFeedbackLoading()) {
+    <p class="feedback-loading">Analyzing your pronunciation...</p>
+  }
+
+  @if (state.feedbackResult()) {
+    <app-feedback-panel [result]="state.feedbackResult()!" />
   }
 </div>

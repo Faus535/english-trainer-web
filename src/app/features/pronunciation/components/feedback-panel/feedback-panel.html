@@ -1,0 +1,32 @@
+<div class="feedback-panel">
+  <div class="score-header">
+    <app-progress-ring
+      [value]="result().score"
+      [size]="72"
+      role="meter"
+      [attr.aria-valuenow]="result().score"
+      aria-valuemax="100"
+      aria-label="Pronunciation score"
+    />
+    <div class="score-info">
+      <span class="score-number">{{ result().score }}<span class="score-max">/100</span></span>
+      <span class="score-label">Pronunciation Score</span>
+    </div>
+  </div>
+
+  @if (result().wordFeedback.length > 0) {
+    <div class="word-highlights">
+      @for (wf of result().wordFeedback; track wf.word) {
+        <span class="word-span" [class]="scoreClass(wf.score)" [attr.aria-label]="scoreLabel(wf)">{{
+          wf.word
+        }}</span>
+      }
+    </div>
+  }
+
+  @if (result().overallTip) {
+    <blockquote class="overall-tip">
+      {{ result().overallTip }}
+    </blockquote>
+  }
+</div>

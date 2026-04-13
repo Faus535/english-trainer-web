@@ -1,0 +1,71 @@
+.feedback-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.score-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.score-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.score-number {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.score-max {
+  font-size: 1rem;
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.score-label {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.word-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.word-span {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+  font-weight: 500;
+
+  &.score-low {
+    background: rgba(239, 68, 68, 0.15);
+    color: #b91c1c;
+  }
+
+  &.score-mid {
+    background: rgba(245, 158, 11, 0.15);
+    color: #b45309;
+  }
+
+  &.score-ok {
+    background: rgba(34, 197, 94, 0.15);
+    color: #15803d;
+  }
+}
+
+.overall-tip {
+  margin: 0;
+  padding: 0.875rem 1rem;
+  border-left: 3px solid var(--color-primary, #6366f1);
+  background: var(--color-surface-2, #f3f4f6);
+  border-radius: 0 0.5rem 0.5rem 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--color-text, #111827);
+}

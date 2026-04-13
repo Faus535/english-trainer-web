@@ -1,0 +1,16 @@
+<button
+  class="record-btn"
+  type="button"
+  [class.recording]="recording()"
+  [attr.aria-label]="recording() ? 'Stop recording' : 'Start recording'"
+  [attr.aria-pressed]="recording()"
+  (click)="onToggle()"
+>
+  @if (recording()) {
+    <app-icon [name]="micOffIcon" [size]="20" />
+    <span aria-live="polite" class="sr-only">Recording started</span>
+  } @else {
+    <app-icon [name]="micIcon" [size]="20" />
+    <span aria-live="polite" class="sr-only">Recording stopped</span>
+  }
+</button>
